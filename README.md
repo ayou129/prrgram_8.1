@@ -1,3 +1,13 @@
+git remote -v
+{
+   origin: 自己的 Forked 仓库
+   upstream: 指向原始骨架项目的仓库
+   pw: 指向gitee自己的仓库
+}
+
+## 合并原始项目代码
+git merge upstream/master
+
 # Introduction
 
 This is a skeleton application using the Hyperf framework. This application is meant to be used as a starting place for those looking to get their feet wet with Hyperf Framework.
