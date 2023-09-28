@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Model;
@@ -25,22 +29,16 @@ class SysSmsRecord extends BaseModel
 {
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected $table = 'sys_sms_record';
+    protected ?string $table = 'sys_sms_record';
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
-    protected $fillable = ['id', 'platform_id', 'phone', 'content', 'send_ip', 'template', 'result_code', 'record_id', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'platform_id', 'phone', 'content', 'send_ip', 'template', 'result_code', 'record_id', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
-    protected $casts = ['id' => 'integer', 'result_code' => 'integer', 'record_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'result_code' => 'integer', 'record_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }

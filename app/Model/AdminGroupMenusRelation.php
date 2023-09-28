@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Model;
@@ -17,28 +21,22 @@ namespace App\Model;
  */
 class AdminGroupMenusRelation extends BaseModel
 {
-    public $incrementing = false;
+    public bool $incrementing = false;
 
-    protected $primaryKey = 'group_id';
+    protected string $primaryKey = 'group_id';
 
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected $table = 'admin_group_menus_relation';
+    protected ?string $table = 'admin_group_menus_relation';
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
-    protected $fillable = ['group_id', 'menu_id', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['group_id', 'menu_id', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
-    protected $casts = ['group_id' => 'integer', 'menu_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['group_id' => 'integer', 'menu_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }

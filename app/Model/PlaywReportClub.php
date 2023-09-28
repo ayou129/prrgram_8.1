@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Model;
@@ -23,10 +27,10 @@ use Hyperf\Utils\Collection;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
- * @property \Hyperf\Database\Model\Collection|PlaywReportClubGroup[] $groups
- * @property \Hyperf\Database\Model\Collection|PlaywReportClubOrder[] $orders
- * @property PlaywReportClubOrderStairPoint $stairPoint
- * @property \Hyperf\Database\Model\Collection|User[] $users
+ * @property null|\Hyperf\Database\Model\Collection|PlaywReportClubGroup[] $groups
+ * @property null|\Hyperf\Database\Model\Collection|User[] $users
+ * @property null|PlaywReportClubOrderStairPoint $stairPoint
+ * @property null|\Hyperf\Database\Model\Collection|PlaywReportClubOrder[] $orders
  */
 class PlaywReportClub extends BaseModel
 {
@@ -44,24 +48,18 @@ class PlaywReportClub extends BaseModel
 
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected $table = 'playw_report_club';
+    protected ?string $table = 'playw_report_club';
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
-    protected $fillable = ['id', 'u_id', 'leave_old_u_id', 'name', 'logo_url', 'auto_apply_boss_create', 'auto_apply_club_join', 'auto_apply_club_leave', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'u_id', 'leave_old_u_id', 'name', 'logo_url', 'auto_apply_boss_create', 'auto_apply_club_join', 'auto_apply_club_leave', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
-    protected $casts = ['id' => 'integer', 'u_id' => 'integer', 'leave_old_u_id' => 'integer', 'auto_apply_boss_create' => 'integer', 'auto_apply_club_join' => 'integer', 'auto_apply_club_leave' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'u_id' => 'integer', 'leave_old_u_id' => 'integer', 'auto_apply_boss_create' => 'integer', 'auto_apply_club_join' => 'integer', 'auto_apply_club_leave' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     public static function getAutoApplyBossArray()
     {

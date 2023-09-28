@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Service\Business\PlaywReport\Club;
@@ -21,6 +25,7 @@ use App\Service\Business\PlaywReport\CommonService;
 use App\Utils\Tools;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
+use Throwable;
 
 class ClubService extends CommonService
 {
@@ -178,7 +183,7 @@ class ClubService extends CommonService
 
             Db::commit();
             return $clubModel;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -261,7 +266,7 @@ class ClubService extends CommonService
             $user->save();
             Db::commit();
             return $clubModel;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -296,7 +301,7 @@ class ClubService extends CommonService
 
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }

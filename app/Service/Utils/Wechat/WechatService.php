@@ -2,14 +2,20 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Service\Utils\Wechat;
 
 use EasyWeChat\Factory;
+use Exception;
 use Hyperf\Guzzle\CoroutineHandler;
+use LogicException;
 
 /**
  * 微信服务.
@@ -41,12 +47,12 @@ abstract class WechatService
                     $this->app = Factory::work($this->getConfig());
                     break;
                 default:
-                    throw new \LogicException();
+                    throw new LogicException();
             }
             $app['guzzle_handler'] = CoroutineHandler::class;
             var_dump($app);
-        } catch (\Exception $e) {
-            throw new \LogicException($e->getMessage());
+        } catch (Exception $e) {
+            throw new LogicException($e->getMessage());
         }
     }
 

@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Model;
@@ -46,7 +50,7 @@ use App\Service\Utils\Redis\PlaywReport\McPlaywClubOrder;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
- * @property PlaywReportPlaywClubBoss $boss
+ * @property null|PlaywReportPlaywClubBoss $boss
  */
 class PlaywReportClubOrder extends BaseModel
 {
@@ -69,26 +73,20 @@ class PlaywReportClubOrder extends BaseModel
 
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected $table = 'playw_report_club_order';
+    protected ?string $table = 'playw_report_club_order';
 
-    protected $appends = ['status_text', 'jq_status_text', 'fd_status_text', 'club_group_method_text'];
+    protected array $appends = ['status_text', 'jq_status_text', 'fd_status_text', 'club_group_method_text'];
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
-    protected $fillable = ['id', 'club_id', 'u_id', 'z_u_id', 'club_group_method', 'club_group_id', 'club_group_name', 'project_id', 'project_name', 'club_boss_id', 'club_boss_wx_name', 'club_boss_wx_number', 'start_at', 'end_at', 'type', 'number', 'convert_number', 'pw_danjia_price', 'jiedan_price', 'jiedan_price_all', 'club_take_price', 'club_take_price_all', 'z_take_price', 'z_take_stair_point_discount_price', 'z_take_price_all', 'price_takes', 'price_takes_all', 'price', 'price_all', 'status', 'jq_status', 'fd_status', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'club_id', 'u_id', 'z_u_id', 'club_group_method', 'club_group_id', 'club_group_name', 'project_id', 'project_name', 'club_boss_id', 'club_boss_wx_name', 'club_boss_wx_number', 'start_at', 'end_at', 'type', 'number', 'convert_number', 'pw_danjia_price', 'jiedan_price', 'jiedan_price_all', 'club_take_price', 'club_take_price_all', 'z_take_price', 'z_take_stair_point_discount_price', 'z_take_price_all', 'price_takes', 'price_takes_all', 'price', 'price_all', 'status', 'jq_status', 'fd_status', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
-    protected $casts = ['id' => 'integer', 'club_id' => 'integer', 'u_id' => 'integer', 'z_u_id' => 'integer', 'club_group_method' => 'integer', 'club_group_id' => 'integer', 'project_id' => 'integer', 'club_boss_id' => 'integer', 'type' => 'integer', 'number' => 'integer', 'convert_number' => 'integer', 'pw_danjia_price' => 'integer', 'jiedan_price' => 'integer', 'jiedan_price_all' => 'integer', 'status' => 'integer', 'jq_status' => 'integer', 'fd_status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'club_id' => 'integer', 'u_id' => 'integer', 'z_u_id' => 'integer', 'club_group_method' => 'integer', 'club_group_id' => 'integer', 'project_id' => 'integer', 'club_boss_id' => 'integer', 'type' => 'integer', 'number' => 'integer', 'convert_number' => 'integer', 'pw_danjia_price' => 'integer', 'jiedan_price' => 'integer', 'jiedan_price_all' => 'integer', 'status' => 'integer', 'jq_status' => 'integer', 'fd_status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     public static function getStatusArray(): array
     {

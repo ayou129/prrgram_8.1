@@ -2,13 +2,18 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Model;
 
 use App\Utils\Tools;
+use Exception;
 use Hyperf\Database\Model\SoftDeletes;
 use Hyperf\DbConnection\Db;
 
@@ -23,7 +28,7 @@ class BaseModel extends Model
 
     public const DELETED_AT = 'deleted_at';
 
-    public $timestamps = true;
+    public bool $timestamps = true;
 
     /**
      * 兼容类：获取器.
@@ -123,7 +128,7 @@ class BaseModel extends Model
             $updateSql = rtrim($updateSql, ', ') . ' WHERE `' . $referenceColumn . '` IN (' . $whereIn . ')';
             // var_dump($updateSql);
             return Db::update($updateSql, $bindings);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }

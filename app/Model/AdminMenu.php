@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Model;
@@ -28,24 +32,18 @@ class AdminMenu extends BaseModel
 {
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected $table = 'admin_menu';
+    protected ?string $table = 'admin_menu';
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
-    protected $fillable = ['id', 'pid', 'title', 'icon', 'path', 'component', 'name', 'redirect', 'always_show', 'index', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'pid', 'title', 'icon', 'path', 'component', 'name', 'redirect', 'always_show', 'index', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
-    protected $casts = ['id' => 'integer', 'pid' => 'integer', 'always_show' => 'integer', 'index' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'pid' => 'integer', 'always_show' => 'integer', 'index' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     public function children()
     {

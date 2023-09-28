@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Model;
@@ -25,32 +29,26 @@ namespace App\Model;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
- * @property bool $cache
- * @property bool $hidden
- * @property bool $is_frame
+ * @property bool|mixed $hidden
+ * @property bool|mixed $is_frame
+ * @property bool|mixed $cache
  */
 class SysMenu extends BaseModel
 {
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected $table = 'sys_menu';
+    protected ?string $table = 'sys_menu';
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
-    protected $fillable = ['id', 'pid', 'sub_count', 'type', 'title', 'name', 'component', 'menu_sort', 'icon', 'path', 'is_frame', 'cache', 'hidden', 'permission', 'create_by', 'update_by', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'pid', 'sub_count', 'type', 'title', 'name', 'component', 'menu_sort', 'icon', 'path', 'is_frame', 'cache', 'hidden', 'permission', 'create_by', 'update_by', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
-    protected $casts = ['id' => 'integer', 'pid' => 'integer', 'sub_count' => 'integer', 'type' => 'integer', 'menu_sort' => 'integer', 'is_frame' => 'integer', 'cache' => 'integer', 'hidden' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'pid' => 'integer', 'sub_count' => 'integer', 'type' => 'integer', 'menu_sort' => 'integer', 'is_frame' => 'integer', 'cache' => 'integer', 'hidden' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     public function setHiddenAttribute($val)
     {

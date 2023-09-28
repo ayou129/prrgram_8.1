@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Service\Business\PlaywReport\Boss;
@@ -18,6 +22,7 @@ use App\Service\Business\PlaywReport\Apply\ApplyService;
 use App\Service\Business\PlaywReport\CommonService;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
+use Throwable;
 
 class BossService extends CommonService
 {
@@ -69,7 +74,7 @@ class BossService extends CommonService
 
             Db::commit();
             return $models->paginate((int) $request->input('size', 10));
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -86,7 +91,7 @@ class BossService extends CommonService
 
             Db::commit();
             return $model->toArray();
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -124,7 +129,7 @@ class BossService extends CommonService
 
             Db::commit();
             return $model->toArray();
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -152,7 +157,7 @@ class BossService extends CommonService
 
             Db::commit();
             return $playwBossModel;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -187,14 +192,14 @@ class BossService extends CommonService
                 try {
                     // 防止内部出错，导致外部无法回滚
                     ApplyService::applyPass($applyModel, $user->id);
-                } catch (\Throwable $ex) {
+                } catch (Throwable $ex) {
                     throw $ex;
                 }
             }
 
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -214,7 +219,7 @@ class BossService extends CommonService
             throw new ServiceException(ServiceCode::ERROR, [], 400, [], '请尝试编辑');
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }

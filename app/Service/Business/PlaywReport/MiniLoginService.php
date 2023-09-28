@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Service\Business\PlaywReport;
@@ -16,9 +20,11 @@ use App\Service\Business\UserService;
 use App\Utils\Tools;
 use EasyWeChat\Factory;
 use EasyWeChat\Kernel\Exceptions\InvalidConfigException;
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
+use Throwable;
 
 class MiniLoginService
 {
@@ -64,10 +70,10 @@ class MiniLoginService
             }
         } catch (InvalidConfigException $ie) {
             var_dump($ie->getMessage());
-            throw new \Exception($ie->getMessage());
+            throw new Exception($ie->getMessage());
         } catch (GuzzleException $ge) {
             var_dump($ge->getMessage());
-            throw new \Exception($ge->getMessage());
+            throw new Exception($ge->getMessage());
         }
         $phone = $wxPhoneResult['phone_info']['purePhoneNumber'];
         //        $phone = '15622535674';
@@ -116,7 +122,7 @@ class MiniLoginService
 
             Db::commit();
             return $tokenInfo;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }

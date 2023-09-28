@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Service\Business\Wuliu\SeaWaybill;
@@ -25,7 +29,9 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class SeaWaybillService
 {
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     public function createSeaWaybill($items)
     {

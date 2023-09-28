@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Exception;
@@ -18,7 +22,10 @@ use Hyperf\HttpMessage\Exception\HttpException;
 use Hyperf\HttpMessage\Stream\SwooleStream;
 use Hyperf\Logger\Logger;
 use Hyperf\Validation\ValidationException;
+use LogicException;
 use Psr\Http\Message\ResponseInterface;
+use RuntimeException;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -34,7 +41,7 @@ class Handler extends ExceptionHandler
         $this->logger = $logger;
     }
 
-    public function handle(\Throwable $throwable, ResponseInterface $response): ResponseInterface
+    public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {
         // $this->logger->debug($this->formatter->format($throwable));
         // $this->logger->error($throwable->getTraceAsString());
@@ -59,9 +66,9 @@ class Handler extends ExceptionHandler
                 $result['data'] = method_exists($throwable, 'getResponseData') ? $throwable->getResponseData() : [];
                 $httpCode = $throwable->getStatusCode() ?? $httpCode;
                 break;
-            case $throwable instanceof \RuntimeException:
+            case $throwable instanceof RuntimeException:
                 break;
-            case $throwable instanceof \LogicException:
+            case $throwable instanceof LogicException:
             default:
                 $httpCode = 500;
                 break;
@@ -89,7 +96,7 @@ class Handler extends ExceptionHandler
             ->withBody(new SwooleStream($result));
     }
 
-    public function isValid(\Throwable $throwable): bool
+    public function isValid(Throwable $throwable): bool
     {
         return true;
     }

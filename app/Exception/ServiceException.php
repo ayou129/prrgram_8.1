@@ -2,14 +2,20 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Exception;
 
 use App\Constant\ServiceCode;
 use Hyperf\HttpMessage\Exception\HttpException;
+use ReflectionClass;
+use Throwable;
 
 class ServiceException extends HttpException
 {
@@ -21,11 +27,11 @@ class ServiceException extends HttpException
         $http_code = 400,
         $response_data = [],
         $custom_msg = '',
-        \Throwable $previous = null
+        Throwable $previous = null
     ) {
         $this->response_data = $response_data;
         if (! $custom_msg) {
-            $class = new \ReflectionClass(ServiceCode::class);
+            $class = new ReflectionClass(ServiceCode::class);
             $staticProperties = $class->getConstants();
             foreach ($staticProperties as $propertyName => $value) {
                 if ($const_scene_key === $value) {

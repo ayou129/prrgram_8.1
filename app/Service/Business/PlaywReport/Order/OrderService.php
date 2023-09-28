@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Service\Business\PlaywReport\Order;
@@ -20,6 +24,7 @@ use App\Service\Business\PlaywReport\Project\ProjectManager;
 use App\Service\Business\PlaywReport\StairPoint\StairPointService;
 use App\Utils\Tools;
 use Hyperf\DbConnection\Db;
+use Throwable;
 
 class OrderService extends CommonService implements OrderInterface
 {
@@ -325,7 +330,7 @@ class OrderService extends CommonService implements OrderInterface
             $model->save();
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -355,7 +360,7 @@ class OrderService extends CommonService implements OrderInterface
             $model->delete();
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -371,7 +376,7 @@ class OrderService extends CommonService implements OrderInterface
 
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -419,7 +424,7 @@ class OrderService extends CommonService implements OrderInterface
 
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -443,7 +448,7 @@ class OrderService extends CommonService implements OrderInterface
 
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }

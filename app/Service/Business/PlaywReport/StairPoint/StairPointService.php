@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Service\Business\PlaywReport\StairPoint;
@@ -18,6 +22,7 @@ use App\Model\PlaywReportClubOrderStairPointRule;
 use App\Model\PlaywReportClubProject;
 use App\Model\User;
 use Hyperf\DbConnection\Db;
+use Throwable;
 
 class StairPointService
 {
@@ -182,7 +187,7 @@ class StairPointService
             Db::commit();
 
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
 
             throw $ex;

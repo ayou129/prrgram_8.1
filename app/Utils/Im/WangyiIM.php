@@ -2,11 +2,17 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Utils\Im;
+
+use LogicException;
 
 class WangyiIM
 {
@@ -180,7 +186,7 @@ class WangyiIM
     public function fail($response_code, array $modify_response = [], string $callback_ext = ''): array
     {
         if (20000 > $response_code || $response_code < 20099) {
-            throw new \LogicException('faild $response_code值有误');
+            throw new LogicException('faild $response_code值有误');
         }
         return [
             'errCode' => self::FAIL,

@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Service\Business\PlaywReport;
@@ -24,6 +28,7 @@ use App\Service\Business\PlaywReport\Order\OrderService;
 use App\Service\Utils\Redis\Redis;
 use App\Utils\Tools;
 use Hyperf\DbConnection\Db;
+use Throwable;
 
 class PlaywService extends CommonService
 {
@@ -240,7 +245,7 @@ class PlaywService extends CommonService
 
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -267,7 +272,7 @@ class PlaywService extends CommonService
 
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -356,7 +361,7 @@ class PlaywService extends CommonService
                 'club_stair_point_rule_type_array' => Tools::convertModelArrayToJsComponentOptions(PlaywReportClubOrderStairPointRule::getTypeArray()),
                 'options_order_page_show_zplayw_share_btn' => $options_order_page_show_zplayw_share_btn,
             ];
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -412,7 +417,7 @@ class PlaywService extends CommonService
 
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -445,7 +450,7 @@ class PlaywService extends CommonService
 
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -467,7 +472,7 @@ class PlaywService extends CommonService
 
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -496,7 +501,7 @@ class PlaywService extends CommonService
 
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -523,7 +528,7 @@ class PlaywService extends CommonService
 
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -553,7 +558,7 @@ class PlaywService extends CommonService
 
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -651,7 +656,7 @@ class PlaywService extends CommonService
 
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -691,7 +696,7 @@ class PlaywService extends CommonService
 
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -715,7 +720,7 @@ class PlaywService extends CommonService
 
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -727,7 +732,7 @@ class PlaywService extends CommonService
      * @param mixed $params
      * @param mixed $request
      * @return true
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function getClubAdminSetting($user, $params, $request)
     {
@@ -741,7 +746,7 @@ class PlaywService extends CommonService
 
             Db::commit();
             return $model->toArray();
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -753,7 +758,7 @@ class PlaywService extends CommonService
      * @param mixed $params
      * @param mixed $request
      * @return array
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function putClubAdminSetting($user, $params, $request)
     {
@@ -775,7 +780,7 @@ class PlaywService extends CommonService
             $model->save();
             Db::commit();
             return true;
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }

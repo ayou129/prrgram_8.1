@@ -2,13 +2,18 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Service\Utils\Redis\PlaywReport\MCStrategy;
 
 use Hyperf\Redis\Redis;
+use RedisException;
 
 abstract class MCStrategyAbstract
 {
@@ -182,7 +187,7 @@ abstract class MCStrategyAbstract
      * @param mixed $start
      * @param mixed $end
      * @return array|false|\Redis
-     * @throws \RedisException
+     * @throws RedisException
      */
     protected function zRangeByScore($key, $start, $end)
     {
@@ -198,7 +203,7 @@ abstract class MCStrategyAbstract
      * @param mixed $start
      * @param mixed $end
      * @return array|false|\Redis
-     * @throws \RedisException
+     * @throws RedisException
      */
     protected function zrange($key, $start, $end)
     {

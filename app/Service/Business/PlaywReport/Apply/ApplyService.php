@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Service\Business\PlaywReport\Apply;
@@ -12,6 +16,7 @@ use App\Model\PlaywReportApply;
 use App\Service\Business\PlaywReport\Boss\BossService;
 use App\Service\Business\PlaywReport\Club\ClubService;
 use App\Utils\Tools;
+use Exception;
 use Hyperf\Di\Annotation\Inject;
 
 class ApplyService
@@ -79,7 +84,7 @@ class ApplyService
                 BossService::bossCreateDone($applyModel->user, $applyModel->params);
                 break;
             default:
-                throw new \Exception('未知的申请类型$type:' . $applyModel->type);
+                throw new Exception('未知的申请类型$type:' . $applyModel->type);
         }
         return $applyModel;
     }
@@ -92,7 +97,11 @@ class ApplyService
         $applyModel->save();
     }
 
-    public function applyUpdate($user, $params, $request) {}
+    public function applyUpdate($user, $params, $request)
+    {
+    }
 
-    public function applyDelete($user, $params, $request) {}
+    public function applyDelete($user, $params, $request)
+    {
+    }
 }

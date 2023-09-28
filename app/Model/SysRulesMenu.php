@@ -2,34 +2,32 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Model;
 
 class SysRulesMenu extends BaseModel
 {
-    public $timestamps = false;
+    public bool $timestamps = false;
 
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected $table = 'sys_rules_menus';
+    protected ?string $table = 'sys_rules_menus';
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
-    protected $fillable = [];
+    protected array $fillable = [];
 
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
-    protected $casts = [];
+    protected array $casts = [];
 }

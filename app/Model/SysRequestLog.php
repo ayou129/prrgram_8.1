@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Model;
@@ -21,31 +25,25 @@ namespace App\Model;
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
  * @property mixed $headers
- * @property mixed $params
  * @property mixed $user_agent
+ * @property mixed $params
  */
 class SysRequestLog extends BaseModel
 {
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected $table = 'sys_request_log';
+    protected ?string $table = 'sys_request_log';
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
-    protected $fillable = ['id', 'method', 'path', 'headers', 'params', 'bodys', 'ip', 'user_agent', 'user_id', 'exception_trace', 'exception_otherinfo', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'method', 'path', 'headers', 'params', 'bodys', 'ip', 'user_agent', 'user_id', 'exception_trace', 'exception_otherinfo', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
-    protected $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     public function setHeadersAttribute($val)
     {

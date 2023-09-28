@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Service\Business\User;
@@ -12,6 +16,7 @@ use App\Constant\ServiceCode;
 use App\Exception\ServiceException;
 use App\Model\UserAddress as UserAddressModel;
 use Hyperf\DbConnection\Db;
+use Throwable;
 
 class UserAddressService
 {
@@ -60,7 +65,7 @@ class UserAddressService
             $model->save();
             Db::commit();
             return true;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Db::rollBack();
             throw $e;
         }
@@ -91,7 +96,7 @@ class UserAddressService
             $model->save();
             Db::commit();
             return true;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Db::rollBack();
             throw $e;
         }
@@ -112,7 +117,7 @@ class UserAddressService
 
             Db::commit();
             return true;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Db::rollBack();
             throw $e;
         }

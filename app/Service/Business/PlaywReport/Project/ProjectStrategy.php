@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Service\Business\PlaywReport\Project;
@@ -12,6 +16,7 @@ use App\Model\PlaywReportClubProject;
 use App\Model\User;
 use App\Service\Business\PlaywReport\StairPoint\StairPointService;
 use App\Utils\Tools;
+use Exception;
 
 class ProjectStrategy implements ProjectInterface
 {
@@ -34,7 +39,7 @@ class ProjectStrategy implements ProjectInterface
             case PlaywReportClubProject::PRICE_METHOD_DOUBLE:
                 return (float) Tools::mul($project->price_method_double, $user->playw_report_club_jiedan_price);
             default:
-                throw new \Exception('不支持的$project->price_method' . $project->price_method);
+                throw new Exception('不支持的$project->price_method' . $project->price_method);
         }
     }
 
@@ -48,7 +53,7 @@ class ProjectStrategy implements ProjectInterface
                 $val = (float) Tools::mul($project->club_take_method_ratio, $this->getPrice(...func_get_args()));
                 break;
             default:
-                throw new \Exception('不支持的$project->club_take_method' . $project->club_take_method);
+                throw new Exception('不支持的$project->club_take_method' . $project->club_take_method);
         }
         # 特殊情况，如果是多倍，则抽成也翻倍
         //        if ($project->price_method === PlaywReportClubProject::PRICE_METHOD_DOUBLE) {
@@ -78,7 +83,7 @@ class ProjectStrategy implements ProjectInterface
                 $val = (float) Tools::mul($project->z_take_method_ratio, $price);
                 break;
             default:
-                throw new \Exception('不支持的$project->z_take_method' . $project->z_take_method);
+                throw new Exception('不支持的$project->z_take_method' . $project->z_take_method);
         }
         # 特殊情况，如果是多倍，则抽成也翻倍
         //        if ($project->price_method === PlaywReportClubProject::PRICE_METHOD_DOUBLE) {

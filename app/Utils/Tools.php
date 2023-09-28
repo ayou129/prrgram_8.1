@@ -2,16 +2,22 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Utils;
 
+use Exception;
 use Hyperf\Logger\Logger;
 use Hyperf\ModelCache\Config;
 use Hyperf\Utils\ApplicationContext;
 use Illuminate\Support\Facades\Log;
+use LogicException;
 
 class Tools
 {
@@ -28,7 +34,7 @@ class Tools
     public static function encrypt($plaintext, $cipher = 'aes-128-ecb')
     {
         if (! in_array($cipher, openssl_get_cipher_methods())) {
-            throw new \LogicException('error openssl method');
+            throw new LogicException('error openssl method');
         }
         // $key以前应该以加密安全的方式生成，例如openssl_random_pseudo_bytes
         // $key should have been previously generated in a cryptographically safe way, like openssl_random_pseudo_bytes
@@ -38,7 +44,7 @@ class Tools
         // $iv = config('main.encrypt.iv');
         try {
             return openssl_encrypt($plaintext, $cipher, $key);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Logger::error('解密失败：' . $e->getMessage());
             return false;
         }
@@ -47,13 +53,13 @@ class Tools
     public static function decrypt($ciphertext, $cipher = 'aes-128-ecb')
     {
         if (! in_array($cipher, openssl_get_cipher_methods())) {
-            throw new \LogicException('error openssl method');
+            throw new LogicException('error openssl method');
         }
         try {
             $key = config('main.encrypt.default.key');
             $key = hex2bin($key);
             return openssl_decrypt($ciphertext, $cipher, $key);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('解密失败：' . $e->getMessage());
             return false;
         }
@@ -109,7 +115,7 @@ class Tools
                     // var_dump($paramsArray[$key], $key);
                     $value = substr((string) $value, 0, 10);
                     $value = date('Y-m-d H:i:s', (int) $value);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     var_dump($e->getMessage());
                     continue;
                 }
@@ -148,7 +154,7 @@ class Tools
             // var_dump($last_date_timestamp_getdate['year'], $this_date_timestamp_getdate['year']);
             // var_dump($last_date_timestamp_getdate['mon'], $this_date_timestamp_getdate['mon']);
             // var_dump($last_date_timestamp_getdate['mday'], $this_date_timestamp_getdate['mday']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw $e;
         }
         return false;

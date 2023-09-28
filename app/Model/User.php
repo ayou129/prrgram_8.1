@@ -2,15 +2,18 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Model;
 
 use App\Service\Utils\Redis\PlaywReport\McUser;
 use Hyperf\Utils\Collection;
-use HyperfExt\Jwt\Contracts\JwtSubjectInterface;
 
 /**
  * @property int $id
@@ -39,18 +42,18 @@ use HyperfExt\Jwt\Contracts\JwtSubjectInterface;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
- * @property \Hyperf\Database\Model\Collection|PlaywReportPlaywClubBoss[] $boss
- * @property PlaywReportClub $club
- * @property PlaywReportApply $clubJoinApply
- * @property PlaywReportApply $clubLeaveApply
- * @property mixed $label
- * @property mixed $onshow
- * @property UserPlatform $platform
- * @property \Hyperf\Database\Model\Collection|UserPlatform[] $platforms
  * @property mixed $birthday
  * @property mixed $social_id
+ * @property mixed $label
+ * @property mixed $onshow
+ * @property null|UserPlatform $platform
+ * @property null|\Hyperf\Database\Model\Collection|UserPlatform[] $platforms
+ * @property null|\Hyperf\Database\Model\Collection|PlaywReportPlaywClubBoss[] $boss
+ * @property null|PlaywReportClub $club
+ * @property null|PlaywReportApply $clubJoinApply
+ * @property null|PlaywReportApply $clubLeaveApply
  */
-class User extends BaseModel implements JwtSubjectInterface
+class User extends BaseModel
 {
     public const PLAYW_REPORT_CLUB_ADMIN_DEFAULT = 0;
 
@@ -60,28 +63,22 @@ class User extends BaseModel implements JwtSubjectInterface
 
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected $table = 'user';
+    protected ?string $table = 'user';
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
-    protected $fillable = ['id', 'phone', 'wx_unionid', 'password', 'real_name', 'nickname', 'avatar_image_id', 'gender', 'birthday', 'constellation', 'city', 'province', 'country', 'status', 'playw_report_playwname', 'playw_report_club_jiedan_price', 'playw_report_club_id', 'playw_report_club_join_at', 'playw_report_club_admin', 'social_id', 'social_dazzle_nickname', 'social_signature', 'social_charm_value', 'social_magnate_value', 'social_noble_value', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'phone', 'wx_unionid', 'password', 'real_name', 'nickname', 'avatar_image_id', 'gender', 'birthday', 'constellation', 'city', 'province', 'country', 'status', 'playw_report_playwname', 'playw_report_club_jiedan_price', 'playw_report_club_id', 'playw_report_club_join_at', 'playw_report_club_admin', 'social_id', 'social_dazzle_nickname', 'social_signature', 'social_charm_value', 'social_magnate_value', 'social_noble_value', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
-    protected $casts = ['id' => 'integer', 'gender' => 'integer', 'status' => 'integer', 'playw_report_club_jiedan_price' => 'integer', 'playw_report_club_id' => 'integer', 'playw_report_club_admin' => 'integer', 'social_id' => 'integer', 'social_charm_value' => 'integer', 'social_magnate_value' => 'integer', 'social_noble_value' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'gender' => 'integer', 'status' => 'integer', 'playw_report_club_jiedan_price' => 'integer', 'playw_report_club_id' => 'integer', 'playw_report_club_admin' => 'integer', 'social_id' => 'integer', 'social_charm_value' => 'integer', 'social_magnate_value' => 'integer', 'social_noble_value' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
-    protected $hidden = ['password'];
+    protected array $hidden = ['password'];
 
-    protected $appends = ['playw_report_club_admin_text', 'label', 'onshow'];
+    protected array $appends = ['playw_report_club_admin_text', 'label', 'onshow'];
 
     public function getPlaywReportClubAdminArray()
     {

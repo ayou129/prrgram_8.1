@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Service\Business;
@@ -14,6 +18,7 @@ use App\Exception\ServiceException;
 use App\Model\User;
 use App\Model\UserLoginInfo;
 use App\Utils\Tools;
+use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use HyperfExt\Jwt\Jwt;
@@ -115,13 +120,15 @@ class UserService
             $userModel->save();
             $this->eventDispatcher->dispatch(new UserRegister($userModel));
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollback();
             throw $e;
         }
     }
 
-    public function wechatLogin($params) {}
+    public function wechatLogin($params)
+    {
+    }
 
     public function mobileLogin($mobile)
     {

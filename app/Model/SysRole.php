@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Model;
@@ -19,31 +23,25 @@ namespace App\Model;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
- * @property \Hyperf\Database\Model\Collection|SysDept[] $depts
- * @property \Hyperf\Database\Model\Collection|SysMenu[] $menus
+ * @property null|\Hyperf\Database\Model\Collection|SysMenu[] $menus
+ * @property null|\Hyperf\Database\Model\Collection|SysDept[] $depts
  */
 class SysRole extends BaseModel
 {
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected $table = 'sys_role';
+    protected ?string $table = 'sys_role';
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
-    protected $fillable = ['id', 'name', 'level', 'description', 'data_scope', 'create_by', 'update_by', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'name', 'level', 'description', 'data_scope', 'create_by', 'update_by', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
-    protected $casts = ['id' => 'integer', 'level' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'level' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     public function menus()
     {

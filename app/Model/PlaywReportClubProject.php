@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Model;
@@ -59,26 +63,20 @@ class PlaywReportClubProject extends BaseModel
 
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected $table = 'playw_report_club_project';
+    protected ?string $table = 'playw_report_club_project';
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
-    protected $fillable = ['id', 'club_id', 'name', 'type', 'price_method', 'price_method_fixed', 'price_method_double', 'club_take_method', 'club_take_method_fixed', 'club_take_method_ratio', 'z_take_method', 'z_take_method_fixed', 'z_take_method_ratio', 'convert', 'convert_number', 'index', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'club_id', 'name', 'type', 'price_method', 'price_method_fixed', 'price_method_double', 'club_take_method', 'club_take_method_fixed', 'club_take_method_ratio', 'z_take_method', 'z_take_method_fixed', 'z_take_method_ratio', 'convert', 'convert_number', 'index', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
-    protected $casts = ['id' => 'integer', 'club_id' => 'integer', 'type' => 'integer', 'price_method' => 'integer', 'price_method_double' => 'integer', 'club_take_method' => 'integer', 'z_take_method' => 'integer', 'convert' => 'integer', 'convert_number' => 'integer', 'index' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'club_id' => 'integer', 'type' => 'integer', 'price_method' => 'integer', 'price_method_double' => 'integer', 'club_take_method' => 'integer', 'z_take_method' => 'integer', 'convert' => 'integer', 'convert_number' => 'integer', 'index' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
-    protected $appends = ['type_text', 'price_method_text', 'club_take_method_text', 'z_take_method_text', 'convert_text'];
+    protected array $appends = ['type_text', 'price_method_text', 'club_take_method_text', 'z_take_method_text', 'convert_text'];
 
     public static function getTypeArray()
     {

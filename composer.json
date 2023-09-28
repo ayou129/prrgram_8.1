@@ -48,7 +48,9 @@
         "psr-4": {
             "App\\": "app/"
         },
-        "files": []
+        "files": [
+            "app/Kernel/Functions.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -70,6 +72,9 @@
             "rm -rf runtime/container"
         ],
         "test": "co-phpunit --prepend test/bootstrap.php -c phpunit.xml --colors=always",
+        "testt": "co-phpunit --prepend test/bootstrap.php test/Cases/ExampleTest.php -c phpunit.xml --colors=always",
+        "testp": "co-phpunit --prepend test/bootstrap.php test/Cases/PlaywReportTest/PlaywReportTest.php -c phpunit.xml --colors=always",
+        "php-cs-fixer": "php-cs-fixer --config=./.php_cs.php fix",
         "cs-fix": "php-cs-fixer fix $1",
         "analyse": "phpstan analyse --memory-limit 300M -l 0 -c phpstan.neon ./app ./config",
         "start": [

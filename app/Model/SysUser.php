@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Model;
@@ -28,10 +32,10 @@ namespace App\Model;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
- * @property SysDept $dept
- * @property bool $enabled
- * @property \Hyperf\Database\Model\Collection|SysJob[] $jobs
- * @property \Hyperf\Database\Model\Collection|SysRole[] $roles
+ * @property bool|mixed $enabled
+ * @property null|SysDept $dept
+ * @property null|\Hyperf\Database\Model\Collection|SysRole[] $roles
+ * @property null|\Hyperf\Database\Model\Collection|SysJob[] $jobs
  */
 class SysUser extends BaseModel
 {
@@ -41,26 +45,20 @@ class SysUser extends BaseModel
 
     /**
      * The table associated with the model.
-     *
-     * @var string
      */
-    protected $table = 'sys_user';
+    protected ?string $table = 'sys_user';
 
-    protected $hidden = ['password'];
+    protected array $hidden = ['password'];
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array
      */
-    protected $fillable = ['id', 'dept_id', 'username', 'password', 'token', 'token_expiretime', 'nick_name', 'gender', 'phone', 'email', 'avatar_name', 'avatar_path', 'is_admin', 'enabled', 'create_by', 'update_by', 'pwd_reset_time', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'dept_id', 'username', 'password', 'token', 'token_expiretime', 'nick_name', 'gender', 'phone', 'email', 'avatar_name', 'avatar_path', 'is_admin', 'enabled', 'create_by', 'update_by', 'pwd_reset_time', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
-     *
-     * @var array
      */
-    protected $casts = ['id' => 'integer', 'dept_id' => 'integer', 'is_admin' => 'integer', 'enabled' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'dept_id' => 'integer', 'is_admin' => 'integer', 'enabled' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     // public function authorities()
     // {
