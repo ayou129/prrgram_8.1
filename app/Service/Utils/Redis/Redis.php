@@ -1,0 +1,68 @@
+<?php
+
+declare(strict_types=1);
+/**
+ * @author liguoxin
+ * @email guoxinlee129@gmail.com
+ */
+
+namespace App\Service\Utils\Redis;
+
+use Hyperf\Utils\ApplicationContext;
+
+class Redis
+{
+    /**
+     * @var \Hyperf\Redis\Redis
+     */
+    protected $redis;
+
+    public function __construct()
+    {
+        $container = ApplicationContext::getContainer();
+        $this->redis = $container->get(\Hyperf\Redis\Redis::class);
+    }
+
+    public function getRedis()
+    {
+        return $this->redis;
+    }
+
+    public function setUserConsoleLog($params)
+    {
+        $data = [
+            'context' => $params['context'],
+        ];
+        // 存储到redis
+        if ($params['user_id']) {
+            $key = 'console_log|uid:' . (string) $params['user_id'];
+        } else {
+            $key = 'console_log|uip:' . (string) $params['ip'];
+        }
+        return $this->redis->hset($key, (string) microtime(true), json_encode($data));
+    }
+
+    public function getOptionsOrderPageShowZplaywShareBtn(): bool
+    {
+        $key = 'options|order_page_show_zplayw_share_btn';
+        $v = $this->redis->get($key);
+        //        var_dump($v);
+        if ($v === false) {
+            $this->redis->set($key, 1);
+            return true;
+        }
+        return (bool) $this->redis->get($key);
+    }
+
+    public function getOptionsForceUpdateUserPrivacyAgreement(): bool
+    {
+        $key = 'options|force_update_user_privacy_agreement';
+        $v = $this->redis->get($key);
+        //        var_dump($v);
+        if ($v === false) {
+            $this->redis->set($key, 0);
+            return true;
+        }
+        return (bool) $this->redis->get($key);
+    }
+}

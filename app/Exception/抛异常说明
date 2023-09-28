@@ -1,0 +1,9 @@
+异常分为
+    框架内部自带
+        http-message Exception
+        hyperf server Exception
+        ...
+    自建框架异常，方便拓展业务
+        App/Exception/*
+
+抛异常一律使用自建框架异常，可定制多语言、枚举类配合使用
