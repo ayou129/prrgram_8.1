@@ -11,5 +11,12 @@ declare(strict_types=1);
  */
 return [
     'http' => [
+        // Hyperf\SwooleTracker\Middleware\HookMallocMiddleware::class,
+        // Hyperf\SwooleTracker\Middleware\HttpServerMiddleware::class,
+
+        // App\Middleware\CorsMiddleware::class,
+        // App\Middleware\BaseMiddleware::class,
+        // App\Middleware\AuthMiddleware::class,
+        // Hyperf\Validation\Middleware\ValidationMiddleware::class,
     ],
 ];

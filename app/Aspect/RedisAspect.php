@@ -18,19 +18,14 @@ use Hyperf\Di\Aop\AbstractAspect;
 use Hyperf\Di\Aop\ProceedingJoinPoint;
 use Hyperf\Redis\RedisProxy;
 
-/**
- * @Aspect
- */
+#[Aspect]
 class RedisAspect extends AbstractAspect
 {
-    public $classes = [
+    public array $classes = [
         RedisProxy::class . '::__call',
     ];
 
-    /**
-     * @var StdoutLoggerInterface
-     */
-    protected $logger;
+    protected StdoutLoggerInterface $logger;
 
     public function __construct(StdoutLoggerInterface $logger)
     {

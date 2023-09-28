@@ -16,9 +16,9 @@ use Hyperf\Constants\AbstractConstants;
 use Hyperf\Constants\Annotation\Constants;
 
 /**
- * @Constants
  * @method getMessage(int $statusCode, array $statusCodeParams = [])
  */
+#[Constants]
 class ServiceCode extends AbstractConstants
 {
     # Base

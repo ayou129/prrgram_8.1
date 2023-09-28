@@ -26,7 +26,7 @@ return [
             'namespace' => 'App\\Command',
         ],
         'controller' => [
-            'namespace' => 'App\\Controller',
+            'namespace' => 'App\\Controller\v1',
         ],
         'job' => [
             'namespace' => 'App\\Job',
@@ -39,6 +39,9 @@ return [
         ],
         'Process' => [
             'namespace' => 'App\\Processes',
+        ],
+        'constant' => [
+            'namespace' => 'App\\Constant',
         ],
     ],
 ];

@@ -23,8 +23,8 @@ return [
         'collation' => env('DB_COLLATION', 'utf8_unicode_ci'),
         'prefix' => env('DB_PREFIX', ''),
         'pool' => [
-            'min_connections' => 1,
-            'max_connections' => 10,
+            'min_connections' => 100,
+            'max_connections' => 4500,
             'connect_timeout' => 10.0,
             'wait_timeout' => 3.0,
             'heartbeat' => -1,
@@ -34,7 +34,17 @@ return [
             'gen:model' => [
                 'path' => 'app/Model',
                 'force_casts' => true,
-                'inheritance' => 'Model',
+                'inheritance' => 'BaseModel',
+                'refresh_fillable' => true,
+                'uses' => '',
+                # App\Model\BaseModel
+                'visitors' => [
+                    Hyperf\Database\Commands\Ast\ModelRewriteKeyInfoVisitor::class,
+                    Hyperf\Database\Commands\Ast\ModelRewriteSoftDeletesVisitor::class,
+                    Hyperf\Database\Commands\Ast\ModelRewriteTimestampsVisitor::class,
+                    // Hyperf\Database\Commands\Ast\ModelRewriteGetterSetterVisitor::class,
+                    // Hyperf\Database\Commands\Ast\ModelUpdateVisitor::class,
+                ],
             ],
         ],
     ],

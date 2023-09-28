@@ -32,12 +32,12 @@ use Throwable;
 
 class PlaywService extends CommonService
 {
-    private $miniProgramService;
-
-    public function __construct()
-    {
-        $this->miniProgramService = new MiniLoginService();
-    }
+    // private $miniProgramService;
+    //
+    // public function __construct()
+    // {
+    //     $this->miniProgramService = new MiniLoginService();
+    // }
 
     public function getClubAdminPlaywToken($userModel, $params)
     {
