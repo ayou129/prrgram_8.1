@@ -19,7 +19,7 @@ use App\Model\SysRolesMenu as SysRolesMenus;
 use App\Model\SysUser;
 use Hyperf\HttpServer\Annotation\AutoController;
 
-#[AutoController]
+
 class RoleController extends AbstractController
 {
     public function getById(int $id)

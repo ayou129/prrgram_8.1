@@ -302,7 +302,7 @@ class WangyiIM
      * @param mixed $codeLen
      * @return $codeLen [验证码长度,范围4～10，默认为4]
      */
-    public function sendSmsCode($templateid, $mobile, $deviceId = '', $codeLen)
+    public function sendSmsCode($templateid, $mobile, $deviceId = '', $codeLen): array
     {
         $url = 'https://api.netease.im/sms/sendcode.action';
         $data = [

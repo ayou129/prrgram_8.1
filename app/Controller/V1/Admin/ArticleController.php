@@ -11,5 +11,5 @@ namespace App\Controller\V1\Admin;
 use App\Controller\AbstractController;
 use Hyperf\HttpServer\Annotation\AutoController;
 
-#[AutoController]
+
 class ArticleController extends AbstractController {}

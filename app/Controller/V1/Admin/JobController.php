@@ -14,7 +14,7 @@ use App\Exception\ServiceException;
 use App\Model\SysJob;
 use Hyperf\HttpServer\Annotation\AutoController;
 
-#[AutoController]
+
 class JobController extends AbstractController
 {
     public function list()

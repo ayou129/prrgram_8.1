@@ -15,7 +15,7 @@ use Hyperf\DbConnection\Db;
 use Hyperf\HttpMessage\Exception\HttpException;
 use Hyperf\HttpServer\Annotation\AutoController;
 
-#[AutoController]
+
 class ShipCompanyController extends AbstractController
 {
     public function list()

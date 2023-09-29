@@ -13,7 +13,7 @@ use App\Exception\ServiceException;
 use App\Model\PlaywReportClub;
 use Hyperf\HttpServer\Annotation\AutoController;
 
-#[AutoController]
+
 class UserController extends CommonController
 {
     public function registerAndLoginByPhone()

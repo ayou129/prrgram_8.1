@@ -15,7 +15,7 @@ use App\Model\WuliuSeaWaybill;
 use Hyperf\HttpMessage\Exception\HttpException;
 use Hyperf\HttpServer\Annotation\AutoController;
 
-#[AutoController]
+
 class SailScheduleController extends AbstractController
 {
     public function list()

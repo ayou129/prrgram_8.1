@@ -14,7 +14,7 @@ use App\Exception\ServiceException;
 use App\Model\SysConfig;
 use Hyperf\HttpServer\Annotation\AutoController;
 
-#[AutoController]
+
 class ConfigController extends AbstractController
 {
     public function list()

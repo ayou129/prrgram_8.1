@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Controller\V1\Business\PlaywReport;
@@ -21,13 +25,9 @@ use App\Service\Business\PlaywReport\Project\ProjectService;
 use App\Service\Utils\Redis\Redis;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
-use Hyperf\HttpServer\Annotation\AutoController;
 
 class CommonController extends AbstractController
 {
-    #[Inject]
-    protected PlaywService $playwService;
-
     #[Inject]
     protected OrderService $orderService;
 
@@ -45,6 +45,9 @@ class CommonController extends AbstractController
 
     #[Inject]
     protected MiniLoginService $miniLoginService;
+
+    #[Inject]
+    private PlaywService $playwService;
 
     public function getOptions()
     {

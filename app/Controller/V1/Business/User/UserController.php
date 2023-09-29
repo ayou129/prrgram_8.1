@@ -18,7 +18,7 @@ use Hyperf\HttpServer\Annotation\AutoController;
 use Hyperf\Snowflake\IdGeneratorInterface;
 use Hyperf\Validation\ValidationException;
 
-#[AutoController]
+
 class UserController
 {
     /**

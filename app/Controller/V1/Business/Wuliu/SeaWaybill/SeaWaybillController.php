@@ -25,7 +25,7 @@ use Hyperf\HttpServer\Annotation\AutoController;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Exception as ReaderExcetpion;
 
-#[AutoController]
+
 class SeaWaybillController extends AbstractController
 {
     /**

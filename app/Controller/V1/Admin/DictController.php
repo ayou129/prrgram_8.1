@@ -17,7 +17,7 @@ use App\Model\SysDictDetail;
 use App\Model\SysUser;
 use Hyperf\HttpServer\Annotation\AutoController;
 
-#[AutoController]
+
 class DictController extends AbstractController
 {
     public function list()

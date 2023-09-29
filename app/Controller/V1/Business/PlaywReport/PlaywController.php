@@ -15,7 +15,7 @@ use App\Model\PlaywReportClub;
 use App\Service\Business\PlaywReport\CommonService;
 use Hyperf\HttpServer\Annotation\AutoController;
 
-#[AutoController]
+
 class PlaywController extends CommonController
 {
     public function checkClubIdStatus()

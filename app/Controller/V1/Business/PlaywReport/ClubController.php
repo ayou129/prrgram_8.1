@@ -13,7 +13,7 @@ use App\Service\Business\PlaywReport\CommonService;
 use App\Service\Business\PlaywReport\StairPoint\StairPointService;
 use Hyperf\HttpServer\Annotation\AutoController;
 
-#[AutoController]
+
 class ClubController extends CommonController
 {
     public function postClubAdminAdd()

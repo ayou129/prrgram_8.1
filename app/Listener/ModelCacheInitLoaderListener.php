@@ -37,7 +37,7 @@ class ModelCacheInitLoaderListener implements ListenerInterface
         ];
     }
 
-    public function process(object $event)
+    public function process(object $event): void
     {
         $green = "\033[32m";
         $reset = "\033[0m";

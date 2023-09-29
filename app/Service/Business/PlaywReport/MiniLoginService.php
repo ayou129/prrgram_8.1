@@ -32,11 +32,8 @@ class MiniLoginService
 
     private int $platform;
 
-    /**
-     * @Inject
-     * @var UserService
-     */
-    private $userService;
+    #[Inject]
+    private UserService $userService;
 
     public function __construct()
     {

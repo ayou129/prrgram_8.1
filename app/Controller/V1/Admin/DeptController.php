@@ -16,7 +16,7 @@ use App\Model\SysDept;
 use App\Model\SysUser;
 use Hyperf\HttpServer\Annotation\AutoController;
 
-#[AutoController]
+
 class DeptController extends AbstractController
 {
     public function list()

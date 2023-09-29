@@ -14,7 +14,7 @@ use App\Model\WuliuSeaWaybill;
 use Hyperf\DbConnection\Db;
 use Hyperf\HttpServer\Annotation\AutoController;
 
-#[AutoController]
+
 class IndexController extends AbstractController
 {
     public function data()

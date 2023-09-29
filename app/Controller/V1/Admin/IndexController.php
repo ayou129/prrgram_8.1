@@ -15,7 +15,7 @@ use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\AutoController;
 use Hyperf\View\RenderInterface;
 
-#[AutoController]
+
 class IndexController extends BaseController
 {
     /**

@@ -18,7 +18,7 @@ use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpMessage\Exception\HttpException;
 use Hyperf\HttpServer\Annotation\AutoController;
 
-#[AutoController]
+
 class BillController extends AbstractController
 {
     /**

@@ -13,7 +13,7 @@ use App\Controller\AbstractController;
 use App\Model\SysRequestLog;
 use Hyperf\HttpServer\Annotation\AutoController;
 
-#[AutoController]
+
 class RequestLogController extends AbstractController
 {
     public function list()

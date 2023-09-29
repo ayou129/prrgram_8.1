@@ -10,5 +10,5 @@ namespace App\Controller\V1\Business\Shop\Order;
 
 use Hyperf\HttpServer\Annotation\AutoController;
 
-#[AutoController]
+
 class OrderController {}

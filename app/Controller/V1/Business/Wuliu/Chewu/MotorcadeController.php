@@ -16,7 +16,7 @@ use Hyperf\DbConnection\Db;
 use Hyperf\HttpMessage\Exception\HttpException;
 use Hyperf\HttpServer\Annotation\AutoController;
 
-#[AutoController]
+
 class MotorcadeController extends AbstractController
 {
     public function searchOptions()

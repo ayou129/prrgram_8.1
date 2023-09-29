@@ -51,7 +51,7 @@ class ModelCacheListener implements ListenerInterface
         ];
     }
 
-    public function process(object $event)
+    public function process(object $event): void
     {
         var_dump('in 模型Event');
         if (! $event instanceof Event) {

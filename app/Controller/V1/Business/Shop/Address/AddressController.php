@@ -18,7 +18,7 @@ use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\AutoController;
 use Hyperf\Validation\ValidationException;
 
-#[AutoController]
+
 class AddressController extends BaseController
 {
     /**
