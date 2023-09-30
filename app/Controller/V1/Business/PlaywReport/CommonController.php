@@ -47,7 +47,7 @@ class CommonController extends AbstractController
     protected MiniLoginService $miniLoginService;
 
     #[Inject]
-    private PlaywService $playwService;
+    protected PlaywService $playwService;
 
     public function getOptions()
     {

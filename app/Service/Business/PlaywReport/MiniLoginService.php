@@ -18,8 +18,10 @@ use App\Model\User;
 use App\Model\UserPlatform;
 use App\Service\Business\UserService;
 use App\Utils\Tools;
-use EasyWeChat\Factory;
+use EasyWeChat\Kernel\Exceptions\DecryptException;
+use EasyWeChat\Kernel\Exceptions\HttpException;
 use EasyWeChat\Kernel\Exceptions\InvalidConfigException;
+use EasyWeChat\MiniApp\Application;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Hyperf\DbConnection\Db;
@@ -33,7 +35,7 @@ class MiniLoginService
     private int $platform;
 
     #[Inject]
-    private UserService $userService;
+    protected UserService $userService;
 
     public function __construct()
     {
@@ -42,12 +44,31 @@ class MiniLoginService
         $this->config = [
             'app_id' => env('WX_MINIPROGRAM_APPID', ''),
             'secret' => env('WX_MINIPROGRAM_SECRET', ''),
-            // 下面为可选项
-            // 指定 API 调用返回结果的类型：array(default)/collection/object/raw/自定义类名
-            'response_type' => 'array',
-            'log' => [
-                'level' => 'debug',
-                'file' => __DIR__ . '/wechat.log',
+            'token' => env('WX_MINIPROGRAM_TOKEN', ''),
+            'aes_key' => env('WX_MINIPROGRAM_AES_KEY', ''),
+            /*
+             * 接口请求相关配置，超时时间等，具体可用参数请参考：
+             * https://github.com/symfony/symfony/blob/5.3/src/Symfony/Contracts/HttpClient/HttpClientInterface.php
+             */
+            'http' => [
+                'throw' => true,
+                // 状态码非 200、300 时是否抛出异常，默认为开启
+                'timeout' => 5.0,
+                // 'base_uri' => 'https://api.weixin.qq.com/', // 如果你在国外想要覆盖默认的 url 的时候才使用，根据不同的模块配置不同的 uri
+
+                'retry' => true,
+                // 使用默认重试配置
+                //  'retry' => [
+                //      // 仅以下状态码重试
+                //      'http_codes' => [429, 500]
+                //       // 最大重试次数
+                //      'max_retries' => 3,
+                //      // 请求间隔 (毫秒)
+                //      'delay' => 1000,
+                //      // 如果设置，每次重试的等待时间都会增加这个系数
+                //      // (例如. 首次:1000ms; 第二次: 3 * 1000ms; etc.)
+                //      'multiplier' => 3
+                //  ],
             ],
         ];
     }
@@ -58,17 +79,24 @@ class MiniLoginService
          * 注册(包括Login)则更新token
          */
         try {
-            $app = Factory::miniProgram($this->config);
-            $wxPhoneResult = $app->phone_number->getUserPhoneNumber($params['code']);
-            $wxResult = $app->auth->session($params['wx_login_code']);
+            /**
+             * wx_login_code wx.login的code.
+             * code、xx getPhoneNumber.
+             */
+            $app = new Application($this->config);
+            $utils = $app->getUtils();
+            $wxResult = $utils->codeToSession($params['wx_login_code']);
             //            var_dump($wxPhoneResult, $wxResult);
+
+            $wxPhoneResult = $utils->decryptSession($wxResult['session_key'], $params['iv'], $params['encryptedData']);
             if (! isset($wxPhoneResult['phone_info']['purePhoneNumber'])) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, $wxPhoneResult);
             }
-        } catch (InvalidConfigException $ie) {
+            var_dump($wxPhoneResult, $wxResult);
+        } catch (DecryptException $ie) {
             var_dump($ie->getMessage());
             throw new Exception($ie->getMessage());
-        } catch (GuzzleException $ge) {
+        } catch (HttpException $ge) {
             var_dump($ge->getMessage());
             throw new Exception($ge->getMessage());
         }

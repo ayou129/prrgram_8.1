@@ -13,7 +13,8 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Service\Utils\Redis\PlaywReport\McPlaywClub;
-use Hyperf\Utils\Collection;
+use Hyperf\Collection\Collection;
+use Hyperf\Paginator\Paginator;
 
 /**
  * @property int $id
@@ -54,26 +55,56 @@ class PlaywReportClub extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'u_id', 'leave_old_u_id', 'name', 'logo_url', 'auto_apply_boss_create', 'auto_apply_club_join', 'auto_apply_club_leave', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = [
+        'id',
+        'u_id',
+        'leave_old_u_id',
+        'name',
+        'logo_url',
+        'auto_apply_boss_create',
+        'auto_apply_club_join',
+        'auto_apply_club_leave',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'u_id' => 'integer', 'leave_old_u_id' => 'integer', 'auto_apply_boss_create' => 'integer', 'auto_apply_club_join' => 'integer', 'auto_apply_club_leave' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = [
+        'id' => 'integer',
+        'u_id' => 'integer',
+        'leave_old_u_id' => 'integer',
+        'auto_apply_boss_create' => 'integer',
+        'auto_apply_club_join' => 'integer',
+        'auto_apply_club_leave' => 'integer',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
     public static function getAutoApplyBossArray()
     {
-        return [self::AUTO_APPLY_BOSS_CREATE_NO => '手动审批', self::AUTO_APPLY_BOSS_CREATE_YES => '自动审批'];
+        return [
+            self::AUTO_APPLY_BOSS_CREATE_NO => '手动审批',
+            self::AUTO_APPLY_BOSS_CREATE_YES => '自动审批',
+        ];
     }
 
     public static function getAutoApplyClubJoinArray()
     {
-        return [self::AUTO_APPLY_CLUB_JOIN_NO => '手动审批', self::AUTO_APPLY_CLUB_JOIN_YES => '自动审批'];
+        return [
+            self::AUTO_APPLY_CLUB_JOIN_NO => '手动审批',
+            self::AUTO_APPLY_CLUB_JOIN_YES => '自动审批',
+        ];
     }
 
     public static function getAutoApplyClubLeaveArray()
     {
-        return [self::AUTO_APPLY_CLUB_LEAVE_NO => '手动审批', self::AUTO_APPLY_CLUB_LEAVE_YES => '自动审批'];
+        return [
+            self::AUTO_APPLY_CLUB_LEAVE_NO => '手动审批',
+            self::AUTO_APPLY_CLUB_LEAVE_YES => '自动审批',
+        ];
     }
 
     public function groups()
@@ -104,7 +135,8 @@ class PlaywReportClub extends BaseModel
         if ($cache) {
             $model = (new self())->newInstance($cache, true);
         } else {
-            $model = (new self())->where('id', $k)->first();
+            $model = (new self())->where('id', $k)
+                ->first();
         }
         if ($model) {
             if (in_array('groups', $relations)) {
@@ -126,7 +158,8 @@ class PlaywReportClub extends BaseModel
         if ($cache) {
             $models = PlaywReportClubGroup::getCacheByIds($cache);
         } else {
-            $models = (new PlaywReportClubGroup())->where('club_id', $k)->get();
+            $models = (new PlaywReportClubGroup())->where('club_id', $k)
+                ->get();
         }
         if ($models) {
         }
@@ -143,6 +176,23 @@ class PlaywReportClub extends BaseModel
             $models = PlaywReportPlaywClubBoss::getCacheByIds($cache);
         } else {
             $models = new Collection([]);
+        }
+        if ($models) {
+        }
+        return $models;
+    }
+
+    public static function getCacheBossListPaginate($k, $relations = [], int $page = 1, int $limit = 10)
+    {
+        $redis = make(\Hyperf\Redis\Redis::class);
+        $mc = new McPlaywClub($redis);
+        $cache = $mc->getBossListSortCreatedAtByClubIdPaginate($k, $page, $limit);
+        //        var_dump($cache);
+        if ($cache) {
+            $data = PlaywReportPlaywClubBoss::getCacheByIds($cache['data']);
+            $models = new Paginator($data, $cache['per_page'], $cache['current_page']);
+        } else {
+            $models = new Paginator([]);
         }
         if ($models) {
         }

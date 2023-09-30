@@ -18,6 +18,7 @@ use App\Model\PlaywReportApply;
 use App\Model\PlaywReportClub;
 use App\Model\PlaywReportClubGroup;
 use App\Model\PlaywReportPlaywClubBoss;
+use App\Model\User;
 use App\Service\Business\PlaywReport\Apply\ApplyService;
 use App\Service\Business\PlaywReport\CommonService;
 use Hyperf\DbConnection\Db;
@@ -51,29 +52,15 @@ class BossService extends CommonService
     {
         Db::beginTransaction();
         try {
-            $models = PlaywReportPlaywClubBoss::query()
-                ->where('club_id', $userModel->playw_report_club_id)
-                ->with(['z', 'group']);
-
-            $models = $this->addModelWhere($models, $params, $userModel, $admin);
-            $models = $this->addModelTimeWhere($models, $params);
-
-            $where = $whereOr = [];
-            $models = $models->where($where)
-                ->where(function ($query) use ($whereOr) {
-                    foreach ($whereOr as $item) {
-                        $query->where(...$item[0])
-                            ->orWhere(...$item[1]);
-                    }
-                })
-                ->with([
-                    // 'sailSchedule' => function ($q) {
-                    //     $q->with(['shipCompany']);
-                    // },
-                ]);
-
+            $result = User::getCacheBossListByIdAndClubId($userModel->id, $userModel->playw_report_club_id, [
+            ], (int) $request->input('page', 1), (int) $request->input('size', 10));
+            $result = $result->toArray();
+            foreach ($result['data'] as &$item) {
+                $item['z'] = User::getCacheById($item['u_id']);
+                $item['group'] = PlaywReportClubGroup::getCacheById($item['group_id']);
+            }
             Db::commit();
-            return $models->paginate((int) $request->input('size', 10));
+            return $result;
         } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
@@ -82,9 +69,15 @@ class BossService extends CommonService
 
     public function getClubBoss($userModel, $params, $request)
     {
+        if (! isset($params['id'])) {
+            throw new ServiceException(ServiceCode::ERROR);
+        }
         Db::beginTransaction();
         try {
-            $model = PlaywReportPlaywClubBoss::getCacheById($userModel->playw_report_club_id, ['z', 'group']);
+            $model = PlaywReportPlaywClubBoss::getCacheById($params['id'], [
+                'z',
+                'group',
+            ]);
             if (! $model || $model->club_id !== $userModel->playw_report_club_id) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据不存在');
             }

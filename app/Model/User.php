@@ -12,8 +12,10 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Service\Utils\Redis\PlaywReport\McPlaywClub;
 use App\Service\Utils\Redis\PlaywReport\McUser;
-use Hyperf\Utils\Collection;
+use Hyperf\Collection\Collection;
+use Hyperf\Paginator\Paginator;
 
 /**
  * @property int $id
@@ -69,20 +71,69 @@ class User extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'phone', 'wx_unionid', 'password', 'real_name', 'nickname', 'avatar_image_id', 'gender', 'birthday', 'constellation', 'city', 'province', 'country', 'status', 'playw_report_playwname', 'playw_report_club_jiedan_price', 'playw_report_club_id', 'playw_report_club_join_at', 'playw_report_club_admin', 'social_id', 'social_dazzle_nickname', 'social_signature', 'social_charm_value', 'social_magnate_value', 'social_noble_value', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = [
+        'id',
+        'phone',
+        'wx_unionid',
+        'password',
+        'real_name',
+        'nickname',
+        'avatar_image_id',
+        'gender',
+        'birthday',
+        'constellation',
+        'city',
+        'province',
+        'country',
+        'status',
+        'playw_report_playwname',
+        'playw_report_club_jiedan_price',
+        'playw_report_club_id',
+        'playw_report_club_join_at',
+        'playw_report_club_admin',
+        'social_id',
+        'social_dazzle_nickname',
+        'social_signature',
+        'social_charm_value',
+        'social_magnate_value',
+        'social_noble_value',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'gender' => 'integer', 'status' => 'integer', 'playw_report_club_jiedan_price' => 'integer', 'playw_report_club_id' => 'integer', 'playw_report_club_admin' => 'integer', 'social_id' => 'integer', 'social_charm_value' => 'integer', 'social_magnate_value' => 'integer', 'social_noble_value' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = [
+        'id' => 'integer',
+        'gender' => 'integer',
+        'status' => 'integer',
+        'playw_report_club_jiedan_price' => 'integer',
+        'playw_report_club_id' => 'integer',
+        'playw_report_club_admin' => 'integer',
+        'social_id' => 'integer',
+        'social_charm_value' => 'integer',
+        'social_magnate_value' => 'integer',
+        'social_noble_value' => 'integer',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
     protected array $hidden = ['password'];
 
-    protected array $appends = ['playw_report_club_admin_text', 'label', 'onshow'];
+    protected array $appends = [
+        'playw_report_club_admin_text',
+        'label',
+        'onshow',
+    ];
 
     public function getPlaywReportClubAdminArray()
     {
-        return [self::PLAYW_REPORT_CLUB_ADMIN_DEFAULT => '否', self::PLAYW_REPORT_CLUB_ADMIN_YES => '是'];
+        return [
+            self::PLAYW_REPORT_CLUB_ADMIN_DEFAULT => '否',
+            self::PLAYW_REPORT_CLUB_ADMIN_YES => '是',
+        ];
     }
 
     public function setBirthdayAttribute($v)
@@ -138,12 +189,17 @@ class User extends BaseModel
     // 关联一个apply type=club_leave的申请
     public function clubLeaveApply()
     {
-        return $this->hasOne(PlaywReportApply::class, 'u_id', 'id')->where('status', PlaywReportApply::STATUS_DEFAULT)->where('type', PlaywReportApply::TYPE_CLUB_LEAVE);
+        return $this->hasOne(PlaywReportApply::class, 'u_id', 'id')
+            ->where('status', PlaywReportApply::STATUS_DEFAULT)
+            ->where('type', PlaywReportApply::TYPE_CLUB_LEAVE);
     }
 
     public function clubJoinApply()
     {
-        return $this->hasOne(PlaywReportApply::class, 'u_id', 'id')->where('status', PlaywReportApply::STATUS_DEFAULT)->where('type', PlaywReportApply::TYPE_CLUB_JOIN)->with('club');
+        return $this->hasOne(PlaywReportApply::class, 'u_id', 'id')
+            ->where('status', PlaywReportApply::STATUS_DEFAULT)
+            ->where('type', PlaywReportApply::TYPE_CLUB_JOIN)
+            ->with('club');
     }
 
     public static function getCacheById($k, $relations = [])
@@ -154,7 +210,8 @@ class User extends BaseModel
         if ($cache) {
             $model = (new self())->newInstance($cache, true);
         } else {
-            $model = (new self())->where('id', $k)->first();
+            $model = (new self())->where('id', $k)
+                ->first();
         }
         self::addRelations($model, $relations);
         return $model ?? null;
@@ -172,7 +229,8 @@ class User extends BaseModel
             }
             $models = $models ? new Collection($models) : new Collection([]);
         } else {
-            $models = (new self())->whereIn('id', $k)->get();
+            $models = (new self())->whereIn('id', $k)
+                ->get();
         }
         foreach ($models as $model) {
             self::addRelations($model, $relations);
@@ -193,7 +251,8 @@ class User extends BaseModel
                 $model = null;
             }
         } else {
-            $model = (new self())->where('phone', $k)->first();
+            $model = (new self())->where('phone', $k)
+                ->first();
         }
         self::addRelations($model, $relations);
         return $model ?? null;
@@ -203,40 +262,45 @@ class User extends BaseModel
      * @param mixed $k
      * @param mixed $k2
      * @param mixed $relations
-     * @return Collection
+     * @return Paginator
      */
-    public static function getCacheBossListByIdAndClubId($k, $k2, $relations = [])
+    public static function getCacheBossListByIdAndClubId($k, $k2, $relations = [], int $page = 1, int $limit = 10)
     {
-        # TODO FIX
         $redis = make(\Hyperf\Redis\Redis::class);
         $mc = new McUser($redis);
-        $cache = $mc->getBossListSortCreatedAtByClubIdAll($k, $k2);
-        var_dump($cache, 'cac');
+        $cache = $mc->getBossListSortCreatedAtByClubIdPaginate($k, $k2, $page, $limit);
+        //        var_dump($cache);
         if ($cache) {
-            $models = PlaywReportPlaywClubBoss::getCacheByIds($cache);
+            $data = PlaywReportPlaywClubBoss::getCacheByIds($cache['data']);
+            $models = new Paginator($data, $cache['per_page'], $cache['current_page']);
         } else {
-            $models = new Collection([]);
+            $models = new Paginator([]);
+        }
+        if ($models) {
         }
         return $models;
     }
 
-    public static function getCacheByBossIdAndClubId($k, $k2, $relations = [])
+    public static function getCacheByBossIdAndClubIdAll($k, $k2, $relations = [])
     {
         $redis = make(\Hyperf\Redis\Redis::class);
         $mc = new McUser($redis);
-        $id = $mc->getBossL($k);
-        if ($id) {
-            $cache = $mc->getModel($id);
-            if ($cache) {
-                $model = (new self())->newInstance($cache, true);
-            } else {
-                $model = null;
+        $cache = $mc->getBossListSortCreatedAtByClubIdAll($k, $k2);
+        if ($cache) {
+            $models = [];
+            foreach ($cache as $item) {
+                $models[] = (new self())->newInstance($item, true);
             }
+            $models = $models ? new Collection($models) : new Collection([]);
         } else {
-            $model = (new self())->where('id', $k)->where('playw_report_club_id', $k2)->first();
+            $models = (new PlaywReportPlaywClubBoss())->where('u_id', $k)
+                ->where('playw_report_club_id', $k2)
+                ->get();
         }
-        self::addRelations($model, $relations);
-        return $model ?? null;
+        foreach ($models as $model) {
+            self::addRelations($model, $relations);
+        }
+        return $models;
     }
 
     public static function addRelations(&$model, $relations = [])
@@ -246,7 +310,7 @@ class User extends BaseModel
                 $model->platformMiniprogram = UserPlatform::getCacheByUserIdAndPlatform(UserPlatform::PLATFORM_MINIPROGRAM, $model->id);
             }
             if (in_array('bosss', $relations)) {
-                $model->bosss = User::getCacheBossListByIdAndClubId($model->playw_report_club_id, $model->id);
+                $model->bosss = User::getCacheByBossIdAndClubIdAll($model->playw_report_club_id, $model->id);
             }
         }
     }

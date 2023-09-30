@@ -49,9 +49,10 @@ class UserController extends CommonController
     {
         $params = $this->getRequestAllFilter();
         $userPlatformModel = $this->miniLoginService->checkAndReletToken($params);
-        $userPlatformModel->user->club = PlaywReportClub::getCacheById($userPlatformModel->user->playw_report_club_id);
         $userPlatformModel->user->clubJoinApply;
-        return $this->responseJson(ServiceCode::SUCCESS, $userPlatformModel->user);
+        $user = $userPlatformModel->user->toArray();
+        $user['club'] = PlaywReportClub::getCacheById($userPlatformModel->user->playw_report_club_id);
+        return $this->responseJson(ServiceCode::SUCCESS, $user);
     }
 
     public function putUserPlaywReportInfo()

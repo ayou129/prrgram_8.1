@@ -22,7 +22,7 @@ use Hyperf\Redis\RedisProxy;
 class RedisAspect extends AbstractAspect
 {
     public array $classes = [
-        RedisProxy::class . '::__call',
+        // RedisProxy::class . '::__call',
     ];
 
     protected StdoutLoggerInterface $logger;

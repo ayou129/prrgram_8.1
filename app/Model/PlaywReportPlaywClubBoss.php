@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Service\Utils\Redis\PlaywReport\McPlaywClubBoss;
-use Hyperf\Utils\Collection;
+use Hyperf\Collection\Collection;
 
 /**
  * @property int $id

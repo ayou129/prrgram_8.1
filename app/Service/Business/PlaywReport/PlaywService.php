@@ -55,7 +55,8 @@ class PlaywService extends CommonService
         //        var_dump($u_id);
         if ($u_id) {
             $orderModels = $orderModels->where(function ($query) use ($u_id) {
-                $query->where('u_id', $u_id)->orWhere('z_u_id', $u_id);
+                $query->where('u_id', $u_id)
+                    ->orWhere('z_u_id', $u_id);
             });
         }
         $orderModels = $this->addModelTimeWhere($orderModels, $params);
@@ -187,7 +188,8 @@ class PlaywService extends CommonService
             'diandan_total_z_take_price_all' => $diandan_total_z_take_price_all,
             'pw_shouyi_all' => $pw_shouyi_all,
 
-            'club_price_takes_all' => $club_price_takes_all, # 俱乐部总收益
+            'club_price_takes_all' => $club_price_takes_all,
+            # 俱乐部总收益
             'data' => $orderModels->toArray(),
 
             'user_order_badge' => $user_order_badges[$userModel->id],
@@ -282,14 +284,22 @@ class PlaywService extends CommonService
     {
         Db::beginTransaction();
         try {
-            $clubModel = PlaywReportClub::getCacheById($userModel->playw_report_club_id, ['groups', 'bosss']);
-            $zIds = array_unique($clubModel->bosss->pluck('u_id')->toArray());
+            $clubModel = PlaywReportClub::getCacheById($userModel->playw_report_club_id, [
+                'groups',
+                'bosss',
+            ]);
+            $zIds = array_unique($clubModel->bosss->pluck('u_id')
+                ->toArray());
 
-            $zModels = User::getCacheByIds($zIds, ['bosss', 'group']);
+            $zModels = User::getCacheByIds($zIds, [
+                'bosss',
+                'group',
+            ]);
             foreach ($zModels as $zModel) {
                 if ($zModel->bosss->isNotEmpty()) {
                     foreach ($zModel->bosss as &$boss) {
-                        $boss->group = PlaywReportClubGroup::getCacheById($boss->group_id)->toArray();
+                        $groupModel = PlaywReportClubGroup::getCacheById($boss->group_id);
+                        $boss->group = $groupModel?->toArray();
                         //                        var_dump($boss->group);
                     }
                 }
@@ -312,7 +322,8 @@ class PlaywService extends CommonService
                 $zArray[] = $zModelArray;
             }
 
-            $models = Db::table((new PlaywReportClubProject())->getTable())->where('club_id', $userModel->playw_report_club_id)
+            $models = Db::table((new PlaywReportClubProject())->getTable())
+                ->where('club_id', $userModel->playw_report_club_id)
                 ->whereIn('type', array_keys(PlaywReportClubProject::getTypeArray()))
                 ->orderBy('index', 'desc')
                 ->get();

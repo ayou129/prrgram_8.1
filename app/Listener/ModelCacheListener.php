@@ -35,19 +35,17 @@ use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Redis\Redis;
 
-/**
- * @Listener
- */
+#[Listener]
 class ModelCacheListener implements ListenerInterface
 {
     public function listen(): array
     {
         return [
             // //            QueryExecuted::class,
-            // Retrieved::class,
-            // Deleted::class,
+            Retrieved::class,
+            Deleted::class,
             // //            Saving::class,
-            // Saved::class,
+            Saved::class,
         ];
     }
 

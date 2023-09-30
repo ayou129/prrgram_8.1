@@ -25,15 +25,13 @@ use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\OnStart;
 use Hyperf\Redis\Redis;
 
-/**
- * @Listener
- */
+#[Listener]
 class ModelCacheInitLoaderListener implements ListenerInterface
 {
     public function listen(): array
     {
         return [
-            //            OnStart::class,
+            OnStart::class,
         ];
     }
 
@@ -51,39 +49,51 @@ class ModelCacheInitLoaderListener implements ListenerInterface
         $mcPlaywClubGroup = new McPlaywClubGroup($redis);
         $mcPlaywClubBoss = new McPlaywClubBoss($redis);
         $mcPlaywClubOrder = new McPlaywClubOrder($redis);
-
+        $redis->pipeline();
         // load model
         echo 'model user loading...';
-        $usersArray = Db::table('user')->whereNull('deleted_at')->get();
+        $usersArray = Db::table('user')
+            ->whereNull('deleted_at')
+            ->get();
         foreach ($usersArray as $item) {
             ModelCacheListener::user($mcUser, $item, $mcPlaywClub);
         }
         echo 'model user_platform loading...';
-        $user_platformsArray = Db::table('user_platform')->whereNull('deleted_at')->get();
+        $user_platformsArray = Db::table('user_platform')
+            ->whereNull('deleted_at')
+            ->get();
         foreach ($user_platformsArray as $item) {
             ModelCacheListener::userPlatform($mcUserPlatform, $item);
         }
         echo 'model playw_club loading...';
-        $playw_report_clubsArray = Db::table('playw_report_club')->whereNull('deleted_at')->get();
+        $playw_report_clubsArray = Db::table('playw_report_club')
+            ->whereNull('deleted_at')
+            ->get();
         foreach ($playw_report_clubsArray as $item) {
             ModelCacheListener::club($mcPlaywClub, $item);
         }
         echo 'model playw_club_group loading...';
-        $playw_report_club_groupsArray = Db::table((new PlaywReportClubGroup())->getTable())->whereNull('deleted_at')->get();
+        $playw_report_club_groupsArray = Db::table((new PlaywReportClubGroup())->getTable())
+            ->whereNull('deleted_at')
+            ->get();
         foreach ($playw_report_club_groupsArray as $item) {
             ModelCacheListener::clubGroup($mcPlaywClubGroup, $item, $mcPlaywClub);
         }
         echo 'model playw_club_boss loading...';
-        $playw_report_playw_club_bosssArray = Db::table('playw_report_playw_club_boss')->whereNull('deleted_at')->get();
+        $playw_report_playw_club_bosssArray = Db::table('playw_report_playw_club_boss')
+            ->whereNull('deleted_at')
+            ->get();
         foreach ($playw_report_playw_club_bosssArray as $item) {
             ModelCacheListener::clubBoss($mcPlaywClubBoss, $item, $mcUser, $mcPlaywClub);
         }
         echo 'model playw_club_order loading...';
-        $playw_report_club_ordersArray = Db::table('playw_report_club_order')->whereNull('deleted_at')->get();
+        $playw_report_club_ordersArray = Db::table('playw_report_club_order')
+            ->whereNull('deleted_at')
+            ->get();
         foreach ($playw_report_club_ordersArray as $item) {
             ModelCacheListener::clubOrder($mcPlaywClubOrder, $item, $mcUser, $mcPlaywClub);
         }
-        //        $redis->exec();
+        $redis->exec();
         echo $green . '     done' . $reset . PHP_EOL;
 
         echo '---------- Cache init load done  ---------' . PHP_EOL;
