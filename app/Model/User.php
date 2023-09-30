@@ -15,6 +15,7 @@ namespace App\Model;
 use App\Service\Utils\Redis\PlaywReport\McPlaywClub;
 use App\Service\Utils\Redis\PlaywReport\McUser;
 use Hyperf\Collection\Collection;
+use Hyperf\Paginator\LengthAwarePaginator;
 use Hyperf\Paginator\Paginator;
 
 /**
@@ -272,9 +273,9 @@ class User extends BaseModel
         //        var_dump($cache);
         if ($cache) {
             $data = PlaywReportPlaywClubBoss::getCacheByIds($cache['data']);
-            $models = new Paginator($data, $cache['per_page'], $cache['current_page']);
+            $models = new LengthAwarePaginator($data, $cache['total'], $cache['per_page'], $cache['current_page']);
         } else {
-            $models = new Paginator([]);
+            $models = new LengthAwarePaginator([]);
         }
         if ($models) {
         }

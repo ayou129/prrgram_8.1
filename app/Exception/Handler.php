@@ -43,9 +43,6 @@ class Handler extends ExceptionHandler
 
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {
-        // $this->logger->debug($this->formatter->format($throwable));
-        // $this->logger->error($throwable->getTraceAsString());
-        // var_dump($throwable->getHttpCode());
         $result['data'] = [];
         $result['code'] = $throwable->getCode() === 0 ? ServiceCode::ERROR : $throwable->getCode();
         $result['msg'] = $throwable->getMessage();
@@ -83,8 +80,6 @@ class Handler extends ExceptionHandler
             $requestLogModel->exception_otherinfo = 'Message:' . $throwable->getMessage() . '|Line:' . $throwable->getLine() . '|File:' . $throwable->getFile();
             $requestLogModel->save();
         }
-
-        $this->logger->error(sprintf('%s[%s] in %s', $result['msg'] ?? $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
 
         if (! $result = json_encode($result, JSON_UNESCAPED_UNICODE)) {
             $result = '';

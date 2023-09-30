@@ -295,15 +295,15 @@ class PlaywService extends CommonService
                 'bosss',
                 'group',
             ]);
-            foreach ($zModels as $zModel) {
-                if ($zModel->bosss->isNotEmpty()) {
-                    foreach ($zModel->bosss as &$boss) {
-                        $groupModel = PlaywReportClubGroup::getCacheById($boss->group_id);
-                        $boss->group = $groupModel?->toArray();
-                        //                        var_dump($boss->group);
-                    }
+            foreach ($zModels as $model) {
+                $model->bosss = User::getCacheByBossIdAndClubIdAll($model->playw_report_club_id, $model->id);
+
+                foreach ($model->bosss as &$boss) {
+                    $groupModel = PlaywReportClubGroup::getCacheById($boss->group_id);
+                    $boss->group = $groupModel?->toArray();
+                    //                        var_dump($boss->group);
                 }
-                $zModel->bosss = $zModel->bosss->toArray();
+                $model->bosss = $model?->bosss->toArray();
             }
             $zModelsArray = $zModels->toArray();
             var_dump($zModelsArray);

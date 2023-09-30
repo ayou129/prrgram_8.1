@@ -52,7 +52,7 @@ class BossService extends CommonService
     {
         Db::beginTransaction();
         try {
-            $result = User::getCacheBossListByIdAndClubId($userModel->id, $userModel->playw_report_club_id, [
+            $result = User::getCacheBossListByIdAndClubId($userModel->playw_report_club_id, $userModel->id, [
             ], (int) $request->input('page', 1), (int) $request->input('size', 10));
             $result = $result->toArray();
             foreach ($result['data'] as &$item) {
