@@ -27,7 +27,7 @@ use Hyperf\Database\Model\Model;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
- * @property null|User $user
+ * @property mixed $user
  */
 class UserPlatform extends BaseModel
 {
@@ -45,29 +45,12 @@ class UserPlatform extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = [
-        'id',
-        'u_id',
-        'platform',
-        'wx_openid',
-        'wx_session_key',
-        'login_token',
-        'login_token_expire_time',
-        'created_at',
-        'updated_at',
-        'deleted_at',
-    ];
+    protected array $fillable = ['id', 'u_id', 'platform', 'wx_openid', 'wx_session_key', 'login_token', 'login_token_expire_time', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = [
-        'id' => 'integer',
-        'u_id' => 'integer',
-        'platform' => 'integer',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
+    protected array $casts = ['id' => 'integer', 'u_id' => 'integer', 'platform' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     public static function getPlatformArray()
     {

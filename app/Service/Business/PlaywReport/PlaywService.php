@@ -284,26 +284,14 @@ class PlaywService extends CommonService
     {
         Db::beginTransaction();
         try {
-            $clubModel = PlaywReportClub::getCacheById($userModel->playw_report_club_id, [
-                'groups',
-                'bosss',
-            ]);
-            $clubBosss = PlaywReportClub::getBossListSortCreatedAtByClubIdAll($userModel->playw_report_club_id);
-            $zIds = array_unique($clubBosss->pluck('u_id')
+            $clubModel = PlaywReportClub::getCacheById($userModel->playw_report_club_id);
+            $clubBossList = PlaywReportClub::getBossListSortCreatedAtByClubIdAll($userModel->playw_report_club_id);
+            $zIds = array_unique($clubBossList?->pluck('u_id')
                 ->toArray());
-
             $zModels = User::getCacheByIds($zIds);
-            $zModels->bosss = User::getBossListSortCreatedAtByClubIdAll($userModel->playw_report_club_id, $userModel->id);
-
-            foreach ($zModels as $model) {
-                $model->bosss = User::getBossListSortCreatedAtByClubIdAll($model->playw_report_club_id, $model->id);
-
-                foreach ($model->bosss as &$boss) {
-                    $groupModel = PlaywReportClubGroup::getCacheById($boss->group_id);
-                    $boss->group = $groupModel?->toArray();
-                    //                        var_dump($boss->group);
-                }
-                $model->bosss = $model?->bosss->toArray();
+            foreach ($zModels as $zUserModel) {
+                $zUserModel->bosss = User::getBossListSortCreatedAtByClubIdAll($zUserModel->playw_report_club_id, $zUserModel->id);
+                $zUserModel->bosss = $zUserModel?->bosss->toArray();
             }
             $zModelsArray = $zModels->toArray();
             var_dump($zModelsArray);
@@ -311,10 +299,9 @@ class PlaywService extends CommonService
             foreach ($zModelsArray as $key => &$zModelArray) {
                 $zModelArray['value'] = $zModelArray['id'];
                 $zModelArray['label'] = $zModelArray['playw_report_playwname'];
-                foreach ($zModelArray['bosss'] as $key => &$boss) {
+                foreach ($zModelArray['bosss'] as &$boss) {
                     $boss['value'] = $boss['id'];
-                    $groupstr = $boss['group']['name'] ? "({$boss['group']['name']})" : '';
-                    $boss['label'] = $zModelArray['playw_report_playwname'] . '/' . $boss['wx_name'] . $groupstr;
+                    $boss['label'] = $zModelArray['playw_report_playwname'] . '/' . $boss['wx_name'];
                     $boss['onshow'] = true;
                 }
                 $zModelArray['children'] = $zModelArray['bosss'];
@@ -342,9 +329,7 @@ class PlaywService extends CommonService
                     $temp['value'] = $temp['id'];
                     $temp['label'] = $temp['name'];
                     $giftArray[] = $temp;
-                    continue;
                 }
-                continue;
             }
 
             Db::commit();

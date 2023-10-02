@@ -18,7 +18,6 @@ use App\Service\Utils\Redis\PlaywReport\ModelCacheTrait;
  * @property int $id
  * @property int $u_id
  * @property int $club_id
- * @property int $group_id
  * @property string $wx_name
  * @property string $wx_number
  * @property string $img_url
@@ -39,10 +38,10 @@ class PlaywReportPlaywClubBoss extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'u_id', 'club_id', 'group_id', 'wx_name', 'wx_number', 'img_url', 'join_at', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'u_id', 'club_id', 'wx_name', 'wx_number', 'img_url', 'join_at', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'u_id' => 'integer', 'club_id' => 'integer', 'group_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'u_id' => 'integer', 'club_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }

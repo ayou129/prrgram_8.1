@@ -34,7 +34,7 @@ trait ModelCacheTrait
         return $model ?? null;
     }
 
-    public static function getCacheByIds(array $ids): array
+    public static function getCacheByIds(array $ids)
     {
         $modelName = __CLASS__; // 获取当前模型的类名
         $mcClassName = 'App\Service\Utils\Redis\PlaywReport\Mc' . \Hyperf\Support\class_basename($modelName);
@@ -66,7 +66,7 @@ trait ModelCacheTrait
             }
         }
 
-        return $cachedModels;
+        return \Hyperf\Collection\collect($cachedModels);
     }
 
     public static function addRelations(&$model, $relations = [])
@@ -75,7 +75,7 @@ trait ModelCacheTrait
             if (in_array('platformMiniprogram', $relations)) {
                 $model->platformMiniprogram = UserPlatform::getCacheByUserIdAndPlatform(UserPlatform::PLATFORM_MINIPROGRAM, $model->id);
             }
-            if (in_array('bosss', $relations)) {
+            if (in_array('user_bosss', $relations)) {
                 $model->bosss = User::getBossListSortCreatedAtByClubIdAll($model->playw_report_club_id, $model->id);
             }
             if (in_array('user', $relations)) {

@@ -73,54 +73,12 @@ class User extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = [
-        'id',
-        'phone',
-        'wx_unionid',
-        'password',
-        'real_name',
-        'nickname',
-        'avatar_image_id',
-        'gender',
-        'birthday',
-        'constellation',
-        'city',
-        'province',
-        'country',
-        'status',
-        'playw_report_playwname',
-        'playw_report_club_jiedan_price',
-        'playw_report_club_id',
-        'playw_report_club_join_at',
-        'playw_report_club_admin',
-        'social_id',
-        'social_dazzle_nickname',
-        'social_signature',
-        'social_charm_value',
-        'social_magnate_value',
-        'social_noble_value',
-        'created_at',
-        'updated_at',
-        'deleted_at',
-    ];
+    protected array $fillable = ['id', 'phone', 'wx_unionid', 'password', 'real_name', 'nickname', 'avatar_image_id', 'gender', 'birthday', 'constellation', 'city', 'province', 'country', 'status', 'playw_report_playwname', 'playw_report_club_jiedan_price', 'playw_report_club_id', 'playw_report_club_join_at', 'playw_report_club_admin', 'social_id', 'social_dazzle_nickname', 'social_signature', 'social_charm_value', 'social_magnate_value', 'social_noble_value', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = [
-        'id' => 'integer',
-        'gender' => 'integer',
-        'status' => 'integer',
-        'playw_report_club_jiedan_price' => 'integer',
-        'playw_report_club_id' => 'integer',
-        'playw_report_club_admin' => 'integer',
-        'social_id' => 'integer',
-        'social_charm_value' => 'integer',
-        'social_magnate_value' => 'integer',
-        'social_noble_value' => 'integer',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
+    protected array $casts = ['id' => 'integer', 'gender' => 'integer', 'status' => 'integer', 'playw_report_club_jiedan_price' => 'integer', 'playw_report_club_id' => 'integer', 'playw_report_club_admin' => 'integer', 'social_id' => 'integer', 'social_charm_value' => 'integer', 'social_magnate_value' => 'integer', 'social_noble_value' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     protected array $hidden = ['password'];
 
@@ -267,11 +225,7 @@ class User extends BaseModel
         $mc = new McUser($redis);
         $cache = $mc->getBossListSortCreatedAtByClubIdAll($k, $k2);
         if ($cache) {
-            $models = [];
-            foreach ($cache as $item) {
-                $models[] = (new self())->newInstance($item, true);
-            }
-            $models = $models ? new Collection($models) : new Collection([]);
+            $models = PlaywReportPlaywClubBoss::getCacheByIds($cache);
         } else {
             $models = (new PlaywReportPlaywClubBoss())->where('u_id', $k)
                 ->where('playw_report_club_id', $k2)

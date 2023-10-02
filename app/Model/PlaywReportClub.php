@@ -30,7 +30,6 @@ use Hyperf\Paginator\LengthAwarePaginator;
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
  * @property null|\Hyperf\Database\Model\Collection|PlaywReportClubGroup[] $groups
- * @property null|\Hyperf\Database\Model\Collection|PlaywReportPlaywClubBoss[] $bosss
  * @property null|\Hyperf\Database\Model\Collection|User[] $users
  * @property null|PlaywReportClubOrderStairPoint $stairPoint
  * @property null|\Hyperf\Database\Model\Collection|PlaywReportClubOrder[] $orders
@@ -59,33 +58,12 @@ class PlaywReportClub extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = [
-        'id',
-        'u_id',
-        'leave_old_u_id',
-        'name',
-        'logo_url',
-        'auto_apply_boss_create',
-        'auto_apply_club_join',
-        'auto_apply_club_leave',
-        'created_at',
-        'updated_at',
-        'deleted_at',
-    ];
+    protected array $fillable = ['id', 'u_id', 'leave_old_u_id', 'name', 'logo_url', 'auto_apply_boss_create', 'auto_apply_club_join', 'auto_apply_club_leave', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = [
-        'id' => 'integer',
-        'u_id' => 'integer',
-        'leave_old_u_id' => 'integer',
-        'auto_apply_boss_create' => 'integer',
-        'auto_apply_club_join' => 'integer',
-        'auto_apply_club_leave' => 'integer',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
+    protected array $casts = ['id' => 'integer', 'u_id' => 'integer', 'leave_old_u_id' => 'integer', 'auto_apply_boss_create' => 'integer', 'auto_apply_club_join' => 'integer', 'auto_apply_club_leave' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     public static function getAutoApplyBossArray()
     {
@@ -131,32 +109,11 @@ class PlaywReportClub extends BaseModel
         return $this->hasMany(PlaywReportClubOrder::class, 'club_id', 'id');
     }
 
-    public static function getCacheById($k, $relations = [])
-    {
-        $redis = make(\Hyperf\Redis\Redis::class);
-        $mc = new McPlaywReportClub($redis);
-        $cache = $mc->getModel($k);
-        if ($cache) {
-            $model = (new self())->newInstance($cache, true);
-        } else {
-            $model = (new self())->where('id', $k)
-                ->first();
-        }
-        if ($model) {
-            if (in_array('groups', $relations)) {
-                $model->groups = PlaywReportClub::getSortCreatedAtByGroupIdAll($model->id);
-            }
-            if (in_array('bosss', $relations)) {
-                $model->bosss = PlaywReportClub::getBossListSortCreatedAtByClubIdAll($model->id);
-            }
-        }
-        return $model ?? null;
-    }
-
     /**
+     * @param mixed $k
      * @return Collection|\Hyperf\Database\Model\Builder[]|\Hyperf\Database\Model\Collection
      */
-    public static function getSortCreatedAtByGroupIdAll($k, $relations = [])
+    public static function getSortCreatedAtByGroupIdAll($k)
     {
         $redis = make(\Hyperf\Redis\Redis::class);
         $mc = new McPlaywReportClub($redis);
@@ -170,23 +127,19 @@ class PlaywReportClub extends BaseModel
         return $models;
     }
 
-    public static function getBossListSortCreatedAtByClubIdAll($k, $relations = [])
+    public static function getBossListSortCreatedAtByClubIdAll($k)
     {
         $redis = make(\Hyperf\Redis\Redis::class);
         $mc = new McPlaywReportClub($redis);
         $cache = $mc->getBossListSortCreatedAtByClubIdAll($k);
         //        var_dump($cache);
         if ($cache) {
-            $models = PlaywReportPlaywClubBoss::getCacheByIds($cache);
-        } else {
-            $models = new Collection([]);
+            return PlaywReportPlaywClubBoss::getCacheByIds($cache);
         }
-        if ($models) {
-        }
-        return $models;
+        return \Hyperf\Collection\collect();
     }
 
-    public static function getBossListSortCreatedAtByClubIdPaginate($k, $relations = [], int $page = 1, int $limit = 10)
+    public static function getBossListSortCreatedAtByClubIdPaginate($k, int $page = 1, int $limit = 10): LengthAwarePaginator
     {
         $redis = make(\Hyperf\Redis\Redis::class);
         $mc = new McPlaywReportClub($redis);
