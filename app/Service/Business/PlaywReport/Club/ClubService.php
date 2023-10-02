@@ -53,7 +53,9 @@ class ClubService extends CommonService
         if (! $params['name']) {
             throw new ServiceException(ServiceCode::ERROR, [], 400, [], 'name不存在');
         }
-        $clubModel = Db::table((new PlaywReportClub())->getTable())->where('name', $params['name'])->first();
+        $clubModel = Db::table((new PlaywReportClub())->getTable())
+            ->where('name', $params['name'])
+            ->first();
         if (! $clubModel) {
             return [];
         }
@@ -65,8 +67,10 @@ class ClubService extends CommonService
     {
         // 按照时间
         // 按照类型
-        $orderModel = PlaywReportClubOrder::where('club_id', $userModel->playw_report_club_id)->with(['user', 'zUser']);
-        $bossModel = PlaywReportPlaywClubBoss::where('club_id', $userModel->playw_report_club_id)->with(['z']);
+        $orderModel = Db::table((new PlaywReportClubOrder)->getTable())
+            ->where('club_id', $userModel->playw_report_club_id);
+        $bossModel = PlaywReportPlaywClubBoss::where('club_id', $userModel->playw_report_club_id)
+            ->with(['z']);
         $orderModel = $this->addModelTimeWhere($orderModel, $params);
         $bossModel = $this->addModelTimeWhere($bossModel, $params);
         $data = [];
@@ -79,9 +83,11 @@ class ClubService extends CommonService
                     ->orderBy('score', 'desc')
                     ->get();
                 foreach ($temp as $item) {
+                    $user = User::getCacheById($item->u_id);
+                    User::addAttrText($user);
                     $data[] = [
-                        'user' => $item['user'],
-                        'score' => $item['score'],
+                        'user' => $user,
+                        'score' => $item->score,
                     ];
                 }
                 break;
@@ -93,9 +99,11 @@ class ClubService extends CommonService
                     ->orderBy('score', 'desc')
                     ->get();
                 foreach ($temp as $item) {
+                    $user = User::getCacheById($item->z_u_id);
+                    User::addAttrText($user);
                     $data[] = [
-                        'user' => $item['zUser'],
-                        'score' => $item['score'],
+                        'user' => $user,
+                        'score' => $item->score,
                     ];
                 }
                 break;
@@ -108,9 +116,11 @@ class ClubService extends CommonService
                     ->orderBy('score', 'desc')
                     ->get();
                 foreach ($temp as $item) {
+                    $user = User::getCacheById($item->u_id);
+                    User::addAttrText($user);
                     $data[] = [
-                        'user' => $item['user'],
-                        'score' => $item['score'],
+                        'user' => $user,
+                        'score' => $item->score,
                     ];
                 }
                 break;
@@ -122,8 +132,10 @@ class ClubService extends CommonService
                     ->orderBy('score', 'desc')
                     ->get();
                 foreach ($temp as $item) {
+                    $user = User::getCacheById($item['u_id']);
+                    User::addAttrText($user);
                     $data[] = [
-                        'user' => $item['z'],
+                        'z' => $user,
                         'score' => $item['score'],
                     ];
                 }
@@ -164,7 +176,9 @@ class ClubService extends CommonService
             if ($user->playw_report_club_id) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '已存在俱乐部');
             }
-            $clubModel = Db::table('playw_report_club')->where('name', $params['name'])->first();
+            $clubModel = Db::table('playw_report_club')
+                ->where('name', $params['name'])
+                ->first();
             if (! $clubModel) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '俱乐部不存在');
             }
@@ -249,7 +263,9 @@ class ClubService extends CommonService
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '已存在俱乐部');
             }
 
-            $clubModel = Db::table('playw_report_club')->where('name', $params['name'])->first();
+            $clubModel = Db::table('playw_report_club')
+                ->where('name', $params['name'])
+                ->first();
             if ($clubModel) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '俱乐部已存在');
             }
