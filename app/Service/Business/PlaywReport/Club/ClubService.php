@@ -67,10 +67,10 @@ class ClubService extends CommonService
     {
         // 按照时间
         // 按照类型
-        $orderModel = Db::table((new PlaywReportClubOrder)->getTable())
+        $orderModel = Db::table((new PlaywReportClubOrder())->getTable())
             ->where('club_id', $userModel->playw_report_club_id);
-        $bossModel = PlaywReportPlaywClubBoss::where('club_id', $userModel->playw_report_club_id)
-            ->with(['z']);
+        $bossModel = Db::table((new PlaywReportPlaywClubBoss())->getTable())
+            ->where('club_id', $userModel->playw_report_club_id);
         $orderModel = $this->addModelTimeWhere($orderModel, $params);
         $bossModel = $this->addModelTimeWhere($bossModel, $params);
         $data = [];
