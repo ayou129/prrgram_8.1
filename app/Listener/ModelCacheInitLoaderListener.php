@@ -12,7 +12,12 @@ declare(strict_types=1);
 
 namespace App\Listener;
 
+use App\Model\PlaywReportClub;
 use App\Model\PlaywReportClubGroup;
+use App\Model\PlaywReportClubOrder;
+use App\Model\PlaywReportPlaywClubBoss;
+use App\Model\User;
+use App\Model\UserPlatform;
 use App\Service\Utils\Redis\PlaywReport\McPlaywReportClub;
 use App\Service\Utils\Redis\PlaywReport\McPlaywReportClubGroup;
 use App\Service\Utils\Redis\PlaywReport\McPlaywReportClubOrder;
@@ -41,6 +46,7 @@ class ModelCacheInitLoaderListener implements ListenerInterface
         $reset = "\033[0m";
         echo '---------- Cache init loading...  ---------' . PHP_EOL;
         $redis = make(Redis::class);
+        // $redis->flushall();
         //        $redis->pipeline();
 
         $mcUser = new McUser($redis);
@@ -56,6 +62,7 @@ class ModelCacheInitLoaderListener implements ListenerInterface
             ->whereNull('deleted_at')
             ->get();
         foreach ($usersArray as $item) {
+            User::addAttrText($item);
             ModelCacheListener::user($mcUser, $item, $mcPlaywClub);
         }
         echo 'model user_platform loading...';
@@ -63,6 +70,7 @@ class ModelCacheInitLoaderListener implements ListenerInterface
             ->whereNull('deleted_at')
             ->get();
         foreach ($user_platformsArray as $item) {
+            UserPlatform::addAttrText($item);
             ModelCacheListener::userPlatform($mcUserPlatform, $item);
         }
         echo 'model playw_club loading...';
@@ -70,6 +78,7 @@ class ModelCacheInitLoaderListener implements ListenerInterface
             ->whereNull('deleted_at')
             ->get();
         foreach ($playw_report_clubsArray as $item) {
+            PlaywReportClub::addAttrText($item);
             ModelCacheListener::club($mcPlaywClub, $item);
         }
         echo 'model playw_club_group loading...';
@@ -77,6 +86,7 @@ class ModelCacheInitLoaderListener implements ListenerInterface
             ->whereNull('deleted_at')
             ->get();
         foreach ($playw_report_club_groupsArray as $item) {
+            PlaywReportClubGroup::addAttrText($item);
             ModelCacheListener::clubGroup($mcPlaywClubGroup, $item, $mcPlaywClub);
         }
         echo 'model playw_club_boss loading...';
@@ -84,6 +94,7 @@ class ModelCacheInitLoaderListener implements ListenerInterface
             ->whereNull('deleted_at')
             ->get();
         foreach ($playw_report_playw_club_bosssArray as $item) {
+            PlaywReportPlaywClubBoss::addAttrText($item);
             ModelCacheListener::clubBoss($mcPlaywClubBoss, $item, $mcUser, $mcPlaywClub);
         }
         echo 'model playw_club_order loading...';
@@ -91,6 +102,7 @@ class ModelCacheInitLoaderListener implements ListenerInterface
             ->whereNull('deleted_at')
             ->get();
         foreach ($playw_report_club_ordersArray as $item) {
+            PlaywReportClubOrder::addAttrText($item);
             ModelCacheListener::clubOrder($mcPlaywClubOrder, $item, $mcUser, $mcPlaywClub);
         }
         $redis->exec();

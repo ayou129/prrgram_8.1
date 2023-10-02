@@ -139,6 +139,18 @@ class PlaywReportClub extends BaseModel
         return \Hyperf\Collection\collect();
     }
 
+    public static function getUserListSortJoinAtByClubIdAll($k)
+    {
+        $redis = make(\Hyperf\Redis\Redis::class);
+        $mc = new McPlaywReportClub($redis);
+        $cache = $mc->getSortJoinAtByUserIdAll($k);
+        //        var_dump($cache);
+        if ($cache) {
+            return User::getCacheByIds($cache);
+        }
+        return \Hyperf\Collection\collect();
+    }
+
     public static function getBossListSortCreatedAtByClubIdPaginate($k, int $page = 1, int $limit = 10): LengthAwarePaginator
     {
         $redis = make(\Hyperf\Redis\Redis::class);

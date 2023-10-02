@@ -46,8 +46,6 @@ use Hyperf\Paginator\LengthAwarePaginator;
  * @property string $deleted_at
  * @property mixed $birthday
  * @property mixed $social_id
- * @property mixed $label
- * @property mixed $onshow
  * @property null|UserPlatform $platform
  * @property null|\Hyperf\Database\Model\Collection|UserPlatform[] $platforms
  * @property null|\Hyperf\Database\Model\Collection|PlaywReportPlaywClubBoss[] $boss
@@ -83,12 +81,9 @@ class User extends BaseModel
     protected array $hidden = ['password'];
 
     protected array $appends = [
-        'playw_report_club_admin_text',
-        'label',
-        'onshow',
     ];
 
-    public function getPlaywReportClubAdminArray()
+    public static function getPlaywReportClubAdminArray()
     {
         return [
             self::PLAYW_REPORT_CLUB_ADMIN_DEFAULT => '否',
@@ -104,26 +99,6 @@ class User extends BaseModel
     public function setSocialIdAttribute($v)
     {
         $this->attributes['social_id'] = $v === '' ? null : $v;
-    }
-
-    public function getLabelAttribute()
-    {
-        return $this->playw_report_playwname ? $this->playw_report_playwname : '未设置昵称';
-    }
-
-    public function getOnshowAttribute()
-    {
-        return true;
-    }
-
-    public function getJwtIdentifier()
-    {
-        return $this->getKey();
-    }
-
-    public function getJwtCustomClaims(): array
-    {
-        return [];
     }
 
     public function platform()
@@ -247,5 +222,11 @@ class User extends BaseModel
                 $model->bosss = User::getBossListSortCreatedAtByClubIdAll($model->playw_report_club_id, $model->id);
             }
         }
+    }
+
+    public static function addAttrText(&$model)
+    {
+        $model->label = $model->playw_report_playwname ?: '未设置昵称';
+        $model->onshow = true;
     }
 }

@@ -26,7 +26,9 @@ trait ModelCacheTrait
         $mc = new $mcClassName($redis);
         $cache = $mc->getModel($id);
         if ($cache) {
-            $model = (new $modelName())->newInstance($cache, true);
+            $instance = new $modelName();
+            $model = $instance->newInstance($cache, true);
+            $instance::addAttrText($model);
         } else {
             $model = (new $modelName())->where('id', $id)
                 ->first();
@@ -82,5 +84,9 @@ trait ModelCacheTrait
                 $model->user = User::getCacheById($model->u_id);
             }
         }
+    }
+
+    public static function addAttrText(&$model)
+    {
     }
 }

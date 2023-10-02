@@ -317,7 +317,7 @@ class PlaywController extends CommonController
         CommonService::checkClubIdStatus($userPlatformModel->user);
         CommonService::checkPlaywName($userPlatformModel->user);
         $result = $this->playwService->getClubAdminPlaywListAll($userPlatformModel->user, $params, $this->request);
-        return $this->responseJson(ServiceCode::SUCCESS, $result);
+        return $this->responseJson(ServiceCode::SUCCESS, $result->toArray());
     }
 
     public function getClubAdminProjectListAll()
@@ -327,7 +327,7 @@ class PlaywController extends CommonController
         CommonService::checkClubIdStatus($userPlatformModel->user);
         CommonService::checkPlaywName($userPlatformModel->user);
         $result = $this->playwService->getClubAdminProjectListAll($userPlatformModel->user, $params, $this->request);
-        return $this->responseJson(ServiceCode::SUCCESS, $result);
+        return $this->responseJson(ServiceCode::SUCCESS, $result->toArray());
     }
 
     public function clubAdminPlaywRemove()
@@ -348,7 +348,7 @@ class PlaywController extends CommonController
         CommonService::checkClubIdStatus($userPlatformModel->user);
         CommonService::checkPlaywName($userPlatformModel->user);
         $result = $this->playwService->getClubAdminGroupList($userPlatformModel->user, $params, $this->request);
-        return $this->responseJson(ServiceCode::SUCCESS, $result);
+        return $this->responseJson(ServiceCode::SUCCESS, $result->toArray());
     }
 
     public function postClubAdminGroup()
@@ -391,7 +391,7 @@ class PlaywController extends CommonController
         CommonService::checkClubIdStatus($userPlatformModel->user);
         CommonService::checkPlaywName($userPlatformModel->user);
         $result = $this->playwService->getClubAdminProject($userPlatformModel->user, $params, $this->request);
-        return $this->responseJson(ServiceCode::SUCCESS, $result);
+        return $this->responseJson(ServiceCode::SUCCESS, $result ? $result->toArray() : $result);
     }
 
     public function getClubAdminProjectList()
@@ -401,7 +401,7 @@ class PlaywController extends CommonController
         CommonService::checkClubIdStatus($userPlatformModel->user);
         CommonService::checkPlaywName($userPlatformModel->user);
         $result = $this->playwService->getClubAdminProjectList($userPlatformModel->user, $params, $this->request);
-        return $this->responseJson(ServiceCode::SUCCESS, $result);
+        return $this->responseJson(ServiceCode::SUCCESS, $result->toArray());
     }
 
     public function postClubAdminProject()

@@ -14,6 +14,7 @@ namespace App\Model;
 
 use App\Constant\ServiceCode;
 use App\Exception\ServiceException;
+use App\Service\Utils\Redis\PlaywReport\McPlaywReportClubProject;
 use App\Service\Utils\Redis\PlaywReport\ModelCacheTrait;
 
 /**
@@ -134,7 +135,7 @@ class PlaywReportClubProject extends BaseModel
     public static function getCacheById($k, $relations = [])
     {
         $redis = make(\Hyperf\Redis\Redis::class);
-        $mc = new PlaywReportClubProject($redis);
+        $mc = new McPlaywReportClubProject($redis);
         $cache = $mc->getModel($k);
         if ($cache) {
             $model = (new self())->newInstance($cache, true);

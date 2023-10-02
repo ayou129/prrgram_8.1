@@ -34,6 +34,12 @@ class McPlaywReportClub extends MCStrategyAbstract
         return [$this->zAdd($key, $scope, $id), $this->ttl($key, self::ttl)];
     }
 
+    public function getSortJoinAtByUserIdAll($club_id): array
+    {
+        $key = self::getSortJoinAtByUserIdKey($club_id);
+        return $this->zrange($key, 0, -1);
+    }
+
     public function getSortJoinAtByUserIdPaginate($club_id, $start, $end)
     {
         $key = self::getSortJoinAtByUserIdKey($club_id);

@@ -87,7 +87,7 @@ class OrderService extends CommonService implements OrderInterface
     // 获取订单列表
     public function orderList($userModel, $params, $request, $admin = false)
     {
-        $models = PlaywReportClubOrder::query()
+        $models = Db::table((new PlaywReportClubOrder())->getTable())
             ->where('club_id', $userModel->playw_report_club_id);
 
         $models = $this->addModelTimeWhere($models, $params);
@@ -102,17 +102,16 @@ class OrderService extends CommonService implements OrderInterface
                         ->orWhere(...$item[1]);
                 }
             })
-            ->with([
-                'user',
-                'zUser',
-                'project',
-                'boss',
-                // 'sailSchedule' => function ($q) {
-                //     $q->with(['shipCompany']);
-                // },
-            ])->orderBy('id', 'desc');
+            ->orderBy('id', 'desc');
 
-        $result = $models->paginate((int) $request->input('size', 10))->toArray();
+        $result = $models->paginate((int) $request->input('size', 10))
+            ->toArray();
+        foreach ($result['data'] as &$item) {
+            $item->user = User::getCacheById($item->u_id);
+            $item->zUser = User::getCacheById($item->z_u_id);
+            $item->project = PlaywReportClubProject::getCacheById($item->project_id);
+            $item->boss = PlaywReportPlaywClubBoss::getCacheById($item->club_boss_id);
+        }
         $user_order_badges = OrderService::getOrderBadgeByUserIds($userModel->playw_report_club_id, [$userModel->id]);
         $result['user_order_badges'] = $user_order_badges[$userModel->id];
         return $result;
@@ -120,12 +119,15 @@ class OrderService extends CommonService implements OrderInterface
 
     public static function getOrderBadgeByUserIds(int $club_id, array $user_ids)
     {
-        $orderModels = PlaywReportClubOrder::where('club_id', $club_id)
+        $orderModels = Db::table((new PlaywReportClubOrder())->getTable())
+            ->where('club_id', $club_id)
             ->where(function ($query) {
                 $query->where('fd_status', PlaywReportClubOrder::FD_STATUS_DEFAULT)
                     ->orWhere('jq_status', PlaywReportClubOrder::JQ_STATUS_DEFAULT);
-            })->where(function ($query) use ($user_ids) {
-                $query->whereIn('u_id', $user_ids)->orWhereIn('z_u_id', $user_ids);
+            })
+            ->where(function ($query) use ($user_ids) {
+                $query->whereIn('u_id', $user_ids)
+                    ->orWhereIn('z_u_id', $user_ids);
             });
 
         $orderModels = $orderModels->get();
@@ -312,7 +314,8 @@ class OrderService extends CommonService implements OrderInterface
             if (! $params['id']) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '参数不存在');
             }
-            $model = PlaywReportClubOrder::query()->where('club_id', $userModel->playw_report_club_id)
+            $model = PlaywReportClubOrder::query()
+                ->where('club_id', $userModel->playw_report_club_id)
                 ->where('u_id', $userModel->id)
                 ->find($params['id']);
             if (! $model) {
@@ -344,7 +347,8 @@ class OrderService extends CommonService implements OrderInterface
             if (! $params['id']) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '参数不存在');
             }
-            $model = PlaywReportClubOrder::query()->where('club_id', $userModel->playw_report_club_id)
+            $model = PlaywReportClubOrder::query()
+                ->where('club_id', $userModel->playw_report_club_id)
                 ->where('u_id', $userModel->id)
                 ->find($params['id']);
             if (! $model) {

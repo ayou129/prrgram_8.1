@@ -303,8 +303,9 @@ class PlaywService extends CommonService
                     $boss['value'] = $boss['id'];
                     $boss['label'] = $zModelArray['playw_report_playwname'] . '/' . $boss['wx_name'];
                     $boss['onshow'] = true;
+                    $zModelArray['children'][] = $boss;
                 }
-                $zModelArray['children'] = $zModelArray['bosss'];
+                // $zModelArray['children'] = $zModelArray['bosss'];
                 unset($zModelArray['bosss']);
                 $zArray[] = $zModelArray;
             }
@@ -383,13 +384,13 @@ class PlaywService extends CommonService
 
     public function getClubAdminPlaywListAll($user, $params, $request)
     {
-        return User::where('playw_report_club_id', $user->playw_report_club_id)
-            ->get();
+        return PlaywReportClub::getUserListSortJoinAtByClubIdAll($user->playw_report_club_id);
     }
 
     public function getClubAdminProjectListAll($user, $params, $request)
     {
-        return PlaywReportClubProject::where('club_id', $user->playw_report_club_id)
+        return Db::table((new PlaywReportClubProject())->getTable())
+            ->where('club_id', $user->playw_report_club_id)
             ->orderBy('index', 'desc')
             ->get();
     }
@@ -476,8 +477,9 @@ class PlaywService extends CommonService
 
     public function getClubAdminGroupList($user, $params, $request)
     {
-        return PlaywReportClubGroup::where('club_id', $user->playw_report_club_id)
-            ->get();
+        return PlaywReportClub::getSortCreatedAtByGroupIdAll($user->playw_report_club_id);
+        // return PlaywReportClubGroup::where('club_id', $user->playw_report_club_id)
+        //     ->get();
     }
 
     public function postClubAdminGroup($user, $params, $request)
@@ -534,22 +536,19 @@ class PlaywService extends CommonService
     {
         Db::beginTransaction();
         try {
-            $groupModel = PlaywReportClubGroup::where('club_id', $user->playw_report_club_id)
-                ->find($params['group_id']);
-            if (! $groupModel) {
+            $groupModel = PlaywReportClubGroup::getCacheById($params['group_id']);
+
+            if (! $groupModel || $groupModel->club_id !== $user->playw_report_club_id) {
                 throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT);
             }
-            $existsModel = PlaywReportClubOrder::where('club_group_id', $groupModel->id)
-                ->first();
+
+            $existsModel = Db::table((new PlaywReportClubOrder())->getTable())
+                ->where('club_group_id', $groupModel->id)
+                ->exists();
             if ($existsModel) {
                 throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT, [], 400, [], '已有订单不可操作');
             }
 
-            $existsModel = PlaywReportPlaywClubBoss::where('group_id', $groupModel->id)
-                ->first();
-            if ($existsModel) {
-                throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT, [], 400, [], '已有老板不可操作');
-            }
             $groupModel->delete();
 
             Db::commit();
@@ -576,7 +575,8 @@ class PlaywService extends CommonService
                 $type = PlaywReportClubProject::TYPE_GIFT;
                 break;
         }
-        return PlaywReportClubProject::where('club_id', $user->playw_report_club_id)
+        return Db::table((new PlaywReportClubProject())->getTable())
+            ->where('club_id', $user->playw_report_club_id)
             ->where('type', $type)
             ->orderBy('index', 'desc')
             ->get();
