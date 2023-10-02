@@ -79,8 +79,6 @@ class PlaywReportClubOrder extends BaseModel
      */
     protected ?string $table = 'playw_report_club_order';
 
-    protected array $appends = ['status_text', 'jq_status_text', 'fd_status_text', 'club_group_method_text'];
-
     /**
      * The attributes that are mass assignable.
      */
@@ -93,22 +91,34 @@ class PlaywReportClubOrder extends BaseModel
 
     public static function getStatusArray(): array
     {
-        return [self::STATUS_DEFAULT => '未结账', self::STATUS_FINISHED => '已结账'];
+        return [
+            self::STATUS_DEFAULT => '未结账',
+            self::STATUS_FINISHED => '已结账',
+        ];
     }
 
     public static function getClubGroupMethodArray(): array
     {
-        return [self::CLUB_GROUP_METHOD_DEFAULT => '群内', self::CLUB_GROUP_METHOD_OUT => '群外'];
+        return [
+            self::CLUB_GROUP_METHOD_DEFAULT => '群内',
+            self::CLUB_GROUP_METHOD_OUT => '群外',
+        ];
     }
 
     public static function getJqStatusArray(): array
     {
-        return [self::JQ_STATUS_DEFAULT => '陪玩费用未结清', self::JQ_STATUS_YES => '陪玩费用已结清'];
+        return [
+            self::JQ_STATUS_DEFAULT => '陪玩费用未结清',
+            self::JQ_STATUS_YES => '陪玩费用已结清',
+        ];
     }
 
     public static function getFdStatusArray(): array
     {
-        return [self::FD_STATUS_DEFAULT => '直属未返点', self::FD_STATUS_FINISHED => '直属已返点'];
+        return [
+            self::FD_STATUS_DEFAULT => '直属未返点',
+            self::FD_STATUS_FINISHED => '直属已返点',
+        ];
     }
 
     public function boss()
@@ -124,22 +134,19 @@ class PlaywReportClubOrder extends BaseModel
         if ($cache) {
             $model = (new self())->newInstance($cache, true);
         } else {
-            $model = (new self())->where('id', $k)->first();
-        }
-        if ($model) {
-            if (in_array('user', $relations)) {
-                $model->user = User::getCacheById($model->u_id);
-            }
-            if (in_array('zUser', $relations)) {
-                $model->zUser = User::getCacheById($model->z_u_id);
-            }
-            if (in_array('project', $relations)) {
-                $model->project = PlaywReportClubProject::getCacheById($model->project_id);
-            }
-            if (in_array('boss', $relations)) {
-                $model->boss = PlaywReportPlaywClubBoss::getCacheById($model->club_boss_id);
-            }
+            $model = (new self())->where('id', $k)
+                ->first();
         }
         return $model ?? null;
+    }
+
+    public static function addAttrText(&$model)
+    {
+        if ($model) {
+            $model->status_text = self::getStatusArray()[$model->status] ?? '';
+            $model->jq_status_text = self::getJqStatusArray()[$model->jq_status] ?? '';
+            $model->fd_status_text = self::getFdStatusArray()[$model->fd_status] ?? '';
+            $model->club_group_method_text = self::getClubGroupMethodArray()[$model->club_group_method] ?? '';
+        }
     }
 }

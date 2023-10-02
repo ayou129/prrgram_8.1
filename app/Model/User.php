@@ -80,9 +80,6 @@ class User extends BaseModel
 
     protected array $hidden = ['password'];
 
-    protected array $appends = [
-    ];
-
     public static function getPlaywReportClubAdminArray()
     {
         return [
@@ -226,7 +223,9 @@ class User extends BaseModel
 
     public static function addAttrText(&$model)
     {
-        $model->label = $model->playw_report_playwname ?: '未设置昵称';
-        $model->onshow = true;
+        if ($model) {
+            $model->label = $model->playw_report_playwname ?: '未设置昵称';
+            $model->onshow = true;
+        }
     }
 }

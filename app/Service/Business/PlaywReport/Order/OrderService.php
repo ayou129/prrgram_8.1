@@ -71,15 +71,16 @@ class OrderService extends CommonService implements OrderInterface
 
     public function getOrderById($userModel, $params, $request, $admin = false)
     {
-        $model = PlaywReportClubOrder::getCacheById($userModel->playw_report_club_id, [
-            'user',
-            'zUser',
-            'project',
-            'boss',
-        ]);
+        $model = PlaywReportClubOrder::getCacheById($userModel->playw_report_club_id);
+
         if (! $model) {
             throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据不存在');
         }
+
+        $model->user = User::getCacheById($model->u_id);
+        $model->zUser = User::getCacheById($model->z_u_id);
+        $model->project = PlaywReportClubProject::getCacheById($model->project_id);
+        $model->boss = PlaywReportPlaywClubBoss::getCacheById($model->club_boss_id);
 
         return $model->toArray();
     }
@@ -107,10 +108,16 @@ class OrderService extends CommonService implements OrderInterface
         $result = $models->paginate((int) $request->input('size', 10))
             ->toArray();
         foreach ($result['data'] as &$item) {
-            $item->user = User::getCacheById($item->u_id);
-            $item->zUser = User::getCacheById($item->z_u_id);
+            $user = User::getCacheById($item->u_id);
+            User::addAttrText($user);
+            $item->user = $user;
+            $zUser = User::getCacheById($item->z_u_id);
+            User::addAttrText($zUser);
+            $item->zUser = $zUser;
+
             $item->project = PlaywReportClubProject::getCacheById($item->project_id);
             $item->boss = PlaywReportPlaywClubBoss::getCacheById($item->club_boss_id);
+            PlaywReportClubOrder::addAttrText($item);
         }
         $user_order_badges = OrderService::getOrderBadgeByUserIds($userModel->playw_report_club_id, [$userModel->id]);
         $result['user_order_badges'] = $user_order_badges[$userModel->id];

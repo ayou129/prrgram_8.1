@@ -28,7 +28,6 @@ trait ModelCacheTrait
         if ($cache) {
             $instance = new $modelName();
             $model = $instance->newInstance($cache, true);
-            $instance::addAttrText($model);
         } else {
             $model = (new $modelName())->where('id', $id)
                 ->first();
