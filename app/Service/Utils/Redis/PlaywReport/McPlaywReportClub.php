@@ -126,6 +126,38 @@ class McPlaywReportClub extends MCStrategyAbstract
     {
         return $this->prefix . $this->table . '|order_list_sort_created_at|id:' . $id;
     }
+    public function setProjectListSortCreatedAtByClubId($club_id, $scope, $id)
+    {
+        $key = self::getProjectListSortCreatedAtByClubIdKey($club_id);
+        return [$this->zAdd($key, $scope, $id), $this->ttl($key, self::ttl)];
+    }
+
+    public function getProjectListSortCreatedAtByClubIdPaginate($club_id, $start, $end): array
+    {
+        $key = self::getProjectListSortCreatedAtByClubIdKey($club_id);
+        return $this->getPaginate($key, $start, $end);
+    }
+
+    public function getProjectListSortCreatedAtByClubIdAll($club_id): array
+    {
+        $key = self::getProjectListSortCreatedAtByClubIdKey($club_id);
+        return $this->zrange($key, 0, -1);
+    }
+
+    public function delProjectListSortCreatedAtByClubIdZRemMembers($club_id, $id, ...$ids)
+    {
+        $key = self::getProjectListSortCreatedAtByClubIdKey($club_id);
+        return $this->zRem($key, $id, ...$ids);
+    }
+
+    /**
+     * 某个俱乐部的所有老板 根据创建时间排序.
+     * @param mixed $id
+     */
+    public function getProjectListSortCreatedAtByClubIdKey($id): string
+    {
+        return $this->prefix . $this->table . '|project_list_sort_created_at|id:' . $id;
+    }
 
     public function setSortCreatedAtByGroupId($club_id, $scope, $id)
     {

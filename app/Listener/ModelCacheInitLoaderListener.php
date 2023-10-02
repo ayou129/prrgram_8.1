@@ -13,9 +13,11 @@ declare(strict_types=1);
 namespace App\Listener;
 
 use App\Model\PlaywReportClubGroup;
+use App\Model\PlaywReportClubProject;
 use App\Service\Utils\Redis\PlaywReport\McPlaywReportClub;
 use App\Service\Utils\Redis\PlaywReport\McPlaywReportClubGroup;
 use App\Service\Utils\Redis\PlaywReport\McPlaywReportClubOrder;
+use App\Service\Utils\Redis\PlaywReport\McPlaywReportClubProject;
 use App\Service\Utils\Redis\PlaywReport\McPlaywReportPlaywClubBoss;
 use App\Service\Utils\Redis\PlaywReport\McUser;
 use App\Service\Utils\Redis\PlaywReport\McUserPlatform;
@@ -50,6 +52,7 @@ class ModelCacheInitLoaderListener implements ListenerInterface
         $mcPlaywClubGroup = new McPlaywReportClubGroup($redis);
         $mcPlaywClubBoss = new McPlaywReportPlaywClubBoss($redis);
         $mcPlaywClubOrder = new McPlaywReportClubOrder($redis);
+        $mcPlaywClubProject = new McPlaywReportClubProject($redis);
         $redis->pipeline();
         // load model
         echo 'model user loading...';
@@ -79,6 +82,13 @@ class ModelCacheInitLoaderListener implements ListenerInterface
             ->get();
         foreach ($playw_report_club_groupsArray as $item) {
             ModelCacheListener::clubGroup($mcPlaywClubGroup, $item, $mcPlaywClub);
+        }
+        echo 'model playw_club_project loading...';
+        $playw_report_club_projectsArray = Db::table((new PlaywReportClubProject())->getTable())
+            ->whereNull('deleted_at')
+            ->get();
+        foreach ($playw_report_club_projectsArray as $item) {
+            ModelCacheListener::clubProject($mcPlaywClubProject, $item, $mcPlaywClub);
         }
         echo 'model playw_club_boss loading...';
         $playw_report_playw_club_bosssArray = Db::table('playw_report_playw_club_boss')

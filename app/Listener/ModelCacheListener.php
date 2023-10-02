@@ -213,7 +213,7 @@ class ModelCacheListener implements ListenerInterface
                              */
                         }
                         $item = Db::table((new PlaywReportClubProject())->getTable())->whereNull('deleted_at')->find($model->id);
-                        self::clubProject($mcPlaywClubProject, $item);
+                        self::clubProject($mcPlaywClubProject, $item, $mcPlaywClub);
 
                         break;
                     case $model instanceof PlaywReportClubOrder:
@@ -267,7 +267,7 @@ class ModelCacheListener implements ListenerInterface
                         break;
                     case $model instanceof PlaywReportClubProject:
                         $item = Db::table((new PlaywReportClub())->getTable())->whereNull('deleted_at')->find($model->id);
-                        self::delClubProject($mcPlaywClubProject, $item);
+                        self::delClubProject($mcPlaywClubProject, $item, $mcPlaywClub);
                         break;
                     case $model instanceof PlaywReportClubOrder:
                         $item = Db::table((new PlaywReportClubOrder())->getTable())->whereNull('deleted_at')->find($model->id);
@@ -378,19 +378,22 @@ class ModelCacheListener implements ListenerInterface
         $mcPlaywClub->delSortCreatedAtByGroupIdZRemMembers($item->club_id, $item->id);
     }
 
-    public static function clubProject(McPlaywReportClubProject $mcPlaywClubProject, $item)
+    public static function clubProject(McPlaywReportClubProject $mcPlaywClubProject, $item, $mcPlaywClub)
     {
         $mcPlaywClubProject->setModel($item->id, (array) $item);
 
         if ($timestamp = strtotime($item->created_at)) {
             $mcPlaywClubProject->setSortCreatedAt($timestamp, $item->id);
+
+            $mcPlaywClub->setProjectListSortCreatedAtByClubId($item->club_id, $timestamp, $item->id);
         }
     }
 
-    public static function delClubProject(McPlaywReportClubProject $mcPlaywClubProject, $item)
+    public static function delClubProject(McPlaywReportClubProject $mcPlaywClubProject, $item, McPlaywReportClub $mcPlaywClub)
     {
         $mcPlaywClubProject->delModel($item->id);
         $mcPlaywClubProject->delSortCreatedAtZRemMembers($item->id);
+        $mcPlaywClub->delProjectListSortCreatedAtByClubIdZRemMembers($item->club_id, $item->id);
     }
 
     public static function clubBoss(McPlaywReportPlaywClubBoss $mcPlaywClubBoss, $item, McUser $mcUser, McPlaywReportClub $mcPlaywClub)

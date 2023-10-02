@@ -50,7 +50,7 @@ class PlaywService extends CommonService
 
     public function getStatisticsData($userModel, $params, $u_id = false, $admin = false)
     {
-        $orderModels = PlaywReportClubOrder::query()
+        $orderModels = Db::table((new PlaywReportClubOrder())->getTable())
             ->where('club_id', $userModel->playw_report_club_id);
         //        var_dump($u_id);
         if ($u_id) {
@@ -294,7 +294,7 @@ class PlaywService extends CommonService
                 $zUserModel->bosss = $zUserModel?->bosss->toArray();
             }
             $zModelsArray = $zModels->toArray();
-            var_dump($zModelsArray);
+            // var_dump($zModelsArray);
             $zArray = [];
             foreach ($zModelsArray as $key => &$zModelArray) {
                 $zModelArray['value'] = $zModelArray['id'];
@@ -340,6 +340,20 @@ class PlaywService extends CommonService
                 $clubUser[] = $item;
             }
 
+            $clubProjectModels = PlaywReportClub::getProjectListSortCreatedAtByClubIdAll($userModel->playw_report_club_id);
+            $clubProject = [];
+            foreach ($clubProjectModels as &$item) {
+                PlaywReportClubProject::addAttrText($item);
+                $clubProject[] = $item;
+            }
+
+            $clubGroupModels = PlaywReportClub::getSortCreatedAtByGroupIdAll($userModel->playw_report_club_id);
+            $clubGroup = [];
+            foreach ($clubGroupModels as &$item) {
+                PlaywReportClubGroup::addAttrText($item);
+                $clubGroup[] = $item;
+            }
+
             Db::commit();
 
             $redis = new Redis();
@@ -348,7 +362,7 @@ class PlaywService extends CommonService
                 'user' => $userModel->toArray(),
                 'zArray' => $zArray,
                 'club_users' => $clubUser,
-                'club_groups_array' => $clubModel->groups->toArray(),
+                'club_groups_array' => $clubGroup,
                 'club_group_method_array' => PlaywReportClubOrder::getClubGroupMethodArray(),
                 'club_project_default_array' => $defaultArray,
                 'club_project_gift_array' => $giftArray,
@@ -357,8 +371,7 @@ class PlaywService extends CommonService
                 'club_project_price_method_array' => Tools::convertModelArrayToJsComponentOptions(PlaywReportClubProject::getPriceMethodArray()),
                 'club_project_club_take_method_array' => Tools::convertModelArrayToJsComponentOptions(PlaywReportClubProject::getClubTakeMethodArray()),
                 'club_project_z_take_method_array' => Tools::convertModelArrayToJsComponentOptions(PlaywReportClubProject::getZTakeMethodArray()),
-                'club_projects' => PlaywReportClubProject::where('club_id', $userModel->playw_report_club_id)
-                    ->get(),
+                'club_projects' => $clubProject,
                 'club_apply_status_array' => Tools::convertModelArrayToJsComponentOptions(PlaywReportApply::getStatusArray()),
                 'club_apply_type_array' => Tools::convertModelArrayToJsComponentOptions(PlaywReportApply::getTypeArray()),
                 'club_stair_point_rule_type_array' => Tools::convertModelArrayToJsComponentOptions(PlaywReportClubOrderStairPointRule::getTypeArray()),
