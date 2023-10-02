@@ -12,11 +12,11 @@ declare(strict_types=1);
 
 namespace App\Service\Utils\Redis\PlaywReport;
 
-use App\Model\PlaywReportClubGroup;
+use App\Model\PlaywReportClub;
 use App\Service\Utils\Redis\PlaywReport\MCStrategy\MCStrategyAbstract;
 use Hyperf\Redis\Redis;
 
-class McPlaywClubGroup extends MCStrategyAbstract
+class McPlaywReportClubProject extends MCStrategyAbstract
 {
     public const ttl = 3600 * 24 * 2;
 
@@ -24,7 +24,7 @@ class McPlaywClubGroup extends MCStrategyAbstract
 
     public function __construct(?Redis $redis)
     {
-        $this->table = (new PlaywReportClubGroup())->getTable();
+        $this->table = (new PlaywReportClub())->getTable();
         parent::__construct($redis);
     }
 }

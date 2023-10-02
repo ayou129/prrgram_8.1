@@ -16,7 +16,7 @@ use App\Model\PlaywReportClubOrder;
 use App\Service\Utils\Redis\PlaywReport\MCStrategy\MCStrategyAbstract;
 use Hyperf\Redis\Redis;
 
-class McPlaywClubOrder extends MCStrategyAbstract
+class McPlaywReportClubOrder extends MCStrategyAbstract
 {
     public const ttl = 3600 * 24 * 2;
 
