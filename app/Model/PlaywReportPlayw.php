@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Service\Utils\Redis\PlaywReport\ModelCacheTrait;
+
 /**
  * @property int $id
  * @property int $u_id
@@ -23,6 +25,8 @@ namespace App\Model;
  */
 class PlaywReportPlayw extends BaseModel
 {
+    use ModelCacheTrait;
+
     /**
      * The table associated with the model.
      */
@@ -31,10 +35,24 @@ class PlaywReportPlayw extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'u_id', 'name', 'club_id', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = [
+        'id',
+        'u_id',
+        'name',
+        'club_id',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'u_id' => 'integer', 'club_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = [
+        'id' => 'integer',
+        'u_id' => 'integer',
+        'club_id' => 'integer',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 }

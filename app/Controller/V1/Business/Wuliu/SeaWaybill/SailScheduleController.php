@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Controller\V1\Business\Wuliu\SeaWaybill;
@@ -13,8 +17,6 @@ use App\Controller\AbstractController;
 use App\Model\WuliuSailSchedule;
 use App\Model\WuliuSeaWaybill;
 use Hyperf\HttpMessage\Exception\HttpException;
-use Hyperf\HttpServer\Annotation\AutoController;
-
 
 class SailScheduleController extends AbstractController
 {
@@ -75,7 +77,9 @@ class SailScheduleController extends AbstractController
         return $this->responseJson(ServiceCode::SUCCESS, $result);
     }
 
-    public function all() {}
+    public function all()
+    {
+    }
 
     public function post()
     {

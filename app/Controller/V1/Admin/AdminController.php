@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Controller\V1\Admin;
@@ -16,8 +20,6 @@ use App\Service\Admin\AdminService;
 use App\Utils\Tools;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpMessage\Exception\HttpException;
-use Hyperf\HttpServer\Annotation\AutoController;
-
 
 class AdminController extends AbstractController
 {
@@ -157,7 +159,9 @@ class AdminController extends AbstractController
         return $this->responseJson(ServiceCode::SUCCESS, []);
     }
 
-    public function users() {}
+    public function users()
+    {
+    }
 
     public function menus()
     {

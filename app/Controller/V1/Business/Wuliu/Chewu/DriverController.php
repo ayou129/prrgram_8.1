@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Controller\V1\Business\Wuliu\Chewu;
@@ -13,10 +17,10 @@ use App\Controller\AbstractController;
 use App\Model\WuliuBill;
 use App\Model\WuliuDriver;
 use App\Model\WuliuSeaWaybill;
+use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\HttpMessage\Exception\HttpException;
-use Hyperf\HttpServer\Annotation\AutoController;
-
+use Throwable;
 
 class DriverController extends AbstractController
 {
@@ -75,7 +79,9 @@ class DriverController extends AbstractController
         return $this->responseJson(ServiceCode::SUCCESS, $result);
     }
 
-    public function all() {}
+    public function all()
+    {
+    }
 
     public function post()
     {
@@ -94,7 +100,7 @@ class DriverController extends AbstractController
             $model->name = $params['name'];
             $model->save();
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -124,7 +130,7 @@ class DriverController extends AbstractController
             $model->save();
 
             Db::commit();
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -163,7 +169,7 @@ class DriverController extends AbstractController
             WuliuDriver::whereIn('id', $params)->delete();
 
             Db::commit();
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }

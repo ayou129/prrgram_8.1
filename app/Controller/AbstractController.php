@@ -17,7 +17,9 @@ use App\Utils\Tools;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
+use LogicException;
 use Psr\Container\ContainerInterface;
+use ReflectionClass;
 
 abstract class AbstractController
 {
@@ -39,7 +41,7 @@ abstract class AbstractController
         if ($custom_msg) {
             $msg = $custom_msg;
         } else {
-            $reflectionClass = new \ReflectionClass(ServiceCode::class);
+            $reflectionClass = new ReflectionClass(ServiceCode::class);
             $statusCode = $reflectionClass->getConstants();
             $target = false;
             foreach ($statusCode as $key => $item) {
@@ -49,7 +51,7 @@ abstract class AbstractController
                 }
             }
             if (! $target) {
-                throw new \LogicException('错误的$code 或 缺少StatusCode！');
+                throw new LogicException('错误的$code 或 缺少StatusCode！');
             }
             $msg = __('messages.' . $target) ?? '';
         }
@@ -65,6 +67,9 @@ abstract class AbstractController
     /**
      * 输出结果，并且将文字进行翻译.
      * 小程序是否显示弹窗，是否回退页面，是否跳转页面.
+     * @param mixed $msg
+     * @param mixed $data
+     * @param mixed $code
      */
     protected function resJson($msg, $data = [], $code = 0): \Psr\Http\Message\ResponseInterface
     {

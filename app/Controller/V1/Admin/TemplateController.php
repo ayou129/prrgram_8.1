@@ -2,18 +2,21 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Controller\V1\Admin;
 
 use App\Constant\ServiceCode;
 use App\Controller\AbstractController;
+use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\HttpMessage\Exception\HttpException;
-use Hyperf\HttpServer\Annotation\AutoController;
-
 
 class TemplateController extends AbstractController
 {
@@ -72,7 +75,9 @@ class TemplateController extends AbstractController
         return $this->responseJson(ServiceCode::SUCCESS, $result);
     }
 
-    public function all() {}
+    public function all()
+    {
+    }
 
     public function post()
     {
@@ -97,7 +102,7 @@ class TemplateController extends AbstractController
             $model->save();
 
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -131,7 +136,7 @@ class TemplateController extends AbstractController
             $model->save();
 
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -170,7 +175,7 @@ class TemplateController extends AbstractController
             Template::whereIn('id', $params)->delete();
 
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -205,7 +210,7 @@ class TemplateController extends AbstractController
             $model->delete();
 
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }

@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Controller\V1\Business\User;
@@ -14,10 +18,8 @@ use App\Service\Business\User\UserService;
 use EasyWeChat\Factory;
 use Hyperf\Amqp\Producer;
 use Hyperf\Di\Annotation\Inject;
-use Hyperf\HttpServer\Annotation\AutoController;
 use Hyperf\Snowflake\IdGeneratorInterface;
 use Hyperf\Validation\ValidationException;
-
 
 class UserController
 {

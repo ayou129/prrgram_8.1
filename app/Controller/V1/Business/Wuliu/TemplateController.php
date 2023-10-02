@@ -2,18 +2,21 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Controller\V1\Business\Wuliu;
 
 use App\Constant\ServiceCode;
 use App\Controller\AbstractController;
+use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\HttpMessage\Exception\HttpException;
-use Hyperf\HttpServer\Annotation\AutoController;
-
 
 class TemplateController extends AbstractController
 {
@@ -111,7 +114,9 @@ class TemplateController extends AbstractController
         return $this->responseJson(ServiceCode::SUCCESS, $result);
     }
 
-    public function all() {}
+    public function all()
+    {
+    }
 
     public function post()
     {
@@ -138,7 +143,7 @@ class TemplateController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -172,7 +177,7 @@ class TemplateController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -211,7 +216,7 @@ class TemplateController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -246,7 +251,7 @@ class TemplateController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }

@@ -12,9 +12,10 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Service\Utils\Redis\PlaywReport\McPlaywClub;
+use App\Service\Utils\Redis\PlaywReport\McPlaywReportClub;
+use App\Service\Utils\Redis\PlaywReport\ModelCacheTrait;
 use Hyperf\Collection\Collection;
-use Hyperf\Paginator\Paginator;
+use Hyperf\Paginator\LengthAwarePaginator;
 
 /**
  * @property int $id
@@ -29,12 +30,15 @@ use Hyperf\Paginator\Paginator;
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
  * @property null|\Hyperf\Database\Model\Collection|PlaywReportClubGroup[] $groups
+ * @property null|\Hyperf\Database\Model\Collection|PlaywReportPlaywClubBoss[] $bosss
  * @property null|\Hyperf\Database\Model\Collection|User[] $users
  * @property null|PlaywReportClubOrderStairPoint $stairPoint
  * @property null|\Hyperf\Database\Model\Collection|PlaywReportClubOrder[] $orders
  */
 class PlaywReportClub extends BaseModel
 {
+    use ModelCacheTrait;
+
     public const AUTO_APPLY_BOSS_CREATE_NO = 0;
 
     public const AUTO_APPLY_BOSS_CREATE_YES = 1;
@@ -130,7 +134,7 @@ class PlaywReportClub extends BaseModel
     public static function getCacheById($k, $relations = [])
     {
         $redis = make(\Hyperf\Redis\Redis::class);
-        $mc = new McPlaywClub($redis);
+        $mc = new McPlaywReportClub($redis);
         $cache = $mc->getModel($k);
         if ($cache) {
             $model = (new self())->newInstance($cache, true);
@@ -140,36 +144,36 @@ class PlaywReportClub extends BaseModel
         }
         if ($model) {
             if (in_array('groups', $relations)) {
-                $model->groups = PlaywReportClub::getCacheGroupListById($model->id);
+                $model->groups = PlaywReportClub::getSortCreatedAtByGroupIdAll($model->id);
             }
             if (in_array('bosss', $relations)) {
-                $model->bosss = PlaywReportClub::getCacheBossListById($model->id);
+                $model->bosss = PlaywReportClub::getBossListSortCreatedAtByClubIdAll($model->id);
             }
         }
         return $model ?? null;
     }
 
-    public static function getCacheGroupListById($k, $relations = [])
+    /**
+     * @return Collection|\Hyperf\Database\Model\Builder[]|\Hyperf\Database\Model\Collection
+     */
+    public static function getSortCreatedAtByGroupIdAll($k, $relations = [])
     {
         $redis = make(\Hyperf\Redis\Redis::class);
-        $mc = new McPlaywClub($redis);
+        $mc = new McPlaywReportClub($redis);
         $cache = $mc->getSortCreatedAtByGroupIdAll($k);
-        var_dump($cache);
         if ($cache) {
             $models = PlaywReportClubGroup::getCacheByIds($cache);
         } else {
             $models = (new PlaywReportClubGroup())->where('club_id', $k)
                 ->get();
         }
-        if ($models) {
-        }
         return $models;
     }
 
-    public static function getCacheBossListById($k, $relations = [])
+    public static function getBossListSortCreatedAtByClubIdAll($k, $relations = [])
     {
         $redis = make(\Hyperf\Redis\Redis::class);
-        $mc = new McPlaywClub($redis);
+        $mc = new McPlaywReportClub($redis);
         $cache = $mc->getBossListSortCreatedAtByClubIdAll($k);
         //        var_dump($cache);
         if ($cache) {
@@ -182,19 +186,17 @@ class PlaywReportClub extends BaseModel
         return $models;
     }
 
-    public static function getCacheBossListPaginate($k, $relations = [], int $page = 1, int $limit = 10)
+    public static function getBossListSortCreatedAtByClubIdPaginate($k, $relations = [], int $page = 1, int $limit = 10)
     {
         $redis = make(\Hyperf\Redis\Redis::class);
-        $mc = new McPlaywClub($redis);
+        $mc = new McPlaywReportClub($redis);
         $cache = $mc->getBossListSortCreatedAtByClubIdPaginate($k, $page, $limit);
         //        var_dump($cache);
         if ($cache) {
             $data = PlaywReportPlaywClubBoss::getCacheByIds($cache['data']);
-            $models = new Paginator($data, $cache['per_page'], $cache['current_page']);
+            $models = new LengthAwarePaginator($data, $cache['total'], $cache['per_page'], $cache['current_page']);
         } else {
-            $models = new Paginator([]);
-        }
-        if ($models) {
+            $models = new LengthAwarePaginator([]);
         }
         return $models;
     }

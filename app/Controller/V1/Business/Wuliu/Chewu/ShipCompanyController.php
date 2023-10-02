@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Controller\V1\Business\Wuliu\Chewu;
@@ -11,10 +15,10 @@ namespace App\Controller\V1\Business\Wuliu\Chewu;
 use App\Constant\ServiceCode;
 use App\Controller\AbstractController;
 use App\Model\WuliuShipCompany;
+use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\HttpMessage\Exception\HttpException;
-use Hyperf\HttpServer\Annotation\AutoController;
-
+use Throwable;
 
 class ShipCompanyController extends AbstractController
 {
@@ -124,7 +128,7 @@ class ShipCompanyController extends AbstractController
             $model->save();
 
             Db::commit();
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -163,7 +167,7 @@ class ShipCompanyController extends AbstractController
             WuliuShipCompany::whereIn('id', $params)->delete();
 
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }

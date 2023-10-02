@@ -13,10 +13,10 @@ declare(strict_types=1);
 namespace App\Listener;
 
 use App\Model\PlaywReportClubGroup;
-use App\Service\Utils\Redis\PlaywReport\McPlaywClub;
-use App\Service\Utils\Redis\PlaywReport\McPlaywClubBoss;
-use App\Service\Utils\Redis\PlaywReport\McPlaywClubGroup;
-use App\Service\Utils\Redis\PlaywReport\McPlaywClubOrder;
+use App\Service\Utils\Redis\PlaywReport\McPlaywReportClub;
+use App\Service\Utils\Redis\PlaywReport\McPlaywReportClubGroup;
+use App\Service\Utils\Redis\PlaywReport\McPlaywReportClubOrder;
+use App\Service\Utils\Redis\PlaywReport\McPlaywReportPlaywClubBoss;
 use App\Service\Utils\Redis\PlaywReport\McUser;
 use App\Service\Utils\Redis\PlaywReport\McUserPlatform;
 use Hyperf\DbConnection\Db;
@@ -45,10 +45,10 @@ class ModelCacheInitLoaderListener implements ListenerInterface
 
         $mcUser = new McUser($redis);
         $mcUserPlatform = new McUserPlatform($redis);
-        $mcPlaywClub = new McPlaywClub($redis);
-        $mcPlaywClubGroup = new McPlaywClubGroup($redis);
-        $mcPlaywClubBoss = new McPlaywClubBoss($redis);
-        $mcPlaywClubOrder = new McPlaywClubOrder($redis);
+        $mcPlaywClub = new McPlaywReportClub($redis);
+        $mcPlaywClubGroup = new McPlaywReportClubGroup($redis);
+        $mcPlaywClubBoss = new McPlaywReportPlaywClubBoss($redis);
+        $mcPlaywClubOrder = new McPlaywReportClubOrder($redis);
         $redis->pipeline();
         // load model
         echo 'model user loading...';

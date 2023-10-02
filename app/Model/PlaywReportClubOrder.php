@@ -12,7 +12,8 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Service\Utils\Redis\PlaywReport\McPlaywClubOrder;
+use App\Service\Utils\Redis\PlaywReport\McPlaywReportClubOrder;
+use App\Service\Utils\Redis\PlaywReport\ModelCacheTrait;
 
 /**
  * @property int $id
@@ -54,6 +55,8 @@ use App\Service\Utils\Redis\PlaywReport\McPlaywClubOrder;
  */
 class PlaywReportClubOrder extends BaseModel
 {
+    use ModelCacheTrait;
+
     public const STATUS_DEFAULT = 0;
 
     // 已结账状态
@@ -116,7 +119,7 @@ class PlaywReportClubOrder extends BaseModel
     public static function getCacheById($k, $relations = [])
     {
         $redis = make(\Hyperf\Redis\Redis::class);
-        $mc = new McPlaywClubOrder($redis);
+        $mc = new McPlaywReportClubOrder($redis);
         $cache = $mc->getModel($k);
         if ($cache) {
             $model = (new self())->newInstance($cache, true);

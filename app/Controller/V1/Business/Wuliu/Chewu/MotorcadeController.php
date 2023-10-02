@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Controller\V1\Business\Wuliu\Chewu;
@@ -12,10 +16,9 @@ use App\Constant\ServiceCode;
 use App\Controller\AbstractController;
 use App\Model\WuliuCar;
 use App\Model\WuliuMotorcade;
+use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\HttpMessage\Exception\HttpException;
-use Hyperf\HttpServer\Annotation\AutoController;
-
 
 class MotorcadeController extends AbstractController
 {
@@ -113,7 +116,9 @@ class MotorcadeController extends AbstractController
         return $this->responseJson(ServiceCode::SUCCESS, $result);
     }
 
-    public function all() {}
+    public function all()
+    {
+    }
 
     public function post()
     {
@@ -139,7 +144,7 @@ class MotorcadeController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -172,7 +177,7 @@ class MotorcadeController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -212,7 +217,7 @@ class MotorcadeController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -248,7 +253,7 @@ class MotorcadeController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }

@@ -9,7 +9,6 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-use Hyperf\HttpServer\Router\Router;
 use App\Controller\V1\Admin\AdminController;
 use App\Controller\V1\Admin\ConfigController;
 use App\Controller\V1\Admin\DeptController;
@@ -25,6 +24,7 @@ use App\Controller\V1\Business\PlaywReport\CommonController;
 use App\Controller\V1\Business\PlaywReport\PlaywController;
 use App\Controller\V1\Business\PlaywReport\UserController as PlaywReportUserController;
 use App\Middleware\AuthMiddleware;
+use Hyperf\HttpServer\Router\Router;
 
 // Router::addRoute(['GET', 'POST', 'HEAD'], '/', 'App\Controller\IndexController@index');
 

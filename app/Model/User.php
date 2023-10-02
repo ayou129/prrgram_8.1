@@ -12,11 +12,10 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Service\Utils\Redis\PlaywReport\McPlaywClub;
 use App\Service\Utils\Redis\PlaywReport\McUser;
+use App\Service\Utils\Redis\PlaywReport\ModelCacheTrait;
 use Hyperf\Collection\Collection;
 use Hyperf\Paginator\LengthAwarePaginator;
-use Hyperf\Paginator\Paginator;
 
 /**
  * @property int $id
@@ -58,6 +57,8 @@ use Hyperf\Paginator\Paginator;
  */
 class User extends BaseModel
 {
+    use ModelCacheTrait;
+
     public const PLAYW_REPORT_CLUB_ADMIN_DEFAULT = 0;
 
     public const PLAYW_REPORT_CLUB_ADMIN_YES = 1;
@@ -203,42 +204,11 @@ class User extends BaseModel
             ->with('club');
     }
 
-    public static function getCacheById($k, $relations = [])
-    {
-        $redis = make(\Hyperf\Redis\Redis::class);
-        $mc = new McUser($redis);
-        $cache = $mc->getModel($k);
-        if ($cache) {
-            $model = (new self())->newInstance($cache, true);
-        } else {
-            $model = (new self())->where('id', $k)
-                ->first();
-        }
-        self::addRelations($model, $relations);
-        return $model ?? null;
-    }
-
-    public static function getCacheByIds($k, $relations = [])
-    {
-        $redis = make(\Hyperf\Redis\Redis::class);
-        $mc = new McUser($redis);
-        $cache = $mc->getModels($k);
-        if ($cache) {
-            $models = [];
-            foreach ($cache as $item) {
-                $models[] = (new self())->newInstance($item, true);
-            }
-            $models = $models ? new Collection($models) : new Collection([]);
-        } else {
-            $models = (new self())->whereIn('id', $k)
-                ->get();
-        }
-        foreach ($models as $model) {
-            self::addRelations($model, $relations);
-        }
-        return $models;
-    }
-
+    /**
+     * @param mixed $k
+     * @param mixed $relations
+     * @return null|\Hyperf\Database\Model\Builder|\Hyperf\Database\Model\Model|object|User
+     */
     public static function getCacheUserByPhone($k, $relations = [])
     {
         $redis = make(\Hyperf\Redis\Redis::class);
@@ -263,10 +233,15 @@ class User extends BaseModel
      * @param mixed $k
      * @param mixed $k2
      * @param mixed $relations
-     * @return Paginator
+     * @return LengthAwarePaginator
      */
-    public static function getCacheBossListByIdAndClubId($k, $k2, $relations = [], int $page = 1, int $limit = 10)
-    {
+    public static function getBossListSortCreatedAtByClubIdPaginate(
+        $k,
+        $k2,
+        $relations = [],
+        int $page = 1,
+        int $limit = 10
+    ) {
         $redis = make(\Hyperf\Redis\Redis::class);
         $mc = new McUser($redis);
         $cache = $mc->getBossListSortCreatedAtByClubIdPaginate($k, $k2, $page, $limit);
@@ -277,12 +252,16 @@ class User extends BaseModel
         } else {
             $models = new LengthAwarePaginator([]);
         }
-        if ($models) {
-        }
         return $models;
     }
 
-    public static function getCacheByBossIdAndClubIdAll($k, $k2, $relations = [])
+    /**
+     * @param mixed $k
+     * @param mixed $k2
+     * @param mixed $relations
+     * @return Collection|\Hyperf\Database\Model\Builder[]|\Hyperf\Database\Model\Collection
+     */
+    public static function getBossListSortCreatedAtByClubIdAll($k, $k2, $relations = [])
     {
         $redis = make(\Hyperf\Redis\Redis::class);
         $mc = new McUser($redis);
@@ -311,7 +290,7 @@ class User extends BaseModel
                 $model->platformMiniprogram = UserPlatform::getCacheByUserIdAndPlatform(UserPlatform::PLATFORM_MINIPROGRAM, $model->id);
             }
             if (in_array('bosss', $relations)) {
-                $model->bosss = User::getCacheByBossIdAndClubIdAll($model->playw_report_club_id, $model->id);
+                $model->bosss = User::getBossListSortCreatedAtByClubIdAll($model->playw_report_club_id, $model->id);
             }
         }
     }

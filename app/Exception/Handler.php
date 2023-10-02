@@ -20,7 +20,6 @@ use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\ExceptionHandler\Formatter\FormatterInterface;
 use Hyperf\HttpMessage\Exception\HttpException;
 use Hyperf\HttpMessage\Stream\SwooleStream;
-use Hyperf\Logger\Logger;
 use Hyperf\Validation\ValidationException;
 use LogicException;
 use Psr\Http\Message\ResponseInterface;

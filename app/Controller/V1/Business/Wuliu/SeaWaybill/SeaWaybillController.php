@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Controller\V1\Business\Wuliu\SeaWaybill;
@@ -18,13 +22,13 @@ use App\Model\WuliuSeaWaybill;
 use App\Model\WuliuShipCompany;
 use App\Service\Business\Wuliu\SeaWaybill\SeaWaybillService;
 use App\Utils\Tools;
+use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpMessage\Exception\HttpException;
-use Hyperf\HttpServer\Annotation\AutoController;
+use LogicException;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Exception as ReaderExcetpion;
-
 
 class SeaWaybillController extends AbstractController
 {
@@ -300,7 +304,7 @@ class SeaWaybillController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -402,7 +406,7 @@ class SeaWaybillController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -450,7 +454,7 @@ class SeaWaybillController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -481,7 +485,7 @@ class SeaWaybillController extends AbstractController
             $updateData = $result['updateCount'];
             Db::commit();
             return $this->resJson("共导入{$insertCount}条，更新{$updateCount}条数据！", [$insertData, $updateData]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -576,7 +580,7 @@ class SeaWaybillController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -628,7 +632,7 @@ class SeaWaybillController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -675,7 +679,7 @@ class SeaWaybillController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -724,7 +728,7 @@ class SeaWaybillController extends AbstractController
                     $field = 'self_bill_id';
                     break;
                 default:
-                    throw new \LogicException('不支持的类型');
+                    throw new LogicException('不支持的类型');
             }
             foreach ($models as $model) {
                 if ($type === WuliuBill::TYPE_SELF) {
@@ -758,7 +762,7 @@ class SeaWaybillController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -814,7 +818,7 @@ class SeaWaybillController extends AbstractController
                     $field = 'self_bill_id';
                     break;
                 default:
-                    throw new \LogicException('不支持的类型');
+                    throw new LogicException('不支持的类型');
             }
             foreach ($models as $model) {
                 if (! $model->{$field}) {
@@ -828,7 +832,7 @@ class SeaWaybillController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -872,7 +876,7 @@ class SeaWaybillController extends AbstractController
             }
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -911,7 +915,7 @@ class SeaWaybillController extends AbstractController
             }
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -937,7 +941,7 @@ class SeaWaybillController extends AbstractController
             $result = $this->seaWaybillService->getReceipt($models);
             // 将文件内容作为响应体返回
             return $this->response->download($result['path'], $result['filename']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Db::rollBack();
             throw $e;
         }
@@ -1279,7 +1283,7 @@ a;
             Db::commit();
 
             return $this->resJson("共导入{$insertCount}条，更新{$updateCount}条数据！", [$insertData, $updateData]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -1602,7 +1606,7 @@ a;
             Db::commit();
 
             return $this->resJson("共导入{$insertCount}条，更新{$updateCount}条数据！", [$insertData, $updateData]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -1684,7 +1688,7 @@ a;
                         $timestamp = strtotime($timeStr);
                         // var_dump($timestamp);
                         $value['car_finished_date'] = date('Y-m-d', $timestamp);
-                    } catch (\Exception $th) {
+                    } catch (Exception $th) {
                         throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, "车完成时间{$value[$car_finished_dateIndex]}格式有误，请更改后处理");
                     }
                 }
@@ -1719,7 +1723,7 @@ a;
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS, "操作成功，共导入{$numberCount}条数据！");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -1826,7 +1830,7 @@ a;
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS, "操作成功，共导入{$numberCount}条数据！");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -1977,7 +1981,7 @@ a;
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS, "操作成功，共导入{$numberCount}条数据！");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -2136,7 +2140,7 @@ a;
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS, "操作成功，共导入{$numberCount}条数据！");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -2307,7 +2311,7 @@ a;
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS, "操作成功，共导入{$numberCount}条数据！");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -2504,7 +2508,7 @@ a;
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS, "操作成功，共导入{$numberCount}条数据！");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -2581,7 +2585,7 @@ a;
             (new WuliuSeaWaybill())->updateBatch($updateSeaWaybillArray);
             Db::commit();
             return $this->responseJson(ServiceCode::SUCCESS, "操作成功，共导入{$numberCount}条数据！");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -2715,7 +2719,7 @@ a;
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS, "操作成功，共导入{$numberCount}条数据！");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -2855,7 +2859,7 @@ a;
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS, "操作成功，共导入{$numberCount}条数据！");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -3053,7 +3057,7 @@ a;
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS, "操作成功，共导入{$numberCount}条数据！");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -3260,7 +3264,7 @@ a;
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS, "操作成功，共导入{$numberCount}条数据！");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -3453,7 +3457,7 @@ a;
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS, "共更新{$updateDataCount}条，插入{$insertDataCount}数据！");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -3594,7 +3598,7 @@ a;
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS, "共更新{$updateDataCount}条，插入{$insertDataCount}数据！");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -3684,10 +3688,12 @@ a;
                 $value = trim($value);
             }
             return $arr;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
 
-    public function downloadImportCommonFile() {}
+    public function downloadImportCommonFile()
+    {
+    }
 }

@@ -19,11 +19,11 @@ use App\Model\PlaywReportClubProject;
 use App\Model\PlaywReportPlaywClubBoss;
 use App\Model\User;
 use App\Model\UserPlatform;
-use App\Service\Utils\Redis\PlaywReport\McPlaywClub;
-use App\Service\Utils\Redis\PlaywReport\McPlaywClubBoss;
-use App\Service\Utils\Redis\PlaywReport\McPlaywClubGroup;
-use App\Service\Utils\Redis\PlaywReport\McPlaywClubOrder;
-use App\Service\Utils\Redis\PlaywReport\McPlaywClubProject;
+use App\Service\Utils\Redis\PlaywReport\McPlaywReportClub;
+use App\Service\Utils\Redis\PlaywReport\McPlaywReportClubGroup;
+use App\Service\Utils\Redis\PlaywReport\McPlaywReportClubOrder;
+use App\Service\Utils\Redis\PlaywReport\McPlaywReportClubProject;
+use App\Service\Utils\Redis\PlaywReport\McPlaywReportPlaywClubBoss;
 use App\Service\Utils\Redis\PlaywReport\McUser;
 use App\Service\Utils\Redis\PlaywReport\McUserPlatform;
 use Hyperf\Database\Model\Events\Deleted;
@@ -65,11 +65,11 @@ class ModelCacheListener implements ListenerInterface
         $redis->pipeline();
         $mcUser = new McUser($redis);
         $mcUserPlatform = new McUserPlatform($redis);
-        $mcPlaywClub = new McPlaywClub($redis);
-        $mcPlaywClubGroup = new McPlaywClubGroup($redis);
-        $mcPlaywClubProject = new McPlaywClubProject($redis);
-        $mcPlaywClubBoss = new McPlaywClubBoss($redis);
-        $mcPlaywClubOrder = new McPlaywClubOrder($redis);
+        $mcPlaywClub = new McPlaywReportClub($redis);
+        $mcPlaywClubGroup = new McPlaywReportClubGroup($redis);
+        $mcPlaywClubProject = new McPlaywReportClubProject($redis);
+        $mcPlaywClubBoss = new McPlaywReportPlaywClubBoss($redis);
+        $mcPlaywClubOrder = new McPlaywReportClubOrder($redis);
 
         switch ($event->getMethod()) {
             case 'retrieved':
@@ -281,7 +281,7 @@ class ModelCacheListener implements ListenerInterface
         $redis->exec();
     }
 
-    public static function user(McUser $mcUser, $item, McPlaywClub $mcPlaywClub)
+    public static function user(McUser $mcUser, $item, McPlaywReportClub $mcPlaywClub)
     {
         $mcUser->setModel($item->id, (array) $item);
 
@@ -299,7 +299,7 @@ class ModelCacheListener implements ListenerInterface
         }
     }
 
-    public static function delUser(McUser $mcUser, $item, McPlaywClub $mcPlaywClub)
+    public static function delUser(McUser $mcUser, $item, McPlaywReportClub $mcPlaywClub)
     {
         $mcUser->delModel($item->id);
         $mcUser->delSortCreatedAtZRemMembers($item->id);
@@ -340,7 +340,7 @@ class ModelCacheListener implements ListenerInterface
         $mcUserPlatform->delByPlatformAndLoginToken($item->platform, $item->login_token);
     }
 
-    public static function club(McPlaywClub $mcPlaywClub, $item)
+    public static function club(McPlaywReportClub $mcPlaywClub, $item)
     {
         $mcPlaywClub->setModel($item->id, (array) $item);
 
@@ -349,13 +349,13 @@ class ModelCacheListener implements ListenerInterface
         }
     }
 
-    public static function delClub(McPlaywClub $mcPlaywClub, $item)
+    public static function delClub(McPlaywReportClub $mcPlaywClub, $item)
     {
         $mcPlaywClub->delModel($item->id);
         $mcPlaywClub->delSortCreatedAtZRemMembers($item->id);
     }
 
-    public static function clubGroup(McPlaywClubGroup $mcPlaywClubGroup, $item, McPlaywClub $mcPlaywClub)
+    public static function clubGroup(McPlaywReportClubGroup $mcPlaywClubGroup, $item, McPlaywReportClub $mcPlaywClub)
     {
         $mcPlaywClubGroup->setModel($item->id, (array) $item);
 
@@ -371,14 +371,14 @@ class ModelCacheListener implements ListenerInterface
     /**
      * @param mixed $item
      */
-    public static function delClubGroup(McPlaywClubGroup $mcPlaywClubGroup, $item, McPlaywClub $mcPlaywClub)
+    public static function delClubGroup(McPlaywReportClubGroup $mcPlaywClubGroup, $item, McPlaywReportClub $mcPlaywClub)
     {
         $mcPlaywClubGroup->delModel($item->id);
         $mcPlaywClubGroup->delSortCreatedAtZRemMembers($item->id);
         $mcPlaywClub->delSortCreatedAtByGroupIdZRemMembers($item->club_id, $item->id);
     }
 
-    public static function clubProject(McPlaywClubProject $mcPlaywClubProject, $item)
+    public static function clubProject(McPlaywReportClubProject $mcPlaywClubProject, $item)
     {
         $mcPlaywClubProject->setModel($item->id, (array) $item);
 
@@ -387,13 +387,13 @@ class ModelCacheListener implements ListenerInterface
         }
     }
 
-    public static function delClubProject(McPlaywClubProject $mcPlaywClubProject, $item)
+    public static function delClubProject(McPlaywReportClubProject $mcPlaywClubProject, $item)
     {
         $mcPlaywClubProject->delModel($item->id);
         $mcPlaywClubProject->delSortCreatedAtZRemMembers($item->id);
     }
 
-    public static function clubBoss(McPlaywClubBoss $mcPlaywClubBoss, $item, McUser $mcUser, McPlaywClub $mcPlaywClub)
+    public static function clubBoss(McPlaywReportPlaywClubBoss $mcPlaywClubBoss, $item, McUser $mcUser, McPlaywReportClub $mcPlaywClub)
     {
         $mcPlaywClubBoss->setModel($item->id, (array) $item);
 
@@ -411,7 +411,7 @@ class ModelCacheListener implements ListenerInterface
         }
     }
 
-    public static function delClubBoss(McPlaywClubBoss $mcPlaywClubBoss, $item, McUser $mcUser, McPlaywClub $mcPlaywClub)
+    public static function delClubBoss(McPlaywReportPlaywClubBoss $mcPlaywClubBoss, $item, McUser $mcUser, McPlaywReportClub $mcPlaywClub)
     {
         $mcPlaywClubBoss->delModel($item->id);
         $mcPlaywClubBoss->delSortCreatedAtZRemMembers($item->id);
@@ -423,7 +423,7 @@ class ModelCacheListener implements ListenerInterface
         $mcPlaywClub->delBossListSortCreatedAtByClubIdPaginateZRemMembers($item->club_id, $item->id);
     }
 
-    public static function clubOrder(McPlaywClubOrder $mcPlaywClubOrder, $item, McUser $mcUser, McPlaywClub $mcPlaywClub)
+    public static function clubOrder(McPlaywReportClubOrder $mcPlaywClubOrder, $item, McUser $mcUser, McPlaywReportClub $mcPlaywClub)
     {
         # id
         $mcPlaywClubOrder->setModel($item->id, (array) $item);
@@ -441,7 +441,7 @@ class ModelCacheListener implements ListenerInterface
         }
     }
 
-    public static function delClubOrder(McPlaywClubOrder $mcPlaywClubOrder, $item, McUser $mcUser, McPlaywClub $mcPlaywClub)
+    public static function delClubOrder(McPlaywReportClubOrder $mcPlaywClubOrder, $item, McUser $mcUser, McPlaywReportClub $mcPlaywClub)
     {
         # id
         $mcPlaywClubOrder->delModel($item->id);

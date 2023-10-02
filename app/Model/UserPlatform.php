@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Service\Utils\Redis\PlaywReport\McUserPlatform;
+use App\Service\Utils\Redis\PlaywReport\ModelCacheTrait;
 use Hyperf\Database\Model\Model;
 
 /**
@@ -26,16 +27,15 @@ use Hyperf\Database\Model\Model;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
- * @property mixed $user
+ * @property null|User $user
  */
 class UserPlatform extends BaseModel
 {
+    use ModelCacheTrait;
+
     public const PLATFORM_MINIPROGRAM = 1;
 
-    /**
-     * @var null|Model|User
-     */
-    public ?User $user;
+    public $user;
 
     /**
      * The table associated with the model.
@@ -45,12 +45,29 @@ class UserPlatform extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'u_id', 'platform', 'wx_openid', 'wx_session_key', 'login_token', 'login_token_expire_time', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = [
+        'id',
+        'u_id',
+        'platform',
+        'wx_openid',
+        'wx_session_key',
+        'login_token',
+        'login_token_expire_time',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'u_id' => 'integer', 'platform' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = [
+        'id' => 'integer',
+        'u_id' => 'integer',
+        'platform' => 'integer',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
     public static function getPlatformArray()
     {
@@ -74,7 +91,8 @@ class UserPlatform extends BaseModel
         if ($cache) {
             $model = (new self())->newInstance($cache, true);
         } else {
-            $model = (new self())->where('id', $k)->first();
+            $model = (new self())->where('id', $k)
+                ->first();
         }
         if ($model) {
             if (in_array('user', $relations)) {
@@ -103,12 +121,9 @@ class UserPlatform extends BaseModel
                 $model = null;
             }
         } else {
-            $model = (new self())->where('platform', $k)->where('login_token', $k2)->first();
-        }
-        if ($model) {
-            if (in_array('user', $relations)) {
-                $model->user = User::getCacheById($model->u_id) ?? null;
-            }
+            $model = (new self())->where('platform', $k)
+                ->where('login_token', $k2)
+                ->first();
         }
         return $model;
     }
@@ -126,7 +141,8 @@ class UserPlatform extends BaseModel
                 $model = null;
             }
         } else {
-            $model = (new self())->where('id', $k2)->first();
+            $model = (new self())->where('id', $k2)
+                ->first();
         }
         if ($model) {
             if (in_array('user', $relations)) {
@@ -149,13 +165,12 @@ class UserPlatform extends BaseModel
                 $model = null;
             }
         } else {
-            $model = (new self())->where('platform', $k)->where('u_id', $k2)->where('wx_openid', $k3)->first();
+            $model = (new self())->where('platform', $k)
+                ->where('u_id', $k2)
+                ->where('wx_openid', $k3)
+                ->first();
         }
-        if ($model) {
-            if (in_array('user', $relations)) {
-                $model->user = User::getCacheById($model->u_id) ?? null;
-            }
-        }
+        self::addRelations($model, $relations);
         return $model ?? null;
     }
 }

@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Controller\V1\Business\Wuliu\Chewu;
@@ -14,10 +18,10 @@ use App\Model\WuliuBill;
 use App\Model\WuliuCar;
 use App\Model\WuliuMotorcade;
 use App\Model\WuliuSeaWaybill;
+use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\HttpMessage\Exception\HttpException;
-use Hyperf\HttpServer\Annotation\AutoController;
-
+use Throwable;
 
 class CarController extends AbstractController
 {
@@ -88,7 +92,9 @@ class CarController extends AbstractController
         return $this->responseJson(ServiceCode::SUCCESS, $result);
     }
 
-    public function all() {}
+    public function all()
+    {
+    }
 
     public function post()
     {
@@ -114,7 +120,7 @@ class CarController extends AbstractController
             $model->motorcade_id = $params['motorcade_id'];
             $model->save();
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -145,7 +151,7 @@ class CarController extends AbstractController
             $model->save();
 
             Db::commit();
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }
@@ -184,7 +190,7 @@ class CarController extends AbstractController
             WuliuCar::whereIn('id', $params)->delete();
 
             Db::commit();
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Db::rollBack();
             throw $ex;
         }

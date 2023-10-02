@@ -56,7 +56,7 @@ class ProjectStrategy implements ProjectInterface
                 throw new Exception('不支持的$project->club_take_method' . $project->club_take_method);
         }
         # 特殊情况，如果是多倍，则抽成也翻倍
-        //        if ($project->price_method === PlaywReportClubProject::PRICE_METHOD_DOUBLE) {
+        //        if ($project->price_method === McPlaywReportClubProject::PRICE_METHOD_DOUBLE) {
         //            $val = Tools::mul($project->price_method_double, $val);
         //        }
         return $val < 0 ? 0 : $val;
@@ -86,7 +86,7 @@ class ProjectStrategy implements ProjectInterface
                 throw new Exception('不支持的$project->z_take_method' . $project->z_take_method);
         }
         # 特殊情况，如果是多倍，则抽成也翻倍
-        //        if ($project->price_method === PlaywReportClubProject::PRICE_METHOD_DOUBLE) {
+        //        if ($project->price_method === McPlaywReportClubProject::PRICE_METHOD_DOUBLE) {
         //            $val = Tools::mul($project->price_method_double, $val);
         //        }
         return $val < 0 ? 0 : $val;

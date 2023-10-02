@@ -288,15 +288,15 @@ class PlaywService extends CommonService
                 'groups',
                 'bosss',
             ]);
-            $zIds = array_unique($clubModel->bosss->pluck('u_id')
+            $clubBosss = PlaywReportClub::getBossListSortCreatedAtByClubIdAll($userModel->playw_report_club_id);
+            $zIds = array_unique($clubBosss->pluck('u_id')
                 ->toArray());
 
-            $zModels = User::getCacheByIds($zIds, [
-                'bosss',
-                'group',
-            ]);
+            $zModels = User::getCacheByIds($zIds);
+            $zModels->bosss = User::getBossListSortCreatedAtByClubIdAll($userModel->playw_report_club_id, $userModel->id);
+
             foreach ($zModels as $model) {
-                $model->bosss = User::getCacheByBossIdAndClubIdAll($model->playw_report_club_id, $model->id);
+                $model->bosss = User::getBossListSortCreatedAtByClubIdAll($model->playw_report_club_id, $model->id);
 
                 foreach ($model->bosss as &$boss) {
                     $groupModel = PlaywReportClubGroup::getCacheById($boss->group_id);

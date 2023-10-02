@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Controller\V1\Admin;
@@ -17,8 +21,6 @@ use App\Model\SysRole;
 use App\Model\SysRolesDept;
 use App\Model\SysRolesMenu as SysRolesMenus;
 use App\Model\SysUser;
-use Hyperf\HttpServer\Annotation\AutoController;
-
 
 class RoleController extends AbstractController
 {

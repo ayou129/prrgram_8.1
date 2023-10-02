@@ -23,19 +23,18 @@ use EasyWeChat\Kernel\Exceptions\HttpException;
 use EasyWeChat\Kernel\Exceptions\InvalidConfigException;
 use EasyWeChat\MiniApp\Application;
 use Exception;
-use GuzzleHttp\Exception\GuzzleException;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Throwable;
 
 class MiniLoginService
 {
+    #[Inject]
+    protected UserService $userService;
+
     private array $config = [];
 
     private int $platform;
-
-    #[Inject]
-    protected UserService $userService;
 
     public function __construct()
     {
@@ -89,7 +88,7 @@ class MiniLoginService
             //            var_dump($wxPhoneResult, $wxResult);
 
             $wxPhoneResult = $utils->decryptSession($wxResult['session_key'], $params['iv'], $params['encryptedData']);
-            if (! isset($wxPhoneResult['phone_info']['purePhoneNumber'])) {
+            if (! isset($wxPhoneResult['purePhoneNumber'])) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, $wxPhoneResult);
             }
             var_dump($wxPhoneResult, $wxResult);
@@ -100,7 +99,7 @@ class MiniLoginService
             var_dump($ge->getMessage());
             throw new Exception($ge->getMessage());
         }
-        $phone = $wxPhoneResult['phone_info']['purePhoneNumber'];
+        $phone = $wxPhoneResult['purePhoneNumber'];
         //        $phone = '15622535674';
         //        $wxResult['openid'] = 'oCNty69xTU_wez04hVPvn56BpmpI';
         Db::beginTransaction();
@@ -119,7 +118,7 @@ class MiniLoginService
              * 1. 确实不存在，第一次创建
              * 2. 手动删除了数据，脏数据，新创建.
              */
-            $userPlatformModel = UserPlatform::getCacheByWxPlatformAndUserIdAndOpenid($this->platform, $userModel->id, $wxResult['openid'], ['user']);
+            $userPlatformModel = UserPlatform::getCacheByWxPlatformAndUserIdAndOpenid($this->platform, $userModel->id, $wxResult['openid']);
 
             if (! $userPlatformModel) {
                 $userPlatformModel = new UserPlatform();
@@ -135,9 +134,7 @@ class MiniLoginService
                 $userPlatformModel->wx_session_key = $wxResult['session_key'];
                 $userPlatformModel->save();
 
-                if (! $userModel->user) {
-                    $userPlatformModel->user = $userModel;
-                }
+                $userPlatformModel->user = User::getCacheById($userPlatformModel->u_id);
                 $tokenInfo = $this->userService->reletToken($userPlatformModel);
             }
             // else {
@@ -233,7 +230,8 @@ class MiniLoginService
             return false;
         }
         # # save
-        $userPlatformModel = UserPlatform::getCacheByTokenAndPlatform($this->platform, $params['token'], ['user']);
+        $userPlatformModel = UserPlatform::getCacheByTokenAndPlatform($this->platform, $params['token']);
+        $userPlatformModel->user = User::getCacheById($userPlatformModel->u_id);
         if (! $userPlatformModel) {
             return false;
         }

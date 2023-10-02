@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Controller\V1\Business\Wuliu\Bill;
@@ -13,11 +17,10 @@ use App\Controller\AbstractController;
 use App\Model\WuliuBill;
 use App\Model\WuliuSeaWaybill;
 use App\Service\Business\Wuliu\Bill\BillService;
+use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpMessage\Exception\HttpException;
-use Hyperf\HttpServer\Annotation\AutoController;
-
 
 class BillController extends AbstractController
 {
@@ -101,7 +104,9 @@ class BillController extends AbstractController
         return $this->responseJson(ServiceCode::SUCCESS, $result);
     }
 
-    public function all() {}
+    public function all()
+    {
+    }
 
     public function post()
     {
@@ -126,7 +131,7 @@ class BillController extends AbstractController
             $model->save();
 
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -164,7 +169,7 @@ class BillController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -206,7 +211,7 @@ class BillController extends AbstractController
             Db::commit();
 
             return $this->responseJson(ServiceCode::SUCCESS);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -248,7 +253,7 @@ class BillController extends AbstractController
             WuliuBill::whereIn('id', $params)->delete();
 
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -283,7 +288,7 @@ class BillController extends AbstractController
             $model->delete();
 
             Db::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }
@@ -309,7 +314,7 @@ class BillController extends AbstractController
             // ob_clean();
             // return $this->response->download($result['path']);
             return $this->response->download($result['path'], $result['filename']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Db::rollBack();
             throw $e;
         }

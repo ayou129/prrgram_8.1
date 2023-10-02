@@ -16,7 +16,7 @@ use App\Constant\ServiceCode;
 use App\Exception\ServiceException;
 use App\Model\PlaywReportApply;
 use App\Model\PlaywReportClub;
-use App\Model\PlaywReportClubGroup;
+use App\Model\PlaywReportClubOrder;
 use App\Model\PlaywReportPlaywClubBoss;
 use App\Model\User;
 use App\Service\Business\PlaywReport\Apply\ApplyService;
@@ -52,12 +52,11 @@ class BossService extends CommonService
     {
         Db::beginTransaction();
         try {
-            $result = User::getCacheBossListByIdAndClubId($userModel->playw_report_club_id, $userModel->id, [
+            $result = User::getBossListSortCreatedAtByClubIdPaginate($userModel->playw_report_club_id, $userModel->id, [
             ], (int) $request->input('page', 1), (int) $request->input('size', 10));
             $result = $result->toArray();
             foreach ($result['data'] as &$item) {
                 $item['z'] = User::getCacheById($item['u_id']);
-                $item['group'] = PlaywReportClubGroup::getCacheById($item['group_id']);
             }
             Db::commit();
             return $result;
@@ -74,13 +73,11 @@ class BossService extends CommonService
         }
         Db::beginTransaction();
         try {
-            $model = PlaywReportPlaywClubBoss::getCacheById($params['id'], [
-                'z',
-                'group',
-            ]);
+            $model = PlaywReportPlaywClubBoss::getCacheById($params['id']);
             if (! $model || $model->club_id !== $userModel->playw_report_club_id) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据不存在');
             }
+            $model->z = User::getCacheById($model->u_id);
 
             Db::commit();
             return $model->toArray();
@@ -94,28 +91,25 @@ class BossService extends CommonService
     {
         Db::beginTransaction();
         try {
-            $model = PlaywReportPlaywClubBoss::where('club_id', $userModel->playw_report_club_id)
-                ->where('u_id', $userModel->id)
-                ->find($params['id']);
+            $model = PlaywReportPlaywClubBoss::getCacheById($params['id']);
             if (! $model) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该老板不存在');
             }
+            if ($model->u_id !== $userModel->id) {
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该老板不存在');
+            }
+            if ($model->club_id !== $userModel->playw_report_club_id) {
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该老板不存在');
+            }
 
-            // 可以不同群有多个老板
-            // 如果改了组，则要判断新组有没有同wx_number的
-            $existsModel = PlaywReportPlaywClubBoss::where('club_id', $userModel->playw_report_club_id)
+            // 检查wx_number
+            $existsModel = Db::table((new PlaywReportPlaywClubBoss())->getTable())
+                ->where('club_id', $userModel->playw_report_club_id)
                 ->where('wx_number', $params['wx_number'])
-                ->where('group_id', $params['group_id'])
                 ->where('id', '<>', $params['id'])
                 ->exists();
             if ($existsModel) {
-                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '存在相同数据');
-            }
-
-            $clubGroupModel = PlaywReportClubGroup::where('club_id', $userModel->playw_report_club_id)
-                ->find($params['group_id']);
-            if (! $clubGroupModel) {
-                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '群不存在');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该老板已在俱乐部报备');
             }
 
             self::bossPutDone($model, $userModel, $params);
@@ -132,15 +126,9 @@ class BossService extends CommonService
     {
         Db::beginTransaction();
         try {
-            $clubGroupModel = PlaywReportClubGroup::where('club_id', $userModel->playw_report_club_id)
-                ->find($params['group_id']);
-            if (! $clubGroupModel) {
-                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '群不存在');
-            }
-
-            $playwBossModel = PlaywReportPlaywClubBoss::where('club_id', $userModel->playw_report_club_id)
+            $playwBossModel = Db::table((new PlaywReportPlaywClubBoss())->getTable())
+                ->where('club_id', $userModel->playw_report_club_id)
                 ->where('wx_number', $params['wx_number'])
-                ->where('group_id', $params['group_id'])
                 ->first();
             if ($playwBossModel) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该老板已存在');
@@ -160,11 +148,12 @@ class BossService extends CommonService
     {
         Db::beginTransaction();
         try {
-            $playwBossModel = PlaywReportPlaywClubBoss::where('club_id', $user->playw_report_club_id)
+            $playwBossModel = Db::table((new PlaywReportPlaywClubBoss())->getTable())
+                ->where('club_id', $user->playw_report_club_id)
                 ->where('wx_number', $params['wx_number'])
                 ->first();
             if ($playwBossModel) {
-                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该老板已存在');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该老板已在俱乐部报备');
             }
 
             $clubModel = PlaywReportClub::find($user->playw_report_club_id);
@@ -202,14 +191,22 @@ class BossService extends CommonService
     {
         Db::beginTransaction();
         try {
-            $playwBossModel = PlaywReportPlaywClubBoss::where('club_id', $user->playw_report_club_id)
+            $playwBossModel = Db::table((new PlaywReportPlaywClubBoss())->getTable())
+                ->where('club_id', $user->playw_report_club_id)
                 ->where('u_id', $user->id)
                 ->find($params['id']);
 
             if (! $playwBossModel) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该老板不存在');
             }
-            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '请尝试编辑');
+            // 检查是否存在对应的order
+            // $existsOrderModel = Db::table((new PlaywReportClubOrder())->getTable())
+            //     ->where('boss_id', $params['id'])
+            //     ->exists();
+            // if ($existsOrderModel) {
+            //     throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该老板不存在');
+            // }
+            // PlaywReportPlaywClubBoss::destroy($params['id']);
             Db::commit();
             return true;
         } catch (Throwable $ex) {
@@ -223,7 +220,6 @@ class BossService extends CommonService
         $model = new PlaywReportPlaywClubBoss();
         $model->u_id = $user->id;
         $model->club_id = $user->playw_report_club_id;
-        $model->group_id = $params['group_id'];
         $model->wx_name = $params['wx_name'];
         $model->wx_number = $params['wx_number'];
         $model->join_at = $params['join_at'];
@@ -234,7 +230,6 @@ class BossService extends CommonService
     {
         $model->u_id = $user->id;
         $model->club_id = $user->playw_report_club_id;
-        $model->group_id = $params['group_id'];
         $model->wx_name = $params['wx_name'];
         $model->wx_number = $params['wx_number'];
         $model->join_at = $params['join_at'];

@@ -20,7 +20,7 @@ return [
             'max_connections' => 5000,
             'connect_timeout' => 10.0,
             'wait_timeout' => 3.0,
-            'heartbeat' => 10, #-1
+            'heartbeat' => 10, # -1
             'max_idle_time' => (float) env('REDIS_MAX_IDLE_TIME', 60),
         ],
     ],

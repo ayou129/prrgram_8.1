@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @author liguoxin
- * @email guoxinlee129@gmail.com
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
 namespace App\Controller\V1\Business\Wuliu;
@@ -12,8 +16,6 @@ use App\Constant\ServiceCode;
 use App\Controller\AbstractController;
 use App\Model\WuliuSeaWaybill;
 use Hyperf\DbConnection\Db;
-use Hyperf\HttpServer\Annotation\AutoController;
-
 
 class IndexController extends AbstractController
 {

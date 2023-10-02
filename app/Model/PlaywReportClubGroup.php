@@ -12,8 +12,7 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Service\Utils\Redis\PlaywReport\McPlaywClubGroup;
-use Hyperf\Collection\Collection;
+use App\Service\Utils\Redis\PlaywReport\ModelCacheTrait;
 
 /**
  * @property int $id
@@ -25,6 +24,8 @@ use Hyperf\Collection\Collection;
  */
 class PlaywReportClubGroup extends BaseModel
 {
+    use ModelCacheTrait;
+
     /**
      * The table associated with the model.
      */
@@ -39,39 +40,4 @@ class PlaywReportClubGroup extends BaseModel
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['id' => 'integer', 'club_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
-
-    public static function getCacheById($k, $relations = [])
-    {
-        $redis = make(\Hyperf\Redis\Redis::class);
-        $mc = new McPlaywClubGroup($redis);
-        $cache = $mc->getModel($k);
-        if ($cache) {
-            $model = (new self())->newInstance($cache, true);
-        } else {
-            $model = (new self())->where('id', $k)->first();
-        }
-        if ($model) {
-        }
-        return $model ?? null;
-    }
-
-    public static function getCacheByIds($k, $relations = [])
-    {
-        $redis = make(\Hyperf\Redis\Redis::class);
-        $mc = new McPlaywClubGroup($redis);
-        $cache = $mc->getModels($k);
-        if ($cache) {
-            $models = [];
-            foreach ($cache as $item) {
-                $models[] = (new self())->newInstance($item, true);
-            }
-            $models = $models ? new Collection($models) : new Collection([]);
-        } else {
-            $models = (new self())->whereIn('id', $k)->get();
-        }
-        if ($models) {
-        }
-
-        return $models;
-    }
 }
