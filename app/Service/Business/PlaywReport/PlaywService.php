@@ -333,6 +333,13 @@ class PlaywService extends CommonService
                 }
             }
 
+            $clubUserModels = PlaywReportClub::getUserListSortJoinAtByClubIdAll($userModel->playw_report_club_id);
+            $clubUser = [];
+            foreach ($clubUserModels as &$item) {
+                User::addAttrText($item);
+                $clubUser[] = $item;
+            }
+
             Db::commit();
 
             $redis = new Redis();
@@ -340,8 +347,7 @@ class PlaywService extends CommonService
             return [
                 'user' => $userModel->toArray(),
                 'zArray' => $zArray,
-                'club_users' => User::where('playw_report_club_id', $userModel->playw_report_club_id)
-                    ->get(),
+                'club_users' => $clubUser,
                 'club_groups_array' => $clubModel->groups->toArray(),
                 'club_group_method_array' => PlaywReportClubOrder::getClubGroupMethodArray(),
                 'club_project_default_array' => $defaultArray,

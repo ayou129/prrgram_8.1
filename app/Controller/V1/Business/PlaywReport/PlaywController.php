@@ -307,7 +307,7 @@ class PlaywController extends CommonController
         CommonService::checkClubIdStatus($userPlatformModel->user);
         CommonService::checkPlaywName($userPlatformModel->user);
         $result = $this->playwService->getClubAdminPlaywList($userPlatformModel->user, $params, $this->request);
-        return $this->responseJson(ServiceCode::SUCCESS, $result);
+        return $this->responseJson(ServiceCode::SUCCESS, $result->toArray());
     }
 
     public function getClubAdminPlaywListAll()

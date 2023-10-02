@@ -111,6 +111,7 @@ class OrderService extends CommonService implements OrderInterface
             $user = User::getCacheById($item->u_id);
             User::addAttrText($user);
             $item->user = $user;
+
             $zUser = User::getCacheById($item->z_u_id);
             User::addAttrText($zUser);
             $item->zUser = $zUser;
