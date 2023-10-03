@@ -226,6 +226,7 @@ class User extends BaseModel
         if ($model) {
             $model->label = $model->playw_report_playwname ?: '未设置昵称';
             $model->onshow = true;
+            $model->playw_report_club_admin_text = self::getPlaywReportClubAdminArray()[$model->playw_report_club_admin];
         }
     }
 }

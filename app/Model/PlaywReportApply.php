@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Service\Utils\Redis\PlaywReport\ModelCacheTrait;
+
 /**
  * @property int $id
  * @property int $u_id
@@ -29,6 +31,8 @@ namespace App\Model;
  */
 class PlaywReportApply extends BaseModel
 {
+    use ModelCacheTrait;
+
     public const STATUS_DEFAULT = 0;
 
     public const STATUS_YES = 1;
@@ -58,7 +62,7 @@ class PlaywReportApply extends BaseModel
      */
     protected array $casts = ['id' => 'integer', 'u_id' => 'integer', 'club_id' => 'integer', 'type' => 'integer', 'exec_u_id' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
-    protected array $appends = ['status_text'];
+    protected array $appends = [];
 
     /**
      * 已存在的字段.
@@ -79,12 +83,21 @@ class PlaywReportApply extends BaseModel
 
     public static function getStatusArray()
     {
-        return [self::STATUS_DEFAULT => '待处理', self::STATUS_YES => '已通过', self::STATUS_NO => '已拒绝', self::STATUS_CANCEL => '已取消'];
+        return [
+            self::STATUS_DEFAULT => '待处理',
+            self::STATUS_YES => '已通过',
+            self::STATUS_NO => '已拒绝',
+            self::STATUS_CANCEL => '已取消',
+        ];
     }
 
     public static function getTypeArray()
     {
-        return [self::TYPE_CLUB_JOIN => '加入俱乐部审核', self::TYPE_CLUB_LEAVE => '退出俱乐部审核', self::TYPE_BOSS_JOIN => '报备老板审核'];
+        return [
+            self::TYPE_CLUB_JOIN => '加入俱乐部审核',
+            self::TYPE_CLUB_LEAVE => '退出俱乐部审核',
+            self::TYPE_BOSS_JOIN => '报备老板审核',
+        ];
     }
 
     public function user()
@@ -95,5 +108,12 @@ class PlaywReportApply extends BaseModel
     public function club()
     {
         return $this->hasOne(PlaywReportClub::class, 'id', 'club_id');
+    }
+
+    public static function addAttrText(&$model)
+    {
+        if ($model) {
+            $model->status_text = self::getStatusArray()[$model->status];
+        }
     }
 }

@@ -205,7 +205,7 @@ class PlaywService extends CommonService
     public function getPageMyData($userModel, $params, $request)
     {
         if (isset($params['club_playw_u_ids']) && is_array($params['club_playw_u_ids'])) {
-            var_dump($params['club_playw_u_ids']);
+            // var_dump($params['club_playw_u_ids']);
             $data = $this->getStatisticsData($userModel, $params, $params['club_playw_u_ids'][0]);
         } else {
             $data = $this->getStatisticsData($userModel, $params);
@@ -213,6 +213,10 @@ class PlaywService extends CommonService
 
         $order_badges = OrderService::getOrderBadge($userModel->playw_report_club_id);
         $data['order_badge'] = $order_badges;
+
+        $apply_badges = ApplyService::getApplyBadge($userModel->playw_report_club_id);
+        $apply_badges = $apply_badges->count();
+        $data['apply_badge']['un_exec'] = $apply_badges;
         return $data;
     }
 
@@ -373,7 +377,7 @@ class PlaywService extends CommonService
                 'club_project_z_take_method_array' => Tools::convertModelArrayToJsComponentOptions(PlaywReportClubProject::getZTakeMethodArray()),
                 'club_projects' => $clubProject,
                 'club_apply_status_array' => Tools::convertModelArrayToJsComponentOptions(PlaywReportApply::getStatusArray()),
-                'club_apply_type_array' => Tools::convertModelArrayToJsComponentOptions(PlaywReportApply::getTypeArray()),
+                // 'club_apply_type_array' => Tools::convertModelArrayToJsComponentOptions(PlaywReportApply::getTypeArray()),
                 'club_stair_point_rule_type_array' => Tools::convertModelArrayToJsComponentOptions(PlaywReportClubOrderStairPointRule::getTypeArray()),
                 'options_order_page_show_zplayw_share_btn' => $options_order_page_show_zplayw_share_btn,
             ];
@@ -441,7 +445,39 @@ class PlaywService extends CommonService
 
     public function getClubApplyList($user, $params, $request)
     {
-        return ApplyService::getApplyList($user->playw_report_club_id, (int) $params['type']);
+        $result = ApplyService::getApplyList($user->playw_report_club_id, (int) $params['type'], $request);
+        $result = $result->toArray();
+        $badges = [
+            'join_club_count' => 0,
+            'leave_club_count' => 0,
+            'boss_count' => 0,
+        ];
+
+        foreach ($result['data'] as &$item) {
+            $item->user = User::getCacheById($item->u_id);
+            User::addAttrText($item->user);
+
+            PlaywReportApply::addAttrText($item);
+        }
+
+        $apply_badges = ApplyService::getApplyBadge($user->playw_report_club_id);
+        foreach ($apply_badges as $apply_badge) {
+            switch ($apply_badge->type) {
+                case PlaywReportApply::TYPE_CLUB_JOIN:
+                    $badges['join_club_count']++;
+                    break;
+                case PlaywReportApply::TYPE_CLUB_LEAVE:
+                    $badges['leave_club_count']++;
+                    break;
+                case PlaywReportApply::TYPE_BOSS_JOIN:
+                    $badges['boss_count']++;
+                    break;
+                default:
+                    break;
+            }
+        }
+        $result['apply_badge_count'] = $badges;
+        return $result;
     }
 
     public function putClubAdminApplyExec($user, $params, $request)

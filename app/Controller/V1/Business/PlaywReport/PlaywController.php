@@ -102,7 +102,7 @@ class PlaywController extends CommonController
             default:
                 throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT);
         }
-        return $this->responseJson(ServiceCode::SUCCESS, $result);
+        return $this->responseJson(ServiceCode::SUCCESS, (array) $result);
     }
 
     public function getPageIndexData()
@@ -337,8 +337,8 @@ class PlaywController extends CommonController
         CommonService::checkClubIdStatus($userPlatformModel->user);
         CommonService::checkPlaywName($userPlatformModel->user);
         CommonService::checkIsClubAdmin($userPlatformModel->user);
-        $result = $this->playwService->clubAdminPlaywRemove($userPlatformModel->user, $params, $this->request);
-        return $this->responseJson(ServiceCode::SUCCESS, $result);
+        $this->playwService->clubAdminPlaywRemove($userPlatformModel->user, $params, $this->request);
+        return $this->responseJson(ServiceCode::SUCCESS);
     }
 
     public function getClubAdminGroupList()

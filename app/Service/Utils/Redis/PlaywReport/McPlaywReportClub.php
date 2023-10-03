@@ -126,6 +126,7 @@ class McPlaywReportClub extends MCStrategyAbstract
     {
         return $this->prefix . $this->table . '|order_list_sort_created_at|id:' . $id;
     }
+
     public function setProjectListSortCreatedAtByClubId($club_id, $scope, $id)
     {
         $key = self::getProjectListSortCreatedAtByClubIdKey($club_id);

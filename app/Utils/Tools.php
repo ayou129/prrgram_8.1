@@ -39,7 +39,7 @@ class Tools
         // $key以前应该以加密安全的方式生成，例如openssl_random_pseudo_bytes
         // $key should have been previously generated in a cryptographically safe way, like openssl_random_pseudo_bytes
         $key = config('main.encrypt.default.key');
-        $key = hex2bin($key);
+        $key = hex2bin((string) $key);
         // var_dump($key);
         // $iv = config('main.encrypt.iv');
         try {

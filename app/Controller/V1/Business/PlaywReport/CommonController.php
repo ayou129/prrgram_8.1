@@ -89,6 +89,7 @@ class CommonController extends AbstractController
             $params['club_names'] = [
                 'JJ俱乐部',
                 'KK俱乐部',
+                'ZHZ俱乐部',
             ];
         }
         $result = [];

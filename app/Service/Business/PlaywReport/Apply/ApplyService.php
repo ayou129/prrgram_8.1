@@ -17,6 +17,7 @@ use App\Service\Business\PlaywReport\Boss\BossService;
 use App\Service\Business\PlaywReport\Club\ClubService;
 use App\Utils\Tools;
 use Exception;
+use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 
 class ApplyService
@@ -43,7 +44,8 @@ class ApplyService
 
     public function getApply($userModel, $params, $request)
     {
-        return PlaywReportApply::where('u_id', $userModel->id)
+        return Db::table((new PlaywReportApply())->getTable())
+            ->where('u_id', $userModel->id)
             ->where('status', $params['status'])
             ->where('type', $params['type'])
             ->with('club')
@@ -52,19 +54,30 @@ class ApplyService
 
     public static function getApplyHistory($user, $params, int $type)
     {
-        return PlaywReportApply::where('u_id', $user->id)
+        return Db::table((new PlaywReportApply())->getTable())
+            ->where('u_id', $user->id)
             ->where('type', $type)
             ->where('status', PlaywReportApply::STATUS_DEFAULT)
             ->first();
     }
 
-    public static function getApplyList($club_id, int $type)
+    public static function getApplyList($club_id, int $type, $request)
     {
-        return PlaywReportApply::where('club_id', $club_id)
-            ->where('type', $type ?? PlaywReportApply::TYPE_BOSS_JOIN)
-            ->with('user')
+        return Db::table((new PlaywReportApply())->getTable())
+            ->where('club_id', $club_id)
+            ->where('type', (int) $type ?? PlaywReportApply::TYPE_BOSS_JOIN)
             ->orderBy('status', 'asc')
-            ->get();
+            ->paginate((int) $request->input('size', 10));
+    }
+
+    public static function getApplyBadge(int $club_id)
+    {
+        $models = Db::table((new PlaywReportApply())->getTable())
+            ->where('club_id', $club_id)
+            ->where(function ($query) {
+                $query->where('status', PlaywReportApply::STATUS_DEFAULT);
+            });
+        return $models->get();
     }
 
     public static function applyPass(PlaywReportApply $applyModel, $exec_u_id)
