@@ -51,6 +51,7 @@ class PlaywService extends CommonService
     public function getStatisticsData($userModel, $params, $u_id = false, $admin = false)
     {
         $orderModels = Db::table((new PlaywReportClubOrder())->getTable())
+            ->whereNull('deleted_at')
             ->where('club_id', $userModel->playw_report_club_id);
         //        var_dump($u_id);
         if ($u_id) {
@@ -323,6 +324,7 @@ class PlaywService extends CommonService
                 ->where('club_id', $userModel->playw_report_club_id)
                 ->whereIn('type', array_keys(PlaywReportClubProject::getTypeArray()))
                 ->orderBy('index', 'desc')
+                ->whereNull('deleted_at')
                 ->get();
 
             $defaultArray = $giftArray = [];
@@ -420,6 +422,7 @@ class PlaywService extends CommonService
         return Db::table((new PlaywReportClubProject())->getTable())
             ->where('club_id', $user->playw_report_club_id)
             ->orderBy('index', 'desc')
+            ->whereNull('deleted_at')
             ->get();
     }
 
@@ -546,9 +549,11 @@ class PlaywService extends CommonService
     {
         Db::beginTransaction();
         try {
-            $groupModel = PlaywReportClubGroup::where('club_id', $user->playw_report_club_id)
+            $groupModel = Db::table((new PlaywReportClubGroup())->getTable())
+                ->where('club_id', $user->playw_report_club_id)
                 ->where('name', $params['group_name'])
-                ->first();
+                ->whereNull('deleted_at')
+                ->exists();
             if ($groupModel) {
                 throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT, [], 400, [], '数据已存在');
             }
@@ -569,11 +574,12 @@ class PlaywService extends CommonService
     {
         Db::beginTransaction();
         try {
-            $groupModel = PlaywReportClubGroup::where('club_id', $user->playw_report_club_id)
-                ->find($params['group_id']);
-            if (! $groupModel) {
+            $groupModel = PlaywReportClubGroup::getCacheById($params['group_id']);
+
+            if (! $groupModel || $groupModel->club_id !== $user->playw_report_club_id) {
                 throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT);
             }
+
             $existsModel = PlaywReportClubGroup::where('club_id', $user->playw_report_club_id)
                 ->where('name', $params['group_name'])
                 ->where('id', '!=', $params['group_id'])
@@ -604,6 +610,7 @@ class PlaywService extends CommonService
 
             $existsModel = Db::table((new PlaywReportClubOrder())->getTable())
                 ->where('club_group_id', $groupModel->id)
+                ->whereNull('deleted_at')
                 ->exists();
             if ($existsModel) {
                 throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT, [], 400, [], '已有订单不可操作');
@@ -639,6 +646,7 @@ class PlaywService extends CommonService
             ->where('club_id', $user->playw_report_club_id)
             ->where('type', $type)
             ->orderBy('index', 'desc')
+            ->whereNull('deleted_at')
             ->get();
     }
 

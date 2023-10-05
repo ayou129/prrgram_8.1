@@ -55,6 +55,7 @@ class ClubService extends CommonService
         }
         $clubModel = Db::table((new PlaywReportClub())->getTable())
             ->where('name', $params['name'])
+            ->whereNull('deleted_at')
             ->first();
         if (! $clubModel) {
             return [];
@@ -68,8 +69,10 @@ class ClubService extends CommonService
         // 按照时间
         // 按照类型
         $orderModel = Db::table((new PlaywReportClubOrder())->getTable())
+            ->whereNull('deleted_at')
             ->where('club_id', $userModel->playw_report_club_id);
         $bossModel = Db::table((new PlaywReportPlaywClubBoss())->getTable())
+            ->whereNull('deleted_at')
             ->where('club_id', $userModel->playw_report_club_id);
         $orderModel = $this->addModelTimeWhere($orderModel, $params);
         $bossModel = $this->addModelTimeWhere($bossModel, $params);
@@ -176,8 +179,9 @@ class ClubService extends CommonService
             if ($user->playw_report_club_id) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '已存在俱乐部');
             }
-            $clubModel = Db::table('playw_report_club')
+            $clubModel = Db::table((new PlaywReportClub())->getTable())
                 ->where('name', $params['name'])
+                ->whereNull('deleted_at')
                 ->first();
             if (! $clubModel) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '俱乐部不存在');
@@ -263,8 +267,9 @@ class ClubService extends CommonService
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '已存在俱乐部');
             }
 
-            $clubModel = Db::table('playw_report_club')
+            $clubModel = Db::table((new PlaywReportClub())->getTable())
                 ->where('name', $params['name'])
+                ->whereNull('deleted_at')
                 ->first();
             if ($clubModel) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '俱乐部已存在');

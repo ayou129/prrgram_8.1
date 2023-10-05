@@ -107,6 +107,7 @@ class BossService extends CommonService
                 ->where('club_id', $userModel->playw_report_club_id)
                 ->where('wx_number', $params['wx_number'])
                 ->where('id', '<>', $params['id'])
+                ->whereNull('deleted_at')
                 ->exists();
             if ($existsModel) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该老板已在俱乐部报备');
@@ -129,6 +130,7 @@ class BossService extends CommonService
             $playwBossModel = Db::table((new PlaywReportPlaywClubBoss())->getTable())
                 ->where('club_id', $userModel->playw_report_club_id)
                 ->where('wx_number', $params['wx_number'])
+                ->whereNull('deleted_at')
                 ->first();
             if ($playwBossModel) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该老板已存在');
@@ -151,6 +153,7 @@ class BossService extends CommonService
             $playwBossModel = Db::table((new PlaywReportPlaywClubBoss())->getTable())
                 ->where('club_id', $user->playw_report_club_id)
                 ->where('wx_number', $params['wx_number'])
+                ->whereNull('deleted_at')
                 ->first();
             if ($playwBossModel) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该老板已在俱乐部报备');
@@ -194,6 +197,7 @@ class BossService extends CommonService
             $playwBossModel = Db::table((new PlaywReportPlaywClubBoss())->getTable())
                 ->where('club_id', $user->playw_report_club_id)
                 ->where('u_id', $user->id)
+                ->whereNull('deleted_at')
                 ->find($params['id']);
 
             if (! $playwBossModel) {
@@ -201,6 +205,7 @@ class BossService extends CommonService
             }
             // 检查是否存在对应的order
             // $existsOrderModel = Db::table((new PlaywReportClubOrder())->getTable())
+            //     ->whereNull('deleted_at')
             //     ->where('boss_id', $params['id'])
             //     ->exists();
             // if ($existsOrderModel) {

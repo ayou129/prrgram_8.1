@@ -49,6 +49,7 @@ class ApplyService
             ->where('status', $params['status'])
             ->where('type', $params['type'])
             ->with('club')
+            ->whereNull('deleted_at')
             ->first();
     }
 
@@ -58,6 +59,7 @@ class ApplyService
             ->where('u_id', $user->id)
             ->where('type', $type)
             ->where('status', PlaywReportApply::STATUS_DEFAULT)
+            ->whereNull('deleted_at')
             ->first();
     }
 
@@ -67,6 +69,7 @@ class ApplyService
             ->where('club_id', $club_id)
             ->where('type', (int) $type ?? PlaywReportApply::TYPE_BOSS_JOIN)
             ->orderBy('status', 'asc')
+            ->whereNull('deleted_at')
             ->paginate((int) $request->input('size', 10));
     }
 
@@ -74,6 +77,7 @@ class ApplyService
     {
         $models = Db::table((new PlaywReportApply())->getTable())
             ->where('club_id', $club_id)
+            ->whereNull('deleted_at')
             ->where(function ($query) {
                 $query->where('status', PlaywReportApply::STATUS_DEFAULT);
             });

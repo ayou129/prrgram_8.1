@@ -246,31 +246,31 @@ class ModelCacheListener implements ListenerInterface
                 # 固定
                 switch (true) {
                     case $model instanceof User:
-                        $item = Db::table((new User())->getTable())->whereNull('deleted_at')->find($model->id);
+                        $item = Db::table((new User())->getTable())->whereNotNull('deleted_at')->find($model->id);
                         self::delUser($mcUser, $item, $mcPlaywClub);
                         break;
                     case $model instanceof UserPlatform:
-                        $item = Db::table((new UserPlatform())->getTable())->whereNull('deleted_at')->find($model->id);
+                        $item = Db::table((new UserPlatform())->getTable())->whereNotNull('deleted_at')->find($model->id);
                         self::delUserPlatform($mcUserPlatform, $item);
                         break;
                     case $model instanceof PlaywReportClub:
-                        $item = Db::table((new PlaywReportClub())->getTable())->whereNull('deleted_at')->find($model->id);
+                        $item = Db::table((new PlaywReportClub())->getTable())->whereNotNull('deleted_at')->find($model->id);
                         self::delClub($mcPlaywClub, $item);
                         break;
                     case $model instanceof PlaywReportClubGroup:
-                        $item = Db::table((new PlaywReportClubGroup())->getTable())->whereNull('deleted_at')->find($model->id);
+                        $item = Db::table((new PlaywReportClubGroup())->getTable())->whereNotNull('deleted_at')->find($model->id);
                         self::delClubGroup($mcPlaywClubGroup, $item, $mcPlaywClub);
                         break;
                     case $model instanceof PlaywReportPlaywClubBoss:
-                        $item = Db::table((new PlaywReportClubGroup())->getTable())->whereNull('deleted_at')->find($model->id);
+                        $item = Db::table((new PlaywReportClubGroup())->getTable())->whereNotNull('deleted_at')->find($model->id);
                         self::delClubBoss($mcPlaywClubBoss, $item, $mcUser, $mcPlaywClub);
                         break;
                     case $model instanceof PlaywReportClubProject:
-                        $item = Db::table((new PlaywReportClub())->getTable())->whereNull('deleted_at')->find($model->id);
+                        $item = Db::table((new PlaywReportClub())->getTable())->whereNotNull('deleted_at')->find($model->id);
                         self::delClubProject($mcPlaywClubProject, $item, $mcPlaywClub);
                         break;
                     case $model instanceof PlaywReportClubOrder:
-                        $item = Db::table((new PlaywReportClubOrder())->getTable())->whereNull('deleted_at')->find($model->id);
+                        $item = Db::table((new PlaywReportClubOrder())->getTable())->whereNotNull('deleted_at')->find($model->id);
                         self::delClubOrder($mcPlaywClubOrder, $item, $mcUser, $mcPlaywClub);
                         break;
                     default:

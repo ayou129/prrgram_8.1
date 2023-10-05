@@ -89,6 +89,7 @@ class OrderService extends CommonService implements OrderInterface
     public function orderList($userModel, $params, $request, $admin = false)
     {
         $models = Db::table((new PlaywReportClubOrder())->getTable())
+            ->whereNull('deleted_at')
             ->where('club_id', $userModel->playw_report_club_id);
 
         $models = $this->addModelTimeWhere($models, $params);
@@ -128,6 +129,7 @@ class OrderService extends CommonService implements OrderInterface
     public static function getOrderBadgeByUserIds(int $club_id, array $user_ids)
     {
         $orderModels = Db::table((new PlaywReportClubOrder())->getTable())
+            ->whereNull('deleted_at')
             ->where('club_id', $club_id)
             ->where(function ($query) {
                 $query->where('fd_status', PlaywReportClubOrder::FD_STATUS_DEFAULT)

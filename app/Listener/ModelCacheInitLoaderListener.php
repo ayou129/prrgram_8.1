@@ -42,8 +42,8 @@ class ModelCacheInitLoaderListener implements ListenerInterface
         $green = "\033[32m";
         $reset = "\033[0m";
         echo '---------- Cache init loading...  ---------' . PHP_EOL;
-        $redis = make(Redis::class);
-        // $redis->flushall();
+        $redis = \Hyperf\Support\make(Redis::class);
+        $redis->flushAll();
         //        $redis->pipeline();
 
         $mcUser = new McUser($redis);
