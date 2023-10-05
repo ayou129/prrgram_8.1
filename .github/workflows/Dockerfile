@@ -15,8 +15,9 @@ LABEL maintainer="Hyperf Developers <group@hyperf.io>" version="1.0" license="MI
 ARG timezone
 
 ENV TIMEZONE=${timezone:-"Asia/Shanghai"} \
-    APP_ENV=prod \
     SCAN_CACHEABLE=(true)
+#    APP_ENV=prod \
+
 
 # update
 RUN set -ex \

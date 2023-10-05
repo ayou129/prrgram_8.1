@@ -85,7 +85,7 @@ class Tools
      */
     public static function isProduct(): bool
     {
-        return env('APP_ENV', 'dev') === 'production';
+        return \Hyperf\Support\env('APP_ENV', 'dev') === 'production';
     }
 
     public static function paramsFilter(&$val)
