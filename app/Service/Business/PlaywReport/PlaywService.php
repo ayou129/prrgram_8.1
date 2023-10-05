@@ -293,10 +293,15 @@ class PlaywService extends CommonService
             $zIds = array_unique($clubBossList?->pluck('u_id')
                 ->toArray());
             $zModels = User::getCacheByIds($zIds);
+
+            // 要考虑 陪玩退俱乐部 没有club_id的情况
             foreach ($zModels as $zUserModel) {
-                $zUserModel->bosss = User::getBossListSortCreatedAtByClubIdAll($zUserModel->playw_report_club_id, $zUserModel->id);
-                $zUserModel->bosss = $zUserModel?->bosss->toArray();
+                if ($zUserModel->playw_report_club_id) {
+                    $zUserModel->bosss = User::getBossListSortCreatedAtByClubIdAll($zUserModel->playw_report_club_id, $zUserModel->id);
+                    $zUserModel->bosss = $zUserModel?->bosss->toArray();
+                }
             }
+
             $zModelsArray = $zModels->toArray();
             // var_dump($zModelsArray);
             $zArray = [];

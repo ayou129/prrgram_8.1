@@ -45,7 +45,7 @@ class Handler extends ExceptionHandler
         $result['data'] = [];
         $result['code'] = $throwable->getCode() === 0 ? ServiceCode::ERROR : $throwable->getCode();
         $result['msg'] = $throwable->getMessage();
-        if (! $result['msg'] || envIsProduction()) {
+        if (! $result['msg'] && envIsProduction()) {
             $result['msg'] = __('messages.ServerErrorHttpException');
         }
         $httpCode = 400;

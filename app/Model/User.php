@@ -200,7 +200,7 @@ class User extends BaseModel
             $models = PlaywReportPlaywClubBoss::getCacheByIds($cache);
         } else {
             $models = (new PlaywReportPlaywClubBoss())->where('u_id', $k)
-                ->where('playw_report_club_id', $k2)
+                ->where('club_id', $k2)
                 ->get();
         }
         foreach ($models as $model) {

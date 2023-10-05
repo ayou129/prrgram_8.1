@@ -231,10 +231,11 @@ class MiniLoginService
         }
         # # save
         $userPlatformModel = UserPlatform::getCacheByTokenAndPlatform($this->platform, $params['token']);
-        $userPlatformModel->user = User::getCacheById($userPlatformModel->u_id);
         if (! $userPlatformModel) {
             return false;
         }
+
+        $userPlatformModel->user = User::getCacheById($userPlatformModel->u_id);
 
         $status = $this->checkUserPlatformModel($userPlatformModel);
         if (! $status) {
