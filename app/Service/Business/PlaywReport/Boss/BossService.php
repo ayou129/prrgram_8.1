@@ -159,7 +159,7 @@ class BossService extends CommonService
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该老板已在俱乐部报备');
             }
 
-            $clubModel = PlaywReportClub::find($user->playw_report_club_id);
+            $clubModel = PlaywReportClub::getCacheById($user->playw_report_club_id);
             if (! $clubModel) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '俱乐部不存在');
             }
@@ -190,17 +190,12 @@ class BossService extends CommonService
         }
     }
 
-    public function deleteClubBoss($user, $params, $request)
+    public function deleteClubBoss($userModel, $params, $request)
     {
         Db::beginTransaction();
         try {
-            $playwBossModel = Db::table((new PlaywReportPlaywClubBoss())->getTable())
-                ->where('club_id', $user->playw_report_club_id)
-                ->where('u_id', $user->id)
-                ->whereNull('deleted_at')
-                ->find($params['id']);
-
-            if (! $playwBossModel) {
+            $model = PlaywReportPlaywClubBoss::getCacheById($params['id']);
+            if (! $model || $model->club_id != $userModel->playw_report_club_id || $model->u_id != $userModel->id) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该老板不存在');
             }
             // 检查是否存在对应的order
@@ -209,9 +204,11 @@ class BossService extends CommonService
             //     ->where('boss_id', $params['id'])
             //     ->exists();
             // if ($existsOrderModel) {
-            //     throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该老板不存在');
+            //     throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该老板已下过单');
             // }
-            // PlaywReportPlaywClubBoss::destroy($params['id']);
+
+            $model->delete();
+
             Db::commit();
             return true;
         } catch (Throwable $ex) {

@@ -419,11 +419,7 @@ class PlaywService extends CommonService
 
     public function getClubAdminProjectListAll($user, $params, $request)
     {
-        return Db::table((new PlaywReportClubProject())->getTable())
-            ->where('club_id', $user->playw_report_club_id)
-            ->orderBy('index', 'desc')
-            ->whereNull('deleted_at')
-            ->get();
+        return PlaywReportClub::getProjectListSortIndexByClubIdAll($user->playw_report_club_id, 'desc');
     }
 
     public function clubAdminPlaywRemove($user, $params, $request)
@@ -602,21 +598,21 @@ class PlaywService extends CommonService
     {
         Db::beginTransaction();
         try {
-            $groupModel = PlaywReportClubGroup::getCacheById($params['group_id']);
+            $model = PlaywReportClubGroup::getCacheById($params['group_id']);
 
-            if (! $groupModel || $groupModel->club_id !== $user->playw_report_club_id) {
+            if (! $model || $model->club_id !== $user->playw_report_club_id) {
                 throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT);
             }
 
             $existsModel = Db::table((new PlaywReportClubOrder())->getTable())
-                ->where('club_group_id', $groupModel->id)
+                ->where('club_group_id', $model->id)
                 ->whereNull('deleted_at')
                 ->exists();
             if ($existsModel) {
                 throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT, [], 400, [], '已有订单不可操作');
             }
 
-            $groupModel->delete();
+            $model->delete();
 
             Db::commit();
             return true;
@@ -628,8 +624,11 @@ class PlaywService extends CommonService
 
     public function getClubAdminProject($user, $params, $request)
     {
-        return PlaywReportClubProject::where('club_id', $user->playw_report_club_id)
-            ->find($params['project_id']);
+        $model = PlaywReportClubProject::getCacheById($params['project_id']);
+        if (! $model || $model->club_id != $user->playw_report_club_id) {
+            return null;
+        }
+        return $model;
     }
 
     public function getClubAdminProjectList($user, $params, $request)
@@ -654,10 +653,12 @@ class PlaywService extends CommonService
     {
         Db::beginTransaction();
         try {
-            $model = PlaywReportClubProject::where('name', $params['project_name'])
+            $model = Db::table((new PlaywReportClubProject())->getTable())
+                ->where('name', $params['project_name'])
                 ->where('club_id', $user->playw_report_club_id)
                 ->where('type', $params['project_type'])
-                ->first();
+                ->whereNull('deleted_at')
+                ->exists();
             if ($model) {
                 throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT, [], 400, [], '数据已存在');
             }
@@ -733,12 +734,11 @@ class PlaywService extends CommonService
             /**
              * @var PlaywReportClubProject $model
              */
-            $model = PlaywReportClubProject::where('club_id', $user->playw_report_club_id)
-                ->find($params['project_id']);
-
-            if (! $model) {
+            $model = PlaywReportClubProject::getCacheById($params['project_id']);
+            if (! $model || $model->club_id != $user->playw_report_club_id) {
                 throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT);
             }
+
             $model->name = $params['project_name'];
             $model->type = $params['project_type'];
             $model->price_method = $params['project_price_method'];
@@ -770,17 +770,21 @@ class PlaywService extends CommonService
     {
         Db::beginTransaction();
         try {
-            $model = PlaywReportClubProject::where('club_id', $user->playw_report_club_id)
-                ->find($params['project_id']);
-            if (! $model) {
+            /**
+             * @var PlaywReportClubProject $model
+             */
+            $model = PlaywReportClubProject::getCacheById($params['project_id']);
+            if (! $model || $model->club_id != $user->playw_report_club_id) {
                 throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT);
             }
+
             $existsModel = PlaywReportClubOrder::where('project_id', $model->id)
                 ->first();
             if ($existsModel) {
                 throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT, [], 400, [], '已有订单不可操作');
             }
-            $model->delete();
+
+            PlaywReportClubProject::destroy($params['project_id']);
 
             Db::commit();
             return true;

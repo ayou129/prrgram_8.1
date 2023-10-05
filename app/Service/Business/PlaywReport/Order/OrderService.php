@@ -14,6 +14,7 @@ namespace App\Service\Business\PlaywReport\Order;
 
 use App\Constant\ServiceCode;
 use App\Exception\ServiceException;
+use App\Model\PlaywReportClub;
 use App\Model\PlaywReportClubGroup;
 use App\Model\PlaywReportClubOrder;
 use App\Model\PlaywReportClubProject;
@@ -357,12 +358,9 @@ class OrderService extends CommonService implements OrderInterface
             if (! $params['id']) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '参数不存在');
             }
-            $model = PlaywReportClubOrder::query()
-                ->where('club_id', $userModel->playw_report_club_id)
-                ->where('u_id', $userModel->id)
-                ->find($params['id']);
-            if (! $model) {
-                throw new ServiceException(ServiceCode::ERROR);
+            $model = PlaywReportClubOrder::getCacheById($params['id']);
+            if (! $model || $model->u_id != $userModel->id || $model->club_id != $userModel->playw_report_club_id) {
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '订单不存在');
             }
             if ($model->fd_status == PlaywReportClubOrder::FD_STATUS_FINISHED) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '返点已结，无法操作');
@@ -372,6 +370,7 @@ class OrderService extends CommonService implements OrderInterface
             }
 
             $model->delete();
+
             Db::commit();
             return true;
         } catch (Throwable $ex) {
