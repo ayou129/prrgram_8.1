@@ -177,4 +177,16 @@ class PlaywReportClub extends BaseModel
         }
         return \Hyperf\Collection\collect();
     }
+
+    public static function getProjectListSortIndexByClubIdAll($k, $range_method = 'asc')
+    {
+        $redis = make(\Hyperf\Redis\Redis::class);
+        $mc = new McPlaywReportClub($redis);
+        $cache = $mc->getProjectListSortIndexByClubIdAll($k, $range_method);
+        //        var_dump($cache);
+        if ($cache) {
+            return PlaywReportClubProject::getCacheByIds($cache);
+        }
+        return \Hyperf\Collection\collect();
+    }
 }

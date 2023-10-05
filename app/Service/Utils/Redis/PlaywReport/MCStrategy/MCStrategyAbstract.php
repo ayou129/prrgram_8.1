@@ -71,7 +71,10 @@ abstract class MCStrategyAbstract
     public function setSortCreatedAt($scope, $id)
     {
         $key = self::getSortCreatedAtKey();
-        return [$this->zAdd($key, $scope, $id), $this->ttl($key, $this::ttl)];
+        return [
+            $this->zAdd($key, $scope, $id),
+            $this->ttl($key, $this::ttl),
+        ];
     }
 
     public function getSortCreatedAtPaginate($start, $end): array
@@ -83,6 +86,27 @@ abstract class MCStrategyAbstract
     public function delSortCreatedAtZRemMembers($id, ...$ids)
     {
         $key = self::getSortCreatedAtKey();
+        return $this->zRem($key, $id, ...$ids);
+    }
+
+    public function setSortIndex($scope, $id)
+    {
+        $key = self::getSortIndexKey();
+        return [
+            $this->zAdd($key, $scope, $id),
+            $this->ttl($key, $this::ttl),
+        ];
+    }
+
+    public function getSortIndexPaginate($start, $end): array
+    {
+        $key = self::getSortIndexKey();
+        return $this->getPaginate($key, $start, $end);
+    }
+
+    public function delSortIndexZRemMembers($id, ...$ids)
+    {
+        $key = self::getSortIndexKey();
         return $this->zRem($key, $id, ...$ids);
     }
 
@@ -100,7 +124,10 @@ abstract class MCStrategyAbstract
         $result2 = $this->redis->expire($key, $ttl);
         $args = func_get_args();
         var_dump(__FUNCTION__, $args, $result1, $result2);
-        return [$result1, $result2];
+        return [
+            $result1,
+            $result2,
+        ];
     }
 
     protected function hGetAll($key)
@@ -182,22 +209,6 @@ abstract class MCStrategyAbstract
     }
 
     /**
-     * 分页数据.
-     * @param mixed $key
-     * @param mixed $start
-     * @param mixed $end
-     * @return array|false|\Redis
-     * @throws RedisException
-     */
-    protected function zRangeByScore($key, $start, $end)
-    {
-        $result = $this->redis->zRangeByScore($key, $start, $end);
-        $args = func_get_args();
-        var_dump(__FUNCTION__, $args, $result);
-        return $result;
-    }
-
-    /**
      * 所有数据.
      * @param mixed $key
      * @param mixed $start
@@ -208,6 +219,22 @@ abstract class MCStrategyAbstract
     protected function zrange($key, $start, $end)
     {
         $result = $this->redis->zrange($key, $start, $end);
+        $args = func_get_args();
+        var_dump(__FUNCTION__, $args, $result);
+        return $result;
+    }
+
+    protected function zRangeByScore(string $key, $start, $end, array $options = [])
+    {
+        $result = $this->redis->zRangeByScore($key, (string) $start, (string) $end, $options);
+        $args = func_get_args();
+        var_dump(__FUNCTION__, $args, $result);
+        return $result;
+    }
+
+    protected function zRevRangeByScore(string $key, $start, $end, array $options = [])
+    {
+        $result = $this->redis->zRevRangeByScore($key, (string) $start, (string) $end, $options);
         $args = func_get_args();
         var_dump(__FUNCTION__, $args, $result);
         return $result;
@@ -250,6 +277,11 @@ abstract class MCStrategyAbstract
     protected function getSortCreatedAtKey(): string
     {
         return $this->prefix . $this->table . '|list_sort_created_at';
+    }
+
+    protected function getSortIndexKey(): string
+    {
+        return $this->prefix . $this->table . '|list_sort_index';
     }
 
     protected function getPaginate($key, $page, $limit)

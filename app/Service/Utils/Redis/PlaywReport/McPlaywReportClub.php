@@ -31,7 +31,10 @@ class McPlaywReportClub extends MCStrategyAbstract
     public function setSortJoinAtByUserId($club_id, $scope, $id)
     {
         $key = self::getSortJoinAtByUserIdKey($club_id);
-        return [$this->zAdd($key, $scope, $id), $this->ttl($key, self::ttl)];
+        return [
+            $this->zAdd($key, $scope, $id),
+            $this->ttl($key, self::ttl),
+        ];
     }
 
     public function getSortJoinAtByUserIdAll($club_id): array
@@ -64,7 +67,10 @@ class McPlaywReportClub extends MCStrategyAbstract
     public function setBossListSortCreatedAtByClubId($club_id, $scope, $id)
     {
         $key = self::getBossListSortCreatedAtByClubIdKey($club_id);
-        return [$this->zAdd($key, $scope, $id), $this->ttl($key, self::ttl)];
+        return [
+            $this->zAdd($key, $scope, $id),
+            $this->ttl($key, self::ttl),
+        ];
     }
 
     public function getBossListSortCreatedAtByClubIdPaginate($club_id, $start, $end): array
@@ -97,7 +103,10 @@ class McPlaywReportClub extends MCStrategyAbstract
     public function setOrderListSortCreatedAtByClubId($club_id, $scope, $id)
     {
         $key = self::getOrderListSortCreatedAtByClubIdKey($club_id);
-        return [$this->zAdd($key, $scope, $id), $this->ttl($key, self::ttl)];
+        return [
+            $this->zAdd($key, $scope, $id),
+            $this->ttl($key, self::ttl),
+        ];
     }
 
     public function getOrderListSortCreatedAtByClubIdPaginate($club_id, $start, $end): array
@@ -130,7 +139,10 @@ class McPlaywReportClub extends MCStrategyAbstract
     public function setProjectListSortCreatedAtByClubId($club_id, $scope, $id)
     {
         $key = self::getProjectListSortCreatedAtByClubIdKey($club_id);
-        return [$this->zAdd($key, $scope, $id), $this->ttl($key, self::ttl)];
+        return [
+            $this->zAdd($key, $scope, $id),
+            $this->ttl($key, self::ttl),
+        ];
     }
 
     public function getProjectListSortCreatedAtByClubIdPaginate($club_id, $start, $end): array
@@ -160,10 +172,52 @@ class McPlaywReportClub extends MCStrategyAbstract
         return $this->prefix . $this->table . '|project_list_sort_created_at|id:' . $id;
     }
 
+    public function setProjectListSortIndexByClubId($club_id, $scope, $id)
+    {
+        $key = self::getProjectListSortIndexByClubIdKey($club_id);
+        return [
+            $this->zAdd($key, $scope, $id),
+            $this->ttl($key, self::ttl),
+        ];
+    }
+
+    public function getProjectListSortIndexByClubIdPaginate($club_id, $start, $end): array
+    {
+        $key = self::getProjectListSortIndexByClubIdKey($club_id);
+        return $this->getPaginate($key, $start, $end);
+    }
+
+    public function getProjectListSortIndexByClubIdAll($club_id, $range_method = 'asc'): array
+    {
+        $key = self::getProjectListSortIndexByClubIdKey($club_id);
+        if ($range_method === 'asc') {
+            return $this->zRevRangeByScore($key, 0, -1);
+        }
+        return $this->zRangeByScore($key, 0, -1);
+    }
+
+    public function delProjectListSortIndexByClubIdZRemMembers($club_id, $id, ...$ids)
+    {
+        $key = self::getProjectListSortIndexByClubIdKey($club_id);
+        return $this->zRem($key, $id, ...$ids);
+    }
+
+    /**
+     * 某个俱乐部的所有老板 根据创建时间排序.
+     * @param mixed $id
+     */
+    public function getProjectListSortIndexByClubIdKey($id): string
+    {
+        return $this->prefix . $this->table . '|project_list_sort_index|id:' . $id;
+    }
+
     public function setSortCreatedAtByGroupId($club_id, $scope, $id)
     {
         $key = self::getSortCreatedAtByGroupIdKey($club_id);
-        return [$this->zAdd($key, $scope, $id), $this->ttl($key, self::ttl)];
+        return [
+            $this->zAdd($key, $scope, $id),
+            $this->ttl($key, self::ttl),
+        ];
     }
 
     public function getSortCreatedAtByGroupIdAll($club_id): array

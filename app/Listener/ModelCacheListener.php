@@ -378,9 +378,14 @@ class ModelCacheListener implements ListenerInterface
         $mcPlaywClub->delSortCreatedAtByGroupIdZRemMembers($item->club_id, $item->id);
     }
 
-    public static function clubProject(McPlaywReportClubProject $mcPlaywClubProject, $item, $mcPlaywClub)
+    public static function clubProject(McPlaywReportClubProject $mcPlaywClubProject, $item, McPlaywReportClub $mcPlaywClub)
     {
         $mcPlaywClubProject->setModel($item->id, (array) $item);
+
+        $mcPlaywClubProject->setSortIndex($item->index, $item->id);
+
+        // 俱乐部所有project
+        $mcPlaywClub->setProjectListSortIndexByClubId($item->club_id, $item->index, $item->id);
 
         if ($timestamp = strtotime($item->created_at)) {
             $mcPlaywClubProject->setSortCreatedAt($timestamp, $item->id);
@@ -393,6 +398,8 @@ class ModelCacheListener implements ListenerInterface
     {
         $mcPlaywClubProject->delModel($item->id);
         $mcPlaywClubProject->delSortCreatedAtZRemMembers($item->id);
+        $mcPlaywClubProject->delSortIndexZRemMembers($item->id);
+        $mcPlaywClub->delProjectListSortIndexByClubIdZRemMembers($item->club_id, $item->id);
         $mcPlaywClub->delProjectListSortCreatedAtByClubIdZRemMembers($item->club_id, $item->id);
     }
 
