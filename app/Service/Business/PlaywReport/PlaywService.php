@@ -289,7 +289,6 @@ class PlaywService extends CommonService
     {
         Db::beginTransaction();
         try {
-            $clubModel = PlaywReportClub::getCacheById($userModel->playw_report_club_id);
             $clubBossList = PlaywReportClub::getBossListSortCreatedAtByClubIdAll($userModel->playw_report_club_id);
             $zIds = array_unique($clubBossList?->pluck('u_id')
                 ->toArray());
@@ -307,6 +306,7 @@ class PlaywService extends CommonService
             // var_dump($zModelsArray);
             $zArray = [];
             foreach ($zModelsArray as $key => &$zModelArray) {
+                $zModelArray['children'] = [];
                 $zModelArray['value'] = $zModelArray['id'];
                 $zModelArray['label'] = $zModelArray['playw_report_playwname'];
                 foreach ($zModelArray['bosss'] as &$boss) {
