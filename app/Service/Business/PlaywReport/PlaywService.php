@@ -415,6 +415,7 @@ class PlaywService extends CommonService
                 ->where('status', PlaywReportApply::STATUS_DEFAULT)
                 ->where('type', PlaywReportApply::TYPE_CLUB_LEAVE)
                 ->first();
+            $model['label'] = $model['playw_report_playwname'];
         }
         return $models;
     }
