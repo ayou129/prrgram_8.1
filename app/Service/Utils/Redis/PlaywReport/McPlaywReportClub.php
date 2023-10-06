@@ -46,7 +46,7 @@ class McPlaywReportClub extends MCStrategyAbstract
     public function getSortJoinAtByUserIdPaginate($club_id, $start, $end)
     {
         $key = self::getSortJoinAtByUserIdKey($club_id);
-        return $this->zRangeByScore($key, $start, $end);
+        return $this->getPaginate($key, $start, $end);
     }
 
     public function delSortJoinAtByUserIdZRemMembers($club_id, $id, ...$ids)
