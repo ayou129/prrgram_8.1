@@ -85,7 +85,7 @@ class MiniLoginService
             $app = new Application($this->config);
             $utils = $app->getUtils();
             $wxResult = $utils->codeToSession($params['wx_login_code']);
-            //            var_dump($wxPhoneResult, $wxResult);
+            // var_dump($wxResult);
 
             $wxPhoneResult = $utils->decryptSession($wxResult['session_key'], $params['iv'], $params['encryptedData']);
             if (! isset($wxPhoneResult['purePhoneNumber'])) {

@@ -64,7 +64,7 @@ class Redis
         $v = $this->redis->get($key);
         //        var_dump($v);
         if ($v === false) {
-            $this->redis->set($key, 0);
+            $this->redis->set($key, 1);
             return true;
         }
         return (bool) $this->redis->get($key);

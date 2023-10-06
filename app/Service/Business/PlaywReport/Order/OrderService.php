@@ -79,7 +79,7 @@ class OrderService extends CommonService implements OrderInterface
         }
 
         $model->user = User::getCacheById($model->u_id);
-        $model->zUser = User::getCacheById($model->z_u_id);
+        $model->z_user = User::getCacheById($model->z_u_id);
         $model->project = PlaywReportClubProject::getCacheById($model->project_id);
         $model->boss = PlaywReportPlaywClubBoss::getCacheById($model->club_boss_id);
 
@@ -116,7 +116,7 @@ class OrderService extends CommonService implements OrderInterface
 
             $zUser = User::getCacheById($item->z_u_id);
             User::addAttrText($zUser);
-            $item->zUser = $zUser;
+            $item->z_user = $zUser;
 
             $item->project = PlaywReportClubProject::getCacheById($item->project_id);
             $item->boss = PlaywReportPlaywClubBoss::getCacheById($item->club_boss_id);
