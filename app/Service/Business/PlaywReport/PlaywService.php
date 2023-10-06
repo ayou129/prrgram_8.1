@@ -405,11 +405,18 @@ class PlaywService extends CommonService
         ];
     }
 
-    public function getClubAdminPlaywList($user, $params, $request)
+    public function getClubAdminPlaywList($userModel, $params, $request)
     {
-        $models = User::where('playw_report_club_id', $user->playw_report_club_id)
-            ->with('clubLeaveApply');
-        return $models->paginate((int) $request->input('size', 10));
+        $models = PlaywReportClub::getUserListSortJoinAtByClubIdPaginate($userModel->playw_report_club_id, (int) $request->input('page', 1), (int) $request->input('size', 10));
+        $models = $models->toArray();
+        foreach ($models['data'] as &$model) {
+            $model['clubLeaveApply'] = Db::table((new PlaywReportApply())->getTable())
+                ->where('u_id', $model['id'])
+                ->where('status', PlaywReportApply::STATUS_DEFAULT)
+                ->where('type', PlaywReportApply::TYPE_CLUB_LEAVE)
+                ->first();
+        }
+        return $models;
     }
 
     public function getClubAdminPlaywListAll($user, $params, $request)

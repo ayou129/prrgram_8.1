@@ -50,20 +50,22 @@ class BossService extends CommonService
 
     public function getClubBossList($userModel, $params, $request, $admin = false)
     {
-        Db::beginTransaction();
-        try {
-            $result = User::getBossListSortCreatedAtByClubIdPaginate($userModel->playw_report_club_id, $userModel->id, [
-            ], (int) $request->input('page', 1), (int) $request->input('size', 10));
-            $result = $result->toArray();
-            foreach ($result['data'] as &$item) {
-                $item['z'] = User::getCacheById($item['u_id']);
-            }
-            Db::commit();
-            return $result;
-        } catch (Throwable $ex) {
-            Db::rollBack();
-            throw $ex;
+        $result = PlaywReportClub::getBossListSortCreatedAtByClubIdPaginate($userModel->playw_report_club_id, (int) $request->input('page', 1), (int) $request->input('size', 10));
+        $result = $result->toArray();
+        foreach ($result['data'] as &$item) {
+            $item['z'] = User::getCacheById($item['u_id']);
         }
+        return $result;
+    }
+
+    public function getClubUserBossList($userModel, $params, $request, $admin = false)
+    {
+        $result = User::getBossListSortCreatedAtByClubIdPaginate($userModel->playw_report_club_id, $userModel->id, (int) $request->input('page', 1), (int) $request->input('size', 10));
+        $result = $result->toArray();
+        foreach ($result['data'] as &$item) {
+            $item['z'] = User::getCacheById($item['u_id']);
+        }
+        return $result;
     }
 
     public function getClubBoss($userModel, $params, $request)

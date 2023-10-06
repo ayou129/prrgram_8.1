@@ -151,6 +151,21 @@ class PlaywReportClub extends BaseModel
         return \Hyperf\Collection\collect();
     }
 
+    public static function getUserListSortJoinAtByClubIdPaginate($k, int $page = 1, int $limit = 10): LengthAwarePaginator
+    {
+        $redis = make(\Hyperf\Redis\Redis::class);
+        $mc = new McPlaywReportClub($redis);
+        $cache = $mc->getSortJoinAtByUserIdPaginate($k, $page, $limit);
+        //        var_dump($cache);
+        if ($cache) {
+            $data = User::getCacheByIds($cache['data']);
+            $models = new LengthAwarePaginator($data, $cache['total'], $cache['per_page'], $cache['current_page']);
+        } else {
+            $models = new LengthAwarePaginator([], 0, 1);
+        }
+        return $models;
+    }
+
     public static function getBossListSortCreatedAtByClubIdPaginate($k, int $page = 1, int $limit = 10): LengthAwarePaginator
     {
         $redis = make(\Hyperf\Redis\Redis::class);
@@ -161,7 +176,7 @@ class PlaywReportClub extends BaseModel
             $data = PlaywReportPlaywClubBoss::getCacheByIds($cache['data']);
             $models = new LengthAwarePaginator($data, $cache['total'], $cache['per_page'], $cache['current_page']);
         } else {
-            $models = new LengthAwarePaginator([]);
+            $models = new LengthAwarePaginator([], 0, 1);
         }
         return $models;
     }

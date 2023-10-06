@@ -94,10 +94,10 @@ class MiniLoginService
             var_dump($wxPhoneResult, $wxResult);
         } catch (DecryptException $ie) {
             var_dump($ie->getMessage());
-            throw new Exception($ie->getMessage());
+            throw new ServiceException(ServiceCode::ERROR, [], 401, [], $ie->getMessage());
         } catch (HttpException $ge) {
             var_dump($ge->getMessage());
-            throw new Exception($ge->getMessage());
+            throw new ServiceException(ServiceCode::ERROR, [], 401, [], $ge->getMessage());
         }
         $phone = $wxPhoneResult['purePhoneNumber'];
         //        $phone = '15622535674';

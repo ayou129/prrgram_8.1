@@ -51,7 +51,6 @@ use Hyperf\Paginator\LengthAwarePaginator;
  * @property null|\Hyperf\Database\Model\Collection|PlaywReportPlaywClubBoss[] $boss
  * @property null|PlaywReportClub $club
  * @property null|PlaywReportApply $clubJoinApply
- * @property null|PlaywReportApply $clubLeaveApply
  */
 class User extends BaseModel
 {
@@ -118,14 +117,6 @@ class User extends BaseModel
         return $this->hasOne(PlaywReportClub::class, 'id', 'playw_report_club_id');
     }
 
-    // 关联一个apply type=club_leave的申请
-    public function clubLeaveApply()
-    {
-        return $this->hasOne(PlaywReportApply::class, 'u_id', 'id')
-            ->where('status', PlaywReportApply::STATUS_DEFAULT)
-            ->where('type', PlaywReportApply::TYPE_CLUB_LEAVE);
-    }
-
     public function clubJoinApply()
     {
         return $this->hasOne(PlaywReportApply::class, 'u_id', 'id')
@@ -168,7 +159,6 @@ class User extends BaseModel
     public static function getBossListSortCreatedAtByClubIdPaginate(
         $k,
         $k2,
-        $relations = [],
         int $page = 1,
         int $limit = 10
     ) {
@@ -180,7 +170,7 @@ class User extends BaseModel
             $data = PlaywReportPlaywClubBoss::getCacheByIds($cache['data']);
             $models = new LengthAwarePaginator($data, $cache['total'], $cache['per_page'], $cache['current_page']);
         } else {
-            $models = new LengthAwarePaginator([]);
+            $models = new LengthAwarePaginator([], 0, 1);
         }
         return $models;
     }

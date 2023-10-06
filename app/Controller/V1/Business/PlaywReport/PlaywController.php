@@ -155,6 +155,16 @@ class PlaywController extends CommonController
         return $this->responseJson(ServiceCode::SUCCESS, $result);
     }
 
+    public function getClubUserBossList()
+    {
+        $params = $this->getRequestAllFilter();
+        $userPlatformModel = $this->miniLoginService->checkAndReletToken($params);
+        CommonService::checkClubIdStatus($userPlatformModel->user);
+        CommonService::checkPlaywName($userPlatformModel->user);
+        $result = $this->bossService->getClubUserBossList($userPlatformModel->user, $params, $this->request);
+        return $this->responseJson(ServiceCode::SUCCESS, $result);
+    }
+
     public function getClubBossList()
     {
         $params = $this->getRequestAllFilter();
@@ -307,7 +317,7 @@ class PlaywController extends CommonController
         CommonService::checkClubIdStatus($userPlatformModel->user);
         CommonService::checkPlaywName($userPlatformModel->user);
         $result = $this->playwService->getClubAdminPlaywList($userPlatformModel->user, $params, $this->request);
-        return $this->responseJson(ServiceCode::SUCCESS, $result->toArray());
+        return $this->responseJson(ServiceCode::SUCCESS, $result);
     }
 
     public function getClubAdminPlaywListAll()

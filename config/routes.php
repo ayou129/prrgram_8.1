@@ -345,7 +345,7 @@ Router::addGroup(
         ]);
         Router::get('/user/club/boss/list', [
             PlaywController::class,
-            'getClubBossList',
+            'getClubUserBossList',
         ]);
         Router::get('/user/club/boss', [
             PlaywController::class,
