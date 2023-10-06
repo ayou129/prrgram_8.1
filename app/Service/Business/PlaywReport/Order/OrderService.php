@@ -72,9 +72,9 @@ class OrderService extends CommonService implements OrderInterface
 
     public function getOrderById($userModel, $params, $request, $admin = false)
     {
-        $model = PlaywReportClubOrder::getCacheById($userModel->playw_report_club_id);
+        $model = PlaywReportClubOrder::getCacheById($params['id']);
 
-        if (! $model) {
+        if (! $model || $model->club_id != $userModel->playw_report_club_id) {
             throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据不存在');
         }
 
