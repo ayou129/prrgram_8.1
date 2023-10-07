@@ -69,4 +69,16 @@ class Redis
         }
         return (bool) $this->redis->get($key);
     }
+    public function getOptionsUserAvatarUrl(): string
+    {
+        $key = 'options|user_avatar_url';
+        $v = $this->redis->get($key);
+        //        var_dump($v);
+        if ($v === false) {
+            $v = 'https://api.playwreport.tianchang56.com/miniprogram/v1/static/点击1.gif';
+            $this->redis->set($key, $v);
+            return $v;
+        }
+        return $this->redis->get($key);
+    }
 }

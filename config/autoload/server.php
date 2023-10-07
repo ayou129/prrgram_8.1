@@ -31,6 +31,7 @@ return [
             ],
         ],
     ],
+
     'settings' => [
         Constant::OPTION_ENABLE_COROUTINE => true,
         Constant::OPTION_WORKER_NUM => swoole_cpu_num(),

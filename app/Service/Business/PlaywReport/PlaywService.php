@@ -224,6 +224,11 @@ class PlaywService extends CommonService
         $apply_badges = ApplyService::getApplyBadge($userModel->playw_report_club_id);
         $apply_badges = $apply_badges->count();
         $data['apply_badge']['un_exec'] = $apply_badges;
+
+        // 头像
+        $redis = new Redis();
+        $data['avatar_url'] = $redis->getOptionsUserAvatarUrl();
+
         return $data;
     }
 
