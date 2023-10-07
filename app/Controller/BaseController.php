@@ -31,7 +31,8 @@ class BaseController extends AbstractController
 
         // 将结果输出到浏览器页面
         $response->withHeader('Content-Type', 'text/html; charset=utf-8');
-        $response->getBody()->write($phpInfo);
+        $response->getBody()
+            ->write($phpInfo);
 
         return $response;
     }

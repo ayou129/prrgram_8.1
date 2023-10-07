@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace App\Exception;
 
 use App\Constant\ServiceCode;
+use App\Utils\Tools;
 use Hyperf\Context\Context;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Di\Annotation\Inject;
@@ -45,9 +46,8 @@ class Handler extends ExceptionHandler
         $result['data'] = [];
         $result['code'] = $throwable->getCode() === 0 ? ServiceCode::ERROR : $throwable->getCode();
         $result['msg'] = $throwable->getMessage();
-        if (! $result['msg'] && envIsProduction()) {
-            $result['msg'] = __('messages.ServerErrorHttpException');
-        }
+        // var_dump($result['msg'], get_class($throwable));
+        // var_dump(Tools::isProduct(), is_subclass_of($throwable, 'LogicException'));
         $httpCode = 400;
         switch (true) {
             case $throwable instanceof ValidationException:
@@ -63,9 +63,13 @@ class Handler extends ExceptionHandler
                 $httpCode = $throwable->getStatusCode() ?? $httpCode;
                 break;
             case $throwable instanceof RuntimeException:
-                break;
+                # hyperf runtime exception: mysql db exception
             case $throwable instanceof LogicException:
             default:
+                if (Tools::isProduct()) {
+                    $result['msg'] = __('messages.ServerErrorHttpException');
+                    $result['code'] = -1;
+                }
                 $httpCode = 500;
                 break;
         }

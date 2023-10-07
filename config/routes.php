@@ -42,6 +42,15 @@ Router::get(
     ]
 );
 Router::addGroup(
+    '/test',
+    function () {
+        Router::get('/exception', [
+            \App\Controller\TestController::class,
+            'testException',
+        ]);
+    }
+);
+Router::addGroup(
     '/v1/admin',
     function () {
         Router::post('/auth/login', [

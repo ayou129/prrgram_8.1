@@ -11,13 +11,6 @@ declare(strict_types=1);
  */
 use Hyperf\Utils\ApplicationContext;
 
-if (! function_exists('envIsProduction')) {
-    function envIsProduction(): bool
-    {
-        return config('app_env') === 'production';
-    }
-}
-
 if (! function_exists('di')) {
     function di($id = null)
     {
