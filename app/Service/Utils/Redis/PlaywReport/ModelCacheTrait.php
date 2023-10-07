@@ -14,6 +14,7 @@ namespace App\Service\Utils\Redis\PlaywReport;
 
 use App\Model\User;
 use App\Model\UserPlatform;
+use App\Service\Utils\Redis\PlaywReport\MCStrategy\MCStrategyAbstract;
 use Hyperf\Redis\Redis;
 
 trait ModelCacheTrait
@@ -41,31 +42,39 @@ trait ModelCacheTrait
         $mcClassName = 'App\Service\Utils\Redis\PlaywReport\Mc' . \Hyperf\Support\class_basename($modelName);
 
         $redis = make(Redis::class);
+        /**
+         * @var MCStrategyAbstract $mc
+         */
         $mc = new $mcClassName($redis); // 使用 $mcClassName 实例化 $mc 类
 
         $cachedModels = [];
         $uncachedIds = [];
 
         // 将需要查询的 ID 分为已缓存和未缓存的部分
+        $mc->pipeline();
         foreach ($ids as $id) {
-            $cache = $mc->getModel($id);
-            if ($cache) {
-                $cachedModels[$id] = (new $modelName())->newInstance($cache, true);
-            } else {
-                $uncachedIds[] = $id;
-            }
+            $mc->getModel($id);
+        }
+        $result = $mc->exec();
+
+        if (! $result) {
+            return \Hyperf\Collection\collect();
+        }
+
+        foreach ($result as $item) {
+            $cachedModels[$item['id']] = (new $modelName())->newInstance($item, true);
         }
 
         // 如果有未缓存的 ID，从数据库中获取并缓存
-        if (! empty($uncachedIds)) {
-            $modelsFromDatabase = (new $modelName())->whereIn('id', $uncachedIds)
-                ->get();
-            foreach ($modelsFromDatabase as $model) {
-                // 缓存新获取的模型数据
-                $mc->setModel($model->id, $model->toArray());
-                $cachedModels[$model->id] = $model;
-            }
-        }
+        // if (! empty($uncachedIds)) {
+        //     $modelsFromDatabase = (new $modelName())->whereIn('id', $uncachedIds)
+        //         ->get();
+        //     foreach ($modelsFromDatabase as $model) {
+        //         // 缓存新获取的模型数据
+        //         $mc->setModel($model->id, $model->toArray());
+        //         $cachedModels[$model->id] = $model;
+        //     }
+        // }
 
         return \Hyperf\Collection\collect($cachedModels);
     }

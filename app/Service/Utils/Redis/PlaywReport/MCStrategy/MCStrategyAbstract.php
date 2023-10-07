@@ -223,6 +223,21 @@ abstract class MCStrategyAbstract
         var_dump(__FUNCTION__, $args, $result);
         return $result;
     }
+    /**
+     * 所有数据.
+     * @param mixed $key
+     * @param mixed $start
+     * @param mixed $end
+     * @return array|false|\Redis
+     * @throws RedisException
+     */
+    protected function zRevRange($key, $start, $end)
+    {
+        $result = $this->redis->zRevRange($key, $start, $end);
+        $args = func_get_args();
+        var_dump(__FUNCTION__, $args, $result);
+        return $result;
+    }
 
     protected function zRangeByScore(string $key, $start, $end, array $options = [])
     {
@@ -310,5 +325,18 @@ abstract class MCStrategyAbstract
             'last_page' => $totalPages,
             'data' => $members,
         ];
+    }
+
+    protected function pipeline()
+    {
+        $this->redis->pipeline();
+    }
+
+    protected function exec()
+    {
+        $args = func_get_args();
+        $result = $this->redis->exec();
+        var_dump(__FUNCTION__, $args, $result);
+        return $result;
     }
 }

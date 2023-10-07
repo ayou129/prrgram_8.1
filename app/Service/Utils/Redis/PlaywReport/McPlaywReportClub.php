@@ -191,9 +191,9 @@ class McPlaywReportClub extends MCStrategyAbstract
     {
         $key = self::getProjectListSortIndexByClubIdKey($club_id);
         if ($range_method === 'asc') {
-            return $this->zRevRangeByScore($key, 0, -1);
+            return $this->zRevRange($key, 0, -1);
         }
-        return $this->zRangeByScore($key, 0, -1);
+        return $this->zrange($key, 0, -1);
     }
 
     public function delProjectListSortIndexByClubIdZRemMembers($club_id, $id, ...$ids)

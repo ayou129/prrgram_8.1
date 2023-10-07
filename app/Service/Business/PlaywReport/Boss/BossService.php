@@ -52,8 +52,10 @@ class BossService extends CommonService
     {
         $result = PlaywReportClub::getBossListSortCreatedAtByClubIdPaginate($userModel->playw_report_club_id, (int) $request->input('page', 1), (int) $request->input('size', 10));
         $result = $result->toArray();
+
+        $clubUser = PlaywReportClub::getUserListSortJoinAtByClubIdAll($userModel->playw_report_club_id);
         foreach ($result['data'] as &$item) {
-            $item['z'] = User::getCacheById($item['u_id']);
+            $item['z'] = $clubUser[$item['u_id']];
         }
         return $result;
     }

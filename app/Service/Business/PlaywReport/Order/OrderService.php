@@ -109,17 +109,25 @@ class OrderService extends CommonService implements OrderInterface
 
         $result = $models->paginate((int) $request->input('size', 10))
             ->toArray();
+
+        $clubProject = PlaywReportClub::getProjectListSortIndexByClubIdAll($userModel->playw_report_club_id);
+        $clubUser = PlaywReportClub::getUserListSortJoinAtByClubIdAll($userModel->playw_report_club_id);
+        $clubBoss = PlaywReportClub::getBossListSortCreatedAtByClubIdAll($userModel->playw_report_club_id);
+
         foreach ($result['data'] as &$item) {
             $user = User::getCacheById($item->u_id);
             User::addAttrText($user);
             $item->user = $user;
 
-            $zUser = User::getCacheById($item->z_u_id);
+            $zUser = $clubUser[$item->z_u_id];
             User::addAttrText($zUser);
             $item->z_user = $zUser;
 
-            $item->project = PlaywReportClubProject::getCacheById($item->project_id);
-            $item->boss = PlaywReportPlaywClubBoss::getCacheById($item->club_boss_id);
+            $item->project = $clubProject[$item->project_id];
+            if ($item->club_boss_id) {
+                $item->boss = $clubBoss[$item->club_boss_id];
+            }
+
             PlaywReportClubOrder::addAttrText($item);
         }
         $user_order_badges = OrderService::getOrderBadgeByUserIds($userModel->playw_report_club_id, [$userModel->id]);
