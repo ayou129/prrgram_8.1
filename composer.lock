@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d0d42524928fc5ef10fa735f6a50e542",
+    "content-hash": "ae5bb7d31819a4a591a5272be85dd0a8",
     "packages": [
         {
             "name": "doctrine/deprecations",
@@ -2470,14 +2470,9 @@
         {
             "name": "hyperf/pool",
             "version": "v3.0.37",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/hyperf/pool.git",
-                "reference": "0bd9cf0e6e40ca9876d5e851967d5aa195fc30b7"
-            },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hyperf/pool/zipball/0bd9cf0e6e40ca9876d5e851967d5aa195fc30b7",
+                "url": "https://mirrors.cloud.tencent.com/repository/composer/hyperf/pool/v3.0.37/hyperf-pool-v3.0.37.zip",
                 "reference": "0bd9cf0e6e40ca9876d5e851967d5aa195fc30b7",
                 "shasum": ""
             },
@@ -2502,7 +2497,6 @@
                     "Hyperf\\Pool\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2514,12 +2508,6 @@
                 "php",
                 "swoole"
             ],
-            "support": {
-                "docs": "https://hyperf.wiki",
-                "issues": "https://github.com/hyperf/hyperf/issues",
-                "pull-request": "https://github.com/hyperf/hyperf/pulls",
-                "source": "https://github.com/hyperf/hyperf"
-            },
             "time": "2023-09-19T01:50:18+00:00"
         },
         {
