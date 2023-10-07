@@ -18,18 +18,17 @@ use App\Model\User;
 use App\Model\UserPlatform;
 use App\Service\Business\UserService;
 use App\Utils\Tools;
-use EasyWeChat\Kernel\Exceptions\DecryptException;
-use EasyWeChat\Kernel\Exceptions\HttpException;
-use EasyWeChat\Kernel\Exceptions\InvalidConfigException;
 use EasyWeChat\MiniApp\Application;
+use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
-use Throwable;
 
 class MiniLoginService
 {
     #[Inject]
     protected UserService $userService;
+
+    private Application $app;
 
     private array $config = [];
 
@@ -69,6 +68,28 @@ class MiniLoginService
                 //  ],
             ],
         ];
+        $this->app = new Application($this->config);
+    }
+
+    public function checksession($access_token)
+    {
+        $response = $this->app->getHttpClient()
+            ->request('GET', '/wxa/checksession', [
+                'query' => [
+                    'appid' => $this->app->getAccount()
+                        ->getAppId(),
+                    'secret' => $this->app->getAccount()
+                        ->getSecret(),
+                    'access_token' => $access_token,
+                ],
+            ])
+            ->toArray(false);
+
+        if (empty($response['errcode']) || $response['errcode'] !== '0') {
+            throw new ServiceException(ServiceCode::ERROR, [], 401, [], 'checksession error: ' . json_encode($response, JSON_UNESCAPED_UNICODE));
+        }
+
+        return $response;
     }
 
     public function registerAndLoginByPhone($params)
@@ -76,74 +97,76 @@ class MiniLoginService
         /*
          * 注册(包括Login)则更新token
          */
+        Db::beginTransaction();
         try {
             /**
              * wx_login_code wx.login的code.
              * code、xx getPhoneNumber.
+             * result[] session_key/unionid/openid.
              */
-            $app = new Application($this->config);
+            $app = $this->app;
             $utils = $app->getUtils();
             $wxResult = $utils->codeToSession($params['wx_login_code']);
-            // var_dump($wxResult);
-
-            $wxPhoneResult = $utils->decryptSession($wxResult['session_key'], $params['iv'], $params['encryptedData']);
-            if (! isset($wxPhoneResult['purePhoneNumber'])) {
-                throw new ServiceException(ServiceCode::ERROR, [], 400, $wxPhoneResult);
-            }
-            var_dump($wxPhoneResult, $wxResult);
-        } catch (DecryptException $ie) {
-            var_dump($ie->getMessage());
-            throw new ServiceException(ServiceCode::ERROR, [], 401, [], $ie->getMessage());
-        } catch (HttpException $ge) {
-            var_dump($ge->getMessage());
-            throw new ServiceException(ServiceCode::ERROR, [], 401, [], $ge->getMessage());
-        }
-        $phone = $wxPhoneResult['purePhoneNumber'];
-        //        $phone = '15622535674';
-        //        $wxResult['openid'] = 'oCNty69xTU_wez04hVPvn56BpmpI';
-        Db::beginTransaction();
-        try {
-            $userModel = User::getCacheUserByPhone($phone);
-            if (! $userModel) {
-                $password = Tools::encrypt(substr($phone, -6, 6));
-                $userModel = new User();
-                $userModel->phone = $phone;
-                $userModel->password = $password;
-                $userModel->save();
-            }
-
-            /**
-             * 有可能user_platform不存在
-             * 1. 确实不存在，第一次创建
-             * 2. 手动删除了数据，脏数据，新创建.
-             */
-            $userPlatformModel = UserPlatform::getCacheByWxPlatformAndUserIdAndOpenid($this->platform, $userModel->id, $wxResult['openid']);
-
+            $userPlatformModel = UserPlatform::getCacheByWxPlatformAndOpenid($this->platform, $wxResult['openid']);
             if (! $userPlatformModel) {
+                // 注册，必须获取手机，session_key必须有效
+                // 查看该手机号是否存在user数据
+                $wxPhoneResult = $utils->decryptSession($wxResult['session_key'], $params['iv'], $params['encryptedData']);
+                if (! isset($wxPhoneResult['purePhoneNumber'])) {
+                    throw new ServiceException(ServiceCode::ERROR, [], 400, $wxPhoneResult);
+                }
+                $wxPhoneResult = $utils->decryptSession($wxResult['session_key'], $params['iv'], $params['encryptedData']);
+                $phone = $wxPhoneResult['purePhoneNumber'];
+
+                $userModel = User::getCacheUserByPhone($phone);
+                if (! $userModel) {
+                    $password = Tools::encrypt(substr($phone, -6, 6));
+                    $userModel = new User();
+                    $userModel->phone = $phone;
+                    $userModel->password = $password;
+                    if (isset($wxResult['unionid']) && $wxResult['unionid']) {
+                        $userModel->wx_unionid = $wxResult['unionid'];
+                    }
+                    $userModel->save();
+                }
+
                 $userPlatformModel = new UserPlatform();
                 $userPlatformModel->platform = $this->platform;
                 $userPlatformModel->u_id = $userModel->id;
                 $userPlatformModel->wx_openid = $wxResult['openid'];
                 $userPlatformModel->wx_session_key = $wxResult['session_key'];
+
                 $userPlatformModel->save();
                 $userPlatformModel->user = $userModel;
 
                 $tokenInfo = $this->userService->reletToken($userPlatformModel, true);
             } else {
+                // 登录，检查session_key是否有效
+                if (! $params['session_key_expire_status']) {
+                    $this->checksession($userPlatformModel->wx_session_key);
+                }
+                $wxPhoneResult = $utils->decryptSession($userPlatformModel->wx_session_key, $params['iv'], $params['encryptedData']);
+                $userPlatformModel->user = User::getCacheById($userPlatformModel->u_id);
+
                 $userPlatformModel->wx_session_key = $wxResult['session_key'];
                 $userPlatformModel->save();
 
                 $userPlatformModel->user = User::getCacheById($userPlatformModel->u_id);
+                if (! $userPlatformModel->user) {
+                    throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据有误，请联系管理员');
+                }
                 $tokenInfo = $this->userService->reletToken($userPlatformModel);
             }
-            // else {
-            //     // 强制更新平台表的u_id
-            //     $userPlatformModel->u_id = $userModel->id;
-            // }
+
+            //        $phone = '15622535674';
+            //        $wxResult['openid'] = 'oCNty69xTU_wez04hVPvn56BpmpI';
+            // $userPlatformModel = UserPlatform::getCacheByWxPlatformAndUserIdAndOpenid($this->platform, $userModel->id, $wxResult['openid']);
+
+            // var_dump($wxPhoneResult, $wxResult);
 
             Db::commit();
             return $tokenInfo;
-        } catch (Throwable $ex) {
+        } catch (Exception $ex) {
             Db::rollBack();
             throw $ex;
         }

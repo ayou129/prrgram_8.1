@@ -156,4 +156,24 @@ class UserPlatform extends BaseModel
         self::addRelations($model, $relations);
         return $model ?? null;
     }
+    public static function getCacheByWxPlatformAndOpenid($k, $k3, $relations = [])
+    {
+        $redis = make(\Hyperf\Redis\Redis::class);
+        $mc = new McUserPlatform($redis);
+        $id = $mc->getByPlatformAndWxOpenid($k, $k3);
+        if ($id) {
+            $cache = $mc->getModel($id);
+            if ($cache) {
+                $model = (new self())->newInstance($cache, true);
+            } else {
+                $model = null;
+            }
+        } else {
+            $model = (new self())->where('platform', $k)
+                ->where('wx_openid', $k3)
+                ->first();
+        }
+        self::addRelations($model, $relations);
+        return $model ?? null;
+    }
 }

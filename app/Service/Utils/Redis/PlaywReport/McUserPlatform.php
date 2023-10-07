@@ -74,6 +74,29 @@ class McUserPlatform extends MCStrategyAbstract
         return $this->prefix . $this->table . '|platform:' . $platform . '|u_id:' . $u_id . '|wx_openid:' . $wx_openid;
     }
 
+    public function setByPlatformAndWxOpenid($platform, $wx_openid, $id)
+    {
+        $key = self::getByPlatformAndWxOpenidKey($platform, $wx_openid);
+        return $this->set($key, $id, ['ex' => self::ttl]);
+    }
+
+    public function getByPlatformAndWxOpenid($platform, $wx_openid)
+    {
+        $key = self::getByPlatformAndWxOpenidKey($platform, $wx_openid);
+        return $this->get($key);
+    }
+
+    public function delByPlatformAndWxOpenid($platform, $wx_openid)
+    {
+        $key = self::getByPlatformAndWxOpenidKey($platform, $wx_openid);
+        return $this->del($key);
+    }
+
+    public function getByPlatformAndWxOpenidKey($platform, $wx_openid): string
+    {
+        return $this->prefix . $this->table . '|platform:' . $platform . '|wx_openid:' . $wx_openid;
+    }
+
     public function setByPlatformAndUserId($platform, $user_id, $id)
     {
         $key = self::getByPlatformAndUserIdKey($platform, $user_id);

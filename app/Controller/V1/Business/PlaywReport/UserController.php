@@ -21,7 +21,7 @@ class UserController extends CommonController
     public function registerAndLoginByPhone()
     {
         $params = $this->getRequestAllFilter();
-        if (! isset($params['wx_login_code'])) {
+        if (! isset($params['wx_login_code'], $params['session_key_expire_status'])) {
             throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT);
         }
         $params['ip'] = $this->request->getUri()

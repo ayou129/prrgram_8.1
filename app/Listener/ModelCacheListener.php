@@ -322,6 +322,7 @@ class ModelCacheListener implements ListenerInterface
                 $mcUserPlatform->setByPlatformAndByLoginToken($item->platform, $item->login_token, $item->id);
             }
             if ($item->wx_openid) {
+                $mcUserPlatform->setByPlatformAndWxOpenid($item->platform, $item->wx_openid, $item->id);
                 $mcUserPlatform->setByPlatformAndUserIdAndWxOpenid($item->platform, $item->u_id, $item->wx_openid, $item->id);
             }
             if ($item->u_id) {
@@ -337,6 +338,7 @@ class ModelCacheListener implements ListenerInterface
 
         $mcUserPlatform->delByPlatformAndUserId($item->platform, $item->u_id);
         $mcUserPlatform->delByPlatformAndUserIdAndWxOpenid($item->platform, $item->u_id, $item->wx_openid);
+        $mcUserPlatform->delByPlatformAndWxOpenid($item->platform, $item->wx_openid);
         $mcUserPlatform->delByPlatformAndLoginToken($item->platform, $item->login_token);
     }
 
