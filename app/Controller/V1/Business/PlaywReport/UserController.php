@@ -62,10 +62,12 @@ class UserController extends CommonController
     {
         $params = $this->getRequestAllFilter();
         $userPlatformModel = $this->miniLoginService->checkAndReletToken($params);
-        if (! isset($params['playw_name']) || ! $params['playw_name'] || (strlen($params['playw_name']) > 50)) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT);
+        if (isset($params['playw_name'])) {
+            if (! $params['playw_name'] || (strlen($params['playw_name']) > 50)) {
+                throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT);
+            }
+            $userPlatformModel->user->playw_report_playwname = $params['playw_name'];
         }
-        $userPlatformModel->user->playw_report_playwname = $params['playw_name'];
         if (isset($params['club_jiedan_price'])) {
             if (! is_numeric($params['club_jiedan_price'])) {
                 throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT);
