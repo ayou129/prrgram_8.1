@@ -24,7 +24,7 @@ use Hyperf\Paginator\LengthAwarePaginator;
  * @property string $password
  * @property string $real_name
  * @property string $nickname
- * @property string $avatar_image_id
+ * @property string $avatar_url
  * @property int $gender
  * @property string $constellation
  * @property string $city
@@ -70,7 +70,7 @@ class User extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'phone', 'wx_unionid', 'password', 'real_name', 'nickname', 'avatar_image_id', 'gender', 'birthday', 'constellation', 'city', 'province', 'country', 'status', 'playw_report_playwname', 'playw_report_club_jiedan_price', 'playw_report_club_id', 'playw_report_club_join_at', 'playw_report_club_admin', 'social_id', 'social_dazzle_nickname', 'social_signature', 'social_charm_value', 'social_magnate_value', 'social_noble_value', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'phone', 'wx_unionid', 'password', 'real_name', 'nickname', 'avatar_url', 'gender', 'birthday', 'constellation', 'city', 'province', 'country', 'status', 'playw_report_playwname', 'playw_report_club_jiedan_price', 'playw_report_club_id', 'playw_report_club_join_at', 'playw_report_club_admin', 'social_id', 'social_dazzle_nickname', 'social_signature', 'social_charm_value', 'social_magnate_value', 'social_noble_value', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
@@ -153,7 +153,6 @@ class User extends BaseModel
     /**
      * @param mixed $k
      * @param mixed $k2
-     * @param mixed $relations
      * @return LengthAwarePaginator
      */
     public static function getBossListSortCreatedAtByClubIdPaginate(

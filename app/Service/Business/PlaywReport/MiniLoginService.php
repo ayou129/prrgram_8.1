@@ -22,7 +22,6 @@ use EasyWeChat\Kernel\Exceptions\DecryptException;
 use EasyWeChat\Kernel\Exceptions\HttpException;
 use EasyWeChat\Kernel\Exceptions\InvalidConfigException;
 use EasyWeChat\MiniApp\Application;
-use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Throwable;

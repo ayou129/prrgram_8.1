@@ -24,7 +24,8 @@ class UserController extends CommonController
         if (! isset($params['wx_login_code'])) {
             throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT);
         }
-        $params['ip'] = $this->request->getUri()->getHost();
+        $params['ip'] = $this->request->getUri()
+            ->getHost();
         $result = $this->miniLoginService->registerAndLoginByPhone($params);
         return $this->responseJson(ServiceCode::SUCCESS, $result);
     }
@@ -70,6 +71,9 @@ class UserController extends CommonController
                 throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT);
             }
             $userPlatformModel->user->playw_report_club_jiedan_price = $params['club_jiedan_price'];
+        }
+        if (isset($params['avatar_url'])) {
+            $userPlatformModel->user->avatar_url = $params['avatar_url'];
         }
         $userPlatformModel->user->save();
         return $this->responseJson(ServiceCode::SUCCESS);

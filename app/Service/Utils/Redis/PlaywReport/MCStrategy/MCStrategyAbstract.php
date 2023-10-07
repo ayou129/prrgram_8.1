@@ -223,6 +223,7 @@ abstract class MCStrategyAbstract
         var_dump(__FUNCTION__, $args, $result);
         return $result;
     }
+
     /**
      * 所有数据.
      * @param mixed $key
