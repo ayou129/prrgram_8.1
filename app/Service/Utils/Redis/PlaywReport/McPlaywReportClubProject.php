@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace App\Service\Utils\Redis\PlaywReport;
 
-use App\Model\PlaywReportClub;
+use App\Model\PlaywReportClubProject;
 use App\Service\Utils\Redis\PlaywReport\MCStrategy\MCStrategyAbstract;
 use Hyperf\Redis\Redis;
 
@@ -24,7 +24,7 @@ class McPlaywReportClubProject extends MCStrategyAbstract
 
     public function __construct(?Redis $redis)
     {
-        $this->table = (new PlaywReportClub())->getTable();
+        $this->table = (new PlaywReportClubProject())->getTable();
         parent::__construct($redis);
     }
 }
