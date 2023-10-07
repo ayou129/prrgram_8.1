@@ -22,6 +22,7 @@ use App\Model\PlaywReportClubOrderStairPointRule;
 use App\Model\PlaywReportClubProject;
 use App\Model\PlaywReportPlaywClubBoss;
 use App\Model\User;
+use App\Model\UserPlatform;
 use App\Service\Business\PlaywReport\Apply\ApplyService;
 use App\Service\Business\PlaywReport\Club\ClubService;
 use App\Service\Business\PlaywReport\Order\OrderService;
@@ -44,8 +45,13 @@ class PlaywService extends CommonService
         if (! $params['id']) {
             throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT, [], 400, [], '请选择用户');
         }
-        $model = User::getCacheUserByIdAndClubId($params['id'], $userModel->playw_report_club_id, ['platformMiniprogram']);
-        return $model->platformMiniprogram->login_token ?? '';
+        $model = User::getCacheById($params['id']);
+        if (! $model || $model->playw_report_club_id != $userModel->playw_report_club_id) {
+            throw new ServiceException(ServiceCode::ERROR_PARAM_CLIENT, [], 400, [], '用户不存在');
+        }
+        $model->platformMiniprogram = UserPlatform::getCacheByUserIdAndPlatform(UserPlatform::PLATFORM_MINIPROGRAM, $params['id']);
+        $token = $model->platformMiniprogram?->login_token ?? '';
+        return ['token' => $token];
     }
 
     public function getStatisticsData($userModel, $params, $u_id = false, $admin = false)
