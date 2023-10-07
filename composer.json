@@ -22,6 +22,7 @@
         "hyperf/db-connection": "~3.0.0",
         "hyperf/di": "^3.0",
         "hyperf/engine": "^2.10",
+        "hyperf/filesystem": "^3.0",
         "hyperf/framework": "~3.0.0",
         "hyperf/guzzle": "~3.0.0",
         "hyperf/http-server": "~3.0.0",
@@ -48,6 +49,7 @@
         "ext-pdo": "Required to use MySQL Client.",
         "ext-pdo_mysql": "Required to use MySQL Client.",
         "ext-redis": "Required to use Redis Client."
+        "ext-fileinfo": "*"
     },
     "autoload": {
         "psr-4": {

@@ -279,6 +279,13 @@ Router::addGroup(
 Router::addGroup(
     '/miniprogram/v1',
     function () {
+        Router::get(
+            '/static/{filename:.+}',
+            [
+                \App\Controller\V1\StaticFileController::class,
+                'file',
+            ],
+        );
         Router::put('/test/testPrepare', [
             CommonController::class,
             'testPrepare',

@@ -43,6 +43,9 @@ return [
         Constant::OPTION_PACKAGE_MAX_LENGTH => 4194304, // 4MB
         Constant::OPTION_SOCKET_BUFFER_SIZE => 2 * 1024 * 1024,
         Constant::OPTION_BUFFER_OUTPUT_SIZE => 2 * 1024 * 1024,
+        // 将 public 替换为上传目录
+        'document_root' => BASE_PATH . '/storage/download',
+        'enable_static_handler' => true,
     ],
     'callbacks' => [
         Event::ON_WORKER_START => [Hyperf\Framework\Bootstrap\WorkerStartCallback::class, 'onWorkerStart'],
