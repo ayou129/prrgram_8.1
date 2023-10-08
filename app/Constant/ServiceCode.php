@@ -30,8 +30,11 @@ class ServiceCode extends AbstractConstants
 
     public const ERROR_PARAM_CLIENT = -2;
 
-    # Base -1*****
+    # Base -10****
     public const ERROR_TOO_MANY_VISITORS = -100001;
+
+    # Miniprogram -12****
+    public const ERROR_MINIPROGRAM_WX_LOGIN_EXPIRE = -120001;
 
     # Admin -11****
     public const ERROR_USER_IS_NOT_ADMIN = -11001;

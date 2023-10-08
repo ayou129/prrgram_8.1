@@ -44,6 +44,9 @@ return [
     # 业务
     'ERROR' => '操作失败!',
 
+    'ERROR_MINIPROGRAM_WX_LOGIN_EXPIRE' => '登录失效，请重新登录!',
+
+
     # # Params
     'ERROR_PARAM_CLIENT' => '参数错误!',
 

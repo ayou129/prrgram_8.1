@@ -44,6 +44,8 @@ return [
     # 业务
     'ERROR' => 'error!',
 
+    'ERROR_MINIPROGRAM_WX_LOGIN_EXPIRE' => 'login failed, please log in again!',
+
     # # Params
     'ERROR_PARAM_CLIENT' => 'the param error!',
 

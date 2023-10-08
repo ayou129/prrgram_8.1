@@ -18,6 +18,7 @@ use App\Model\User;
 use App\Model\UserPlatform;
 use App\Service\Business\UserService;
 use App\Utils\Tools;
+use EasyWeChat\Kernel\Exceptions\DecryptException;
 use EasyWeChat\MiniApp\Application;
 use Exception;
 use Hyperf\DbConnection\Db;
@@ -71,7 +72,7 @@ class MiniLoginService
         $this->app = new Application($this->config);
     }
 
-    public function checksession($access_token)
+    public function checksession($access_token, $only_data = false)
     {
         $response = $this->app->getHttpClient()
             ->request('GET', '/wxa/checksession', [
@@ -86,6 +87,9 @@ class MiniLoginService
             ->toArray(false);
 
         if (empty($response['errcode']) || $response['errcode'] !== '0') {
+            if ($only_data) {
+                return $response;
+            }
             throw new ServiceException(ServiceCode::ERROR, [], 401, [], 'checksession error: ' . json_encode($response, JSON_UNESCAPED_UNICODE));
         }
 
@@ -106,63 +110,71 @@ class MiniLoginService
              */
             $app = $this->app;
             $utils = $app->getUtils();
+
+            // 微信官方小程序登录
             $wxResult = $utils->codeToSession($params['wx_login_code']);
             $userPlatformModel = UserPlatform::getCacheByWxPlatformAndOpenid($this->platform, $wxResult['openid']);
-            if (! $userPlatformModel) {
-                // 注册，必须获取手机，session_key必须有效
-                // 查看该手机号是否存在user数据
-                $wxPhoneResult = $utils->decryptSession($wxResult['session_key'], $params['iv'], $params['encryptedData']);
+
+
+            // 有时sk可能会失效，这时先过滤掉 新的，但是存储的时候 依然存新的sk
+            $use_sk = $wxResult['session_key'];
+            if ($userPlatformModel && $userPlatformModel->wx_session_key) {
+                $response = $this->checksession($wxResult['session_key'], true);
+                if ($response['errcode'] != '0') {
+                    $use_sk = $userPlatformModel->wx_session_key;
+                }
+            }
+
+            // 解密数据
+            try {
+                $wxPhoneResult = $utils->decryptSession($use_sk, $params['iv'], $params['encryptedData']);
                 if (! isset($wxPhoneResult['purePhoneNumber'])) {
                     throw new ServiceException(ServiceCode::ERROR, [], 400, $wxPhoneResult);
                 }
-                $wxPhoneResult = $utils->decryptSession($wxResult['session_key'], $params['iv'], $params['encryptedData']);
-                $phone = $wxPhoneResult['purePhoneNumber'];
-
-                $userModel = User::getCacheUserByPhone($phone);
-                if (! $userModel) {
-                    $password = Tools::encrypt(substr($phone, -6, 6));
-                    $userModel = new User();
-                    $userModel->phone = $phone;
-                    $userModel->password = $password;
-                    if (isset($wxResult['unionid']) && $wxResult['unionid']) {
-                        $userModel->wx_unionid = $wxResult['unionid'];
-                    }
-                    $userModel->save();
-                }
-
-                $userPlatformModel = new UserPlatform();
-                $userPlatformModel->platform = $this->platform;
-                $userPlatformModel->u_id = $userModel->id;
-                $userPlatformModel->wx_openid = $wxResult['openid'];
-                $userPlatformModel->wx_session_key = $wxResult['session_key'];
-
-                $userPlatformModel->save();
-                $userPlatformModel->user = $userModel;
-
-                $tokenInfo = $this->userService->reletToken($userPlatformModel, true);
-            } else {
-                // 登录，检查session_key是否有效
-                if (! $params['session_key_expire_status']) {
-                    $this->checksession($userPlatformModel->wx_session_key);
-                }
-                $wxPhoneResult = $utils->decryptSession($userPlatformModel->wx_session_key, $params['iv'], $params['encryptedData']);
-                $userPlatformModel->user = User::getCacheById($userPlatformModel->u_id);
-
-                $userPlatformModel->wx_session_key = $wxResult['session_key'];
-                $userPlatformModel->save();
-
-                $userPlatformModel->user = User::getCacheById($userPlatformModel->u_id);
-                if (! $userPlatformModel->user) {
-                    throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据有误，请联系管理员');
-                }
-                $tokenInfo = $this->userService->reletToken($userPlatformModel);
+            } catch (DecryptException $e) {
+                throw new ServiceException(ServiceCode::ERROR_MINIPROGRAM_WX_LOGIN_EXPIRE);
             }
+
+            $phone = $wxPhoneResult['purePhoneNumber'];
 
             //        $phone = '15622535674';
             //        $wxResult['openid'] = 'oCNty69xTU_wez04hVPvn56BpmpI';
             // $userPlatformModel = UserPlatform::getCacheByWxPlatformAndUserIdAndOpenid($this->platform, $userModel->id, $wxResult['openid']);
 
             // var_dump($wxPhoneResult, $wxResult);
+
+            // 通过手机号查找用户
+            $userModel = User::getCacheUserByPhone($phone);
+            if (! $userModel) {
+                // 通过手机号注册用户
+                $password = Tools::encrypt(substr($phone, -6, 6));
+                $userModel = new User();
+                $userModel->phone = $phone;
+                $userModel->password = $password;
+                if (isset($wxResult['unionid']) && $wxResult['unionid']) {
+                    $userModel->wx_unionid = $wxResult['unionid'];
+                }
+                $userModel->save();
+            }
+
+            if (! $userPlatformModel) {
+                $userPlatformModel = new UserPlatform();
+                $userPlatformModel->platform = $this->platform;
+                $userPlatformModel->u_id = $userModel->id;
+                $userPlatformModel->wx_openid = $wxResult['openid'];
+                $userPlatformModel->wx_session_key = $wxResult['session_key'];
+                $userPlatformModel->save();
+                $userPlatformModel->user = $userModel;
+
+                $tokenInfo = $this->userService->reletToken($userPlatformModel, true);
+            } else {
+                $userPlatformModel->wx_session_key = $wxResult['session_key'];
+                $userPlatformModel->save();
+                $userPlatformModel->user = $userModel;
+
+                $tokenInfo = $this->userService->reletToken($userPlatformModel);
+            }
+
 
             Db::commit();
             return $tokenInfo;
