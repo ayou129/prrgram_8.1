@@ -132,7 +132,10 @@ class MiniLoginService
                     throw new ServiceException(ServiceCode::ERROR, [], 400, $wxPhoneResult);
                 }
             } catch (DecryptException $e) {
-                throw new ServiceException(ServiceCode::ERROR_MINIPROGRAM_WX_LOGIN_EXPIRE);
+                $userPlatformModel->wx_session_key = $wxResult['session_key'];
+                $userPlatformModel->save();
+                Db::commit();
+                return false;
             }
 
             $phone = $wxPhoneResult['purePhoneNumber'];

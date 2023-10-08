@@ -27,6 +27,9 @@ class UserController extends CommonController
         $params['ip'] = $this->request->getUri()
             ->getHost();
         $result = $this->miniLoginService->registerAndLoginByPhone($params);
+        if ($result === false) {
+            throw new ServiceException(ServiceCode::ERROR_MINIPROGRAM_WX_LOGIN_EXPIRE);
+        }
         return $this->responseJson(ServiceCode::SUCCESS, $result);
     }
 
