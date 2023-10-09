@@ -69,6 +69,7 @@ class Redis
         }
         return (bool) $this->redis->get($key);
     }
+
     public function getOptionsUserAvatarUrl(): string
     {
         $key = 'options|user_avatar_url';

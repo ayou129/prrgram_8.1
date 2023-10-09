@@ -77,8 +77,10 @@ class UserController extends CommonController
             }
             $userPlatformModel->user->playw_report_club_jiedan_price = $params['club_jiedan_price'];
         }
-        if (isset($params['avatar_url'])) {
-            $userPlatformModel->user->avatar_url = $params['avatar_url'];
+        if (isset($params['wx_user_profile'])) {
+            if (isset($params['wx_user_profile']['userInfo']['avatarUrl'])) {
+                $userPlatformModel->user->avatar_url = $params['wx_user_profile']['userInfo']['avatarUrl'];
+            }
         }
         $userPlatformModel->user->save();
         return $this->responseJson(ServiceCode::SUCCESS);

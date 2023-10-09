@@ -21,7 +21,6 @@ class StaticFileController extends AbstractController
 {
     /**
      * 获取图片.
-     * @param $filename
      * @return \Psr\Http\Message\MessageInterface|\Psr\Http\Message\ResponseInterface
      */
     public function file($filename)

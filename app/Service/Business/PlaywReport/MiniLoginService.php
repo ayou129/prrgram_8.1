@@ -115,7 +115,6 @@ class MiniLoginService
             $wxResult = $utils->codeToSession($params['wx_login_code']);
             $userPlatformModel = UserPlatform::getCacheByWxPlatformAndOpenid($this->platform, $wxResult['openid']);
 
-
             // 有时sk可能会失效，这时先过滤掉 新的，但是存储的时候 依然存新的sk
             $use_sk = $wxResult['session_key'];
             if ($userPlatformModel && $userPlatformModel->wx_session_key) {
@@ -177,7 +176,6 @@ class MiniLoginService
 
                 $tokenInfo = $this->userService->reletToken($userPlatformModel);
             }
-
 
             Db::commit();
             return $tokenInfo;

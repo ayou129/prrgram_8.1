@@ -156,6 +156,7 @@ class UserPlatform extends BaseModel
         self::addRelations($model, $relations);
         return $model ?? null;
     }
+
     public static function getCacheByWxPlatformAndOpenid($k, $k3, $relations = [])
     {
         $redis = make(\Hyperf\Redis\Redis::class);
