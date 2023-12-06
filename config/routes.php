@@ -19,10 +19,20 @@ use App\Controller\V1\Admin\MenuController;
 use App\Controller\V1\Admin\RequestLogController;
 use App\Controller\V1\Admin\RoleController;
 use App\Controller\V1\Admin\UserController;
+use App\Controller\V1\Business\Wuliu\IndexController;
+use App\Controller\V1\Business\Wuliu\Chewu\PartnerController;
+use App\Controller\V1\Business\Wuliu\Bill\BillController;
+use App\Controller\V1\Business\Wuliu\Chewu\CarController;
+use App\Controller\V1\Business\Wuliu\Chewu\DriverController;
+use App\Controller\V1\Business\Wuliu\Chewu\MotorcadeController;
+use App\Controller\V1\Business\Wuliu\Chewu\ShipCompanyController;
 use App\Controller\V1\Business\PlaywReport\ClubController;
 use App\Controller\V1\Business\PlaywReport\CommonController;
 use App\Controller\V1\Business\PlaywReport\PlaywController;
 use App\Controller\V1\Business\PlaywReport\UserController as PlaywReportUserController;
+use App\Controller\V1\Business\Wuliu\SeaWaybill\JinkouController;
+use App\Controller\V1\Business\Wuliu\SeaWaybill\SailScheduleController;
+use App\Controller\V1\Business\Wuliu\SeaWaybill\SeaWaybillController;
 use App\Middleware\AuthMiddleware;
 use Hyperf\HttpServer\Router\Router;
 
@@ -277,269 +287,337 @@ Router::addGroup(
 );
 
 Router::addGroup(
-    '/miniprogram/v1',
+    '/api/v1/admin/wuliu',
     function () {
-        Router::get(
-            '/static/{filename:.+}',
-            [
-                \App\Controller\V1\StaticFileController::class,
-                'file',
-            ],
-        );
-        Router::put('/test/testPrepare', [
-            CommonController::class,
-            'testPrepare',
+        // ------------------------ Base -------
+        Router::get('/api/index/data', [
+            IndexController::class,
+            'data',
         ]);
-        Router::post('/console/log', [
-            CommonController::class,
-            'postConsoleLog',
+        // ------------------------ Partner -------
+        Router::get('/api/partner/all', [
+            PartnerController::class,
+            'all',
         ]);
-        Router::get('/options', [
-            CommonController::class,
-            'getOptions',
+        Router::get('/api/partner/list', [
+            PartnerController::class,
+            'list',
         ]);
-        // ------------------------ user -------
-        Router::post('/user/registerAndLoginByPhone', [
-            PlaywReportUserController::class,
-            'registerAndLoginByPhone',
+        Router::post('/api/partner', [
+            PartnerController::class,
+            'post',
         ]);
-        //        Router::post('/user/login', [
-        //            PlaywReportUserController::class,
-        //            'miniLogin',
-        //        ]);
-        Router::get('/user/check_user_platform_exists', [
-            PlaywReportUserController::class,
-            'checkUserPlatformExists',
+        Router::put('/api/partner', [
+            PartnerController::class,
+            'put',
         ]);
-        Router::get('/user/playw_report/info', [
-            PlaywReportUserController::class,
-            'getUserPlaywReportInfo',
-        ]);
-        Router::put('/user/playw_report/info', [
-            PlaywReportUserController::class,
-            'putUserPlaywReportInfo',
+        Router::delete('/api/partner', [
+            PartnerController::class,
+            'delete',
         ]);
 
-        // ------------------------ User Club -------
-        Router::get('/user/club', [
-            PlaywController::class,
-            'getClubById',
+        // ------------------------ ShipCompany -------
+        Router::get('/api/ship_company/all', [
+            ShipCompanyController::class,
+            'all',
         ]);
-        Router::get('/user/club/byname', [
-            PlaywController::class,
-            'getClubByName',
+        Router::get('/api/ship_company/list', [
+            ShipCompanyController::class,
+            'list',
         ]);
-        Router::get('/user/club/ranking', [
-            PlaywController::class,
-            'getClubRanking',
+        Router::post('/api/ship_company', [
+            ShipCompanyController::class,
+            'post',
         ]);
-        Router::post('/user/club/join', [
-            PlaywController::class,
-            'clubJoin',
+        Router::put('/api/ship_company', [
+            ShipCompanyController::class,
+            'put',
         ]);
-        Router::put('/user/club/leave', [
-            PlaywController::class,
-            'putClubLeave',
-        ]);
-        Router::get('/user/order/list', [
-            PlaywController::class,
-            'getOrderList',
-        ]);
-        Router::get('/user/club/page/options', [
-            PlaywController::class,
-            'getClubPageOptions',
-        ]);
-        Router::get('/user/club/id/status', [
-            PlaywController::class,
-            'checkClubIdStatus',
+        Router::delete('/api/ship_company', [
+            ShipCompanyController::class,
+            'delete',
         ]);
 
-        // ------------------------ User Boss -------
-        Router::post('/user/boss/withAutoApproval', [
-            PlaywController::class,
-            'postBossWithAutoApproval',
+        // ------------------------ Car -------
+        Router::get('/api/car/search_options', [
+            CarController::class,
+            'searchOptions',
         ]);
-        Router::get('/user/club/boss/list', [
-            PlaywController::class,
-            'getClubUserBossList',
+        Router::get('/api/car/all', [
+            CarController::class,
+            'all',
         ]);
-        Router::get('/user/club/boss', [
-            PlaywController::class,
-            'getClubBoss',
+        Router::get('/api/car/list', [
+            CarController::class,
+            'list',
         ]);
-        Router::post('/user/club/boss', [
-            PlaywController::class,
-            'postBossWithAutoApproval',
+        Router::post('/api/car', [
+            CarController::class,
+            'post',
         ]);
-        Router::put('/user/club/boss', [
-            PlaywController::class,
-            'putClubBoss',
+        Router::put('/api/car', [
+            CarController::class,
+            'put',
         ]);
-        Router::delete('/user/club/boss', [
-            PlaywController::class,
-            'deleteClubBoss',
+        Router::delete('/api/car', [
+            CarController::class,
+            'delete',
         ]);
-
-        // ------------------------ Club Apply -------
-        Router::get('/user/club/apply/list', [
-            PlaywController::class,
-            'getClubApplyList',
+        // ------------------------ Motorcade -------
+        Router::get('/api/motorcade/search_options', [
+            MotorcadeController::class,
+            'searchOptions',
         ]);
-        Router::get('/user/club/apply', [
-            PlaywController::class,
-            'getClubApply',
+        Router::get('/api/motorcade/all', [
+            MotorcadeController::class,
+            'all',
         ]);
-        Router::put('/user/club/apply/cancel', [
-            PlaywController::class,
-            'putClubJoinApplyCancel',
+        Router::get('/api/motorcade/list', [
+            MotorcadeController::class,
+            'list',
         ]);
-
-        // ------------------------ Order -------
-        Router::get('/user/club/order', [
-            PlaywController::class,
-            'getOrder',
+        Router::post('/api/motorcade', [
+            MotorcadeController::class,
+            'post',
         ]);
-        Router::get('/user/club/order/list', [
-            PlaywController::class,
-            'orderList',
+        Router::put('/api/motorcade', [
+            MotorcadeController::class,
+            'put',
         ]);
-        Router::post('/user/club/order', [
-            PlaywController::class,
-            'orderCreate',
-        ]);
-        Router::put('/user/club/order', [
-            PlaywController::class,
-            'putOrder',
-        ]);
-        Router::delete('/user/club/order', [
-            PlaywController::class,
-            'deleteOrder',
-        ]);
-        Router::put('/user/club/order/jqjiezhang', [
-            PlaywController::class,
-            'putOrderJiezhang',
-        ]);
-        Router::put('/user/club/order/jqfandian', [
-            PlaywController::class,
-            'putOrderFandian',
+        Router::delete('/api/motorcade', [
+            MotorcadeController::class,
+            'delete',
         ]);
 
-        Router::get('/user/club/order/calculate/info', [
-            PlaywController::class,
-            'orderCalculate',
+        // ------------------------ Driver -------
+        Router::get('/api/driver/all', [
+            DriverController::class,
+            'all',
+        ]);
+        Router::get('/api/driver/list', [
+            DriverController::class,
+            'list',
+        ]);
+        Router::post('/api/driver', [
+            DriverController::class,
+            'post',
+        ]);
+        Router::put('/api/driver', [
+            DriverController::class,
+            'put',
+        ]);
+        Router::delete('/api/driver', [
+            DriverController::class,
+            'delete',
         ]);
 
-        // ------------------------ Page Data -------
-        Router::get('/user/page/index/data', [
-            PlaywController::class,
-            'getPageIndexData',
+        // ------------------------ SeaWaybill -------
+        Router::get('/api/sea_waybill/search_options', [
+            SeaWaybillController::class,
+            'searchOptions',
         ]);
-        Router::get('/user/page/my/data', [
-            PlaywController::class,
-            'getPageMyData',
+        Router::get('/api/sea_waybill/list', [
+            SeaWaybillController::class,
+            'list',
         ]);
-
-        // ------------------------ Club Admin playw -------
-        Router::get('/user/club/admin/playw/token', [
-            PlaywController::class,
-            'getClubAdminPlaywToken',
+        Router::post('/api/sea_waybill', [
+            SeaWaybillController::class,
+            'post',
         ]);
-        Router::get('/user/club/admin/playw/list/all', [
-            PlaywController::class,
-            'getClubAdminPlaywListAll',
+        Router::put('/api/sea_waybill', [
+            SeaWaybillController::class,
+            'put',
         ]);
-        Router::get('/user/club/admin/playw/list', [
-            PlaywController::class,
-            'getClubAdminPlaywList',
+        Router::delete('/api/sea_waybill', [
+            SeaWaybillController::class,
+            'delete',
         ]);
-        // ------------------------ Club Admin 任命&移除 -------
-        Router::post('/user/club/admin/add', [
-            ClubController::class,
-            'postClubAdminAdd',
+        Router::post('/api/sea_waybill/copy', [
+            SeaWaybillController::class,
+            'copy',
         ]);
-        Router::delete('/user/club/admin/delete', [
-            ClubController::class,
-            'deleteClubAdmin',
+        Router::post('/api/sea_waybill/paiche', [
+            SeaWaybillController::class,
+            'paiche',
         ]);
-        Router::post('/user/club/admin/playw/remove', [
-            PlaywController::class,
-            'clubAdminPlaywRemove',
+        Router::post('/api/sea_waybill/paiche/cancel', [
+            SeaWaybillController::class,
+            'paicheCancel',
         ]);
-        Router::get('/user/club/admin/setting', [
-            PlaywController::class,
-            'getClubAdminSetting',
+        Router::post('/api/sea_waybill/bill/luru', [
+            SeaWaybillController::class,
+            'billLuru',
         ]);
-        Router::put('/user/club/admin/setting', [
-            PlaywController::class,
-            'putClubAdminSetting',
+        Router::post('/api/sea_waybill/bill/luru/cancel', [
+            SeaWaybillController::class,
+            'billLuruCancel',
         ]);
-
-        // ------------------------ Club Admin group-------
-        Router::get('/user/club/admin/group/list', [
-            PlaywController::class,
-            'getClubAdminGroupList',
+        Router::post('/api/sea_waybill/partner/bind', [
+            SeaWaybillController::class,
+            'bindPartner',
         ]);
-        Router::post('/user/club/admin/group', [
-            PlaywController::class,
-            'postClubAdminGroup',
-        ]);
-        Router::put('/user/club/admin/group', [
-            PlaywController::class,
-            'putClubAdminGroup',
-        ]);
-        Router::delete('/user/club/admin/group', [
-            PlaywController::class,
-            'deleteClubAdminGroup',
-        ]);
-        // ------------------------ Club Admin Apply -------
-        Router::put('/user/club/admin/apply/exec', [
-            ClubController::class,
-            'putClubAdminApplyExec',
-        ]);
-        // ------------------------ Club Admin Project -------
-        Router::get('/user/club/admin/project/list/all', [
-            PlaywController::class,
-            'getClubAdminProjectListAll',
-        ]);
-        Router::get('/user/club/admin/project/list', [
-            PlaywController::class,
-            'getClubAdminProjectList',
-        ]);
-        Router::get('/user/club/admin/project', [
-            PlaywController::class,
-            'getClubAdminProject',
-        ]);
-        Router::post('/user/club/admin/project', [
-            PlaywController::class,
-            'postClubAdminProject',
-        ]);
-        Router::put('/user/club/admin/project', [
-            PlaywController::class,
-            'putClubAdminProject',
-        ]);
-        Router::delete('/user/club/admin/project', [
-            PlaywController::class,
-            'deleteClubAdminProject',
-        ]);
-        // ------------------------ Club Admin Order -------
-        Router::get('/user/club/admin/order/list', [
-            ClubController::class,
-            'getClubAdminOrderList',
-        ]);
-        // ------------------------ Club Admin Boss -------
-        Router::get('/user/club/admin/boss/list', [
-            ClubController::class,
-            'getClubAdminBossList',
+        Router::post('/api/sea_waybill/partner/bind/cancel', [
+            SeaWaybillController::class,
+            'bindPartnerCancel',
         ]);
 
-        // ------------------------ Club Admin StairPoint -------
-        Router::get('/user/club/admin/stair_point', [
-            ClubController::class,
-            'getClubAdminStairPoint',
+        Router::get('/api/sea_waybill/port/select', [
+            SeaWaybillController::class,
+            'zjportSelect',
         ]);
-        Router::put('/user/club/admin/stair_point', [
-            ClubController::class,
-            'putClubAdminStairPoint',
+        Router::post('/api/sea_waybill/import/men', [
+            SeaWaybillController::class,
+            'importMen',
         ]);
-    }
+        Router::post('/api/sea_waybill/import/shoudongdan', [
+            SeaWaybillController::class,
+            'importShoudongdan',
+        ]);
+        // Router::post('/api/sea_waybill/import', [
+        //     SeaWaybillController::class,
+        //     'importCommon',
+        // ]);
+        // Router::post('/api/sea_waybill/import/temp1', [
+        //     SeaWaybillController::class,
+        //     'importTemp1',
+        // ]);
+        // Router::post('/api/sea_waybill/import/temp2', [
+        //     SeaWaybillController::class,
+        //     'importTemp2',
+        // ]);
+        // Router::post('/api/sea_waybill/import/zhongguangshimo2022', [
+        //     SeaWaybillController::class,
+        //     'importZhongguangshimo2022',
+        // ]);
+        // Router::post('/api/sea_waybill/import/guanjian20212022', [
+        //     JinkouController::class,
+        //     'importGuanjian20212022',
+        // ]);
+        // Router::post('/api/sea_waybill/import/haihang2022', [
+        //     JinkouController::class,
+        //     'importHaihang2022',
+        // ]);
+        // Router::post('/api/sea_waybill/import/new_common', [
+        //     JinkouController::class,
+        //     'importNewCommon',
+        // ]);
+        // Router::post('/api/sea_waybill/import/new_common_add_partner_id', [
+        //     JinkouController::class,
+        //     'importNewCommonAddPartnerId',
+        // ]);
+        // Router::post('/api/sea_waybill/import/antong/jinkou', [
+        //     SeaWaybillController::class,
+        //     'importAntongJinkou',
+        // ]);
+        // Router::post('/api/sea_waybill/jinkou/zhonggu/import', [
+        //     JinkouController::class,
+        //     'importZhongGuJinkou',
+        // ]);
+        // Router::post('/api/sea_waybill/chukou/zhonggu/teshu/import', [
+        //     JinkouController::class,
+        //     'importZhongguTeshupaicheChukou',
+        // ]);
+        // Router::post('/api/sea_waybill/jinkou/antong/import', [
+        //     JinkouController::class,
+        //     'importAntongJinkou',
+        // ]);
+        // Router::post('/api/sea_waybill/jinkou/zhongyuan/import', [
+        //     JinkouController::class,
+        //     'importZhongyuanJinkou',
+        // ]);
+        // Router::post('/api/sea_waybill/jinkou/import/tencent/zhonggu2023', [
+        //     JinkouController::class,
+        //     'importTencentZhonggu2023',
+        // ]);
+        // Router::post('/api/sea_waybill/jinkou/import/tencent/zhonggu2023/fix_exists_data', [
+        //     JinkouController::class,
+        //     'importTencentZhonggu2023FixExistsData',
+        // ]);
+        // Router::post('/api/sea_waybill/jinkou/import/tencent/antongdaomen2023', [
+        //     JinkouController::class,
+        //     'importTencentAntongDaomen2023',
+        // ]);
+        // Router::post('/api/sea_waybill/jinkou/import/antongsystem/cydaogang', [
+        //     JinkouController::class,
+        //     'importAntongSystemCYDaoGang',
+        // ]);
+
+        // ------------------------ SailSchedule -------
+        Router::get('/api/sail_schedule/list', [
+            SailScheduleController::class,
+            'list',
+        ]);
+        Router::post('/api/sail_schedule', [
+            SailScheduleController::class,
+            'post',
+        ]);
+        Router::put('/api/sail_schedule', [
+            SailScheduleController::class,
+            'put',
+        ]);
+        Router::delete('/api/sail_schedule', [
+            SailScheduleController::class,
+            'delete',
+        ]);
+
+        // ------------------------ Bill -------
+        Router::post('/api/bill/export', [
+            BillController::class,
+            'export',
+        ]);
+        Router::post('/api/sea_waybill/download/receipt', [
+            SeaWaybillController::class,
+            'downloadReceipt',
+        ]);
+        Router::get('/api/bill/options', [
+            BillController::class,
+            'optons',
+        ]);
+        Router::get('/api/bill/list', [
+            BillController::class,
+            'list',
+        ]);
+        Router::post('/api/bill', [
+            BillController::class,
+            'post',
+        ]);
+        Router::put('/api/bill', [
+            BillController::class,
+            'put',
+        ]);
+        Router::put('/api/bill/status', [
+            BillController::class,
+            'putStatus',
+        ]);
+        Router::delete('/api/bill', [
+            BillController::class,
+            'delete',
+        ]);
+    },
+    ['middleware' => [AuthMiddleware::class]]
 );
+
+// ------------------------ Template -------
+// Router::addGroup(
+//     '/api/v1/admin/wuliu',
+//     function () {
+//         // ------------------------ SailSchedule -------
+//         Router::get('/api/model/list', [
+//             ModelController::class,
+//             'list',
+//         ]);
+//         Router::post('/api/sail_schedule', [
+//             ModelController::class,
+//             'post',
+//         ]);
+//         Router::put('/api/sail_schedule', [
+//             ModelController::class,
+//             'put',
+//         ]);
+//         Router::delete('/api/sail_schedule', [
+//             ModelController::class,
+//             'delete',
+//         ]);
+//     },
+//     // ['middleware' => [AuthMiddleware::class]]
+// );
