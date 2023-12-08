@@ -23,6 +23,8 @@ namespace App\Model;
  */
 class UserLoginInfo extends BaseModel
 {
+    public bool $incrementing = false;
+
     /**
      * The table associated with the model.
      */

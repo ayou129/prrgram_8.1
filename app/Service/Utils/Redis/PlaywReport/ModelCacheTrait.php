@@ -79,20 +79,20 @@ trait ModelCacheTrait
         return \Hyperf\Collection\collect($cachedModels);
     }
 
-    public static function addRelations(&$model, $relations = [])
-    {
-        if ($model && $relations) {
-            if (in_array('platformMiniprogram', $relations)) {
-                $model->platformMiniprogram = UserPlatform::getCacheByUserIdAndPlatform(UserPlatform::PLATFORM_MINIPROGRAM, $model->id);
-            }
-            if (in_array('user_bosss', $relations)) {
-                $model->bosss = User::getBossListSortCreatedAtByClubIdAll($model->playw_report_club_id, $model->id);
-            }
-            if (in_array('user', $relations)) {
-                $model->user = User::getCacheById($model->u_id);
-            }
-        }
-    }
+    // public static function addRelations(&$model, $relations = [])
+    // {
+    //     if ($model && $relations) {
+    //         if (in_array('platformMiniprogram', $relations)) {
+    //             $model->platformMiniprogram = UserPlatform::getCacheByUserIdAndPlatform(UserPlatform::PLATFORM_MINIPROGRAM, $model->id);
+    //         }
+    //         if (in_array('user_bosss', $relations)) {
+    //             $model->bosss = User::getBossListSortCreatedAtByClubIdAll($model->playw_report_club_id, $model->id);
+    //         }
+    //         if (in_array('user', $relations)) {
+    //             $model->user = User::getCacheById($model->u_id);
+    //         }
+    //     }
+    // }
 
     public static function addAttrText(&$model)
     {

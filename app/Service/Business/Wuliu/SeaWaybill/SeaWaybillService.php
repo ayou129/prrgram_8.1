@@ -210,10 +210,10 @@ class SeaWaybillService
             if ($value[$sail_schedule_nameIndex] && $value[$sail_schedule_voyageIndex]) {
                 $sail_schedule_name = $value[$sail_schedule_nameIndex];
                 $sail_schedule_voyage = $value[$sail_schedule_voyageIndex];
-                // var_dump($sail_schedule_id);
-                // return $this->responseJson(ServiceCode::SUCCESS, 1);
-                // return $this->responseJson(ServiceCode::SUCCESS, [$sailScheduleMatchingModelsArray, $sail_schedule_id, $ship_company_id, $sail_schedule_array[0], $sail_schedule_array[1]]);
-                // var_dump();
+            // var_dump($sail_schedule_id);
+            // return $this->responseJson(ServiceCode::SUCCESS, 1);
+            // return $this->responseJson(ServiceCode::SUCCESS, [$sailScheduleMatchingModelsArray, $sail_schedule_id, $ship_company_id, $sail_schedule_array[0], $sail_schedule_array[1]]);
+            // var_dump();
             } elseif ($value[$sail_scheduleIndex]) {
                 $sail_schedule_array = $this->getImportFotmatSailScheduleNameAndVoyavge($value[$sail_scheduleIndex]);
                 if (! $sail_schedule_array) {

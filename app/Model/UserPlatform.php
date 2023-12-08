@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Service\Utils\Redis\PlaywReport\McUserPlatform;
-use App\Service\Utils\Redis\PlaywReport\ModelCacheTrait;
+// use App\Service\Utils\Redis\PlaywReport\McUserPlatform;
+// use App\Service\Utils\Redis\PlaywReport\ModelCacheTrait;
 use Hyperf\Database\Model\Model;
 
 /**
@@ -24,14 +24,14 @@ use Hyperf\Database\Model\Model;
  * @property string $wx_session_key
  * @property string $login_token
  * @property string $login_token_expire_time
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property string $created_at
+ * @property string $updated_at
  * @property string $deleted_at
  * @property mixed $user
  */
 class UserPlatform extends BaseModel
 {
-    use ModelCacheTrait;
+    // use ModelCacheTrait;
 
     public const PLATFORM_MINIPROGRAM = 1;
 
@@ -50,7 +50,7 @@ class UserPlatform extends BaseModel
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'u_id' => 'integer', 'platform' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'u_id' => 'integer', 'platform' => 'integer'];
 
     public static function getPlatformArray()
     {
@@ -66,115 +66,115 @@ class UserPlatform extends BaseModel
         unset($this->attributes['user']);
     }
 
-    public static function getCacheById($k, $relations = [])
-    {
-        $redis = make(\Hyperf\Redis\Redis::class);
-        $mcUserPlatform = new McUserPlatform($redis);
-        $cache = $mcUserPlatform->getModel($k);
-        if ($cache) {
-            $model = (new self())->newInstance($cache, true);
-        } else {
-            $model = (new self())->where('id', $k)
-                ->first();
-        }
-        if ($model) {
-            if (in_array('user', $relations)) {
-                $model->user = User::getCacheById($model->u_id);
-            }
-        }
-        return $model;
-    }
+    // public static function getCacheById($k, $relations = [])
+    // {
+    //     $redis = make(\Hyperf\Redis\Redis::class);
+    //     $mcUserPlatform = new McUserPlatform($redis);
+    //     $cache = $mcUserPlatform->getModel($k);
+    //     if ($cache) {
+    //         $model = (new self())->newInstance($cache, true);
+    //     } else {
+    //         $model = (new self())->where('id', $k)
+    //             ->first();
+    //     }
+    //     if ($model) {
+    //         if (in_array('user', $relations)) {
+    //             $model->user = User::getCacheById($model->u_id);
+    //         }
+    //     }
+    //     return $model;
+    // }
 
-    /**
-     * @param mixed $relations
-     * @param mixed $k
-     * @param mixed $k2
-     * @return null|\Hyperf\Database\Model\Builder|Model|object
-     */
-    public static function getCacheByTokenAndPlatform($k, $k2, $relations = [])
-    {
-        $redis = make(\Hyperf\Redis\Redis::class);
-        $mc = new McUserPlatform($redis);
-        $id = $mc->getByPlatformAndLoginToken($k, $k2);
-        if ($id) {
-            $cache = $mc->getModel($id);
-            if ($cache) {
-                $model = (new self())->newInstance($cache, true);
-            } else {
-                $model = null;
-            }
-        } else {
-            $model = (new self())->where('platform', $k)
-                ->where('login_token', $k2)
-                ->first();
-        }
-        return $model;
-    }
+    // /**
+    //  * @param mixed $relations
+    //  * @param mixed $k
+    //  * @param mixed $k2
+    //  * @return null|\Hyperf\Database\Model\Builder|Model|object
+    //  */
+    // public static function getCacheByTokenAndPlatform($k, $k2, $relations = [])
+    // {
+    //     $redis = make(\Hyperf\Redis\Redis::class);
+    //     $mc = new McUserPlatform($redis);
+    //     $id = $mc->getByPlatformAndLoginToken($k, $k2);
+    //     if ($id) {
+    //         $cache = $mc->getModel($id);
+    //         if ($cache) {
+    //             $model = (new self())->newInstance($cache, true);
+    //         } else {
+    //             $model = null;
+    //         }
+    //     } else {
+    //         $model = (new self())->where('platform', $k)
+    //             ->where('login_token', $k2)
+    //             ->first();
+    //     }
+    //     return $model;
+    // }
 
-    public static function getCacheByUserIdAndPlatform($k, $k2, $relations = [])
-    {
-        $redis = make(\Hyperf\Redis\Redis::class);
-        $mc = new McUserPlatform($redis);
-        $id = $mc->getByPlatformAndUserId($k, $k2);
-        if ($id) {
-            $cache = $mc->getModel($id);
-            if ($cache) {
-                $model = (new self())->newInstance($cache, true);
-            } else {
-                $model = null;
-            }
-        } else {
-            $model = (new self())->where('id', $k2)
-                ->first();
-        }
-        if ($model) {
-            if (in_array('user', $relations)) {
-                $model->user = User::getCacheById($model->u_id) ?? null;
-            }
-        }
-        return $model ?? null;
-    }
-
-    public static function getCacheByWxPlatformAndUserIdAndOpenid($k, $k2, $k3, $relations = [])
-    {
-        $redis = make(\Hyperf\Redis\Redis::class);
-        $mc = new McUserPlatform($redis);
-        $id = $mc->getByPlatformAndUserIdAndWxOpenid($k, $k2, $k3);
-        if ($id) {
-            $cache = $mc->getModel($id);
-            if ($cache) {
-                $model = (new self())->newInstance($cache, true);
-            } else {
-                $model = null;
-            }
-        } else {
-            $model = (new self())->where('platform', $k)
-                ->where('u_id', $k2)
-                ->where('wx_openid', $k3)
-                ->first();
-        }
-        self::addRelations($model, $relations);
-        return $model ?? null;
-    }
-
-    public static function getCacheByWxPlatformAndOpenid($k, $k3, $relations = [])
-    {
-        $redis = make(\Hyperf\Redis\Redis::class);
-        $mc = new McUserPlatform($redis);
-        $id = $mc->getByPlatformAndWxOpenid($k, $k3);
-        if ($id) {
-            $cache = $mc->getModel($id);
-            if ($cache) {
-                $model = (new self())->newInstance($cache, true);
-            } else {
-                $model = null;
-            }
-        } else {
-            $model = (new self())->where('platform', $k)
-                ->where('wx_openid', $k3)
-                ->first();
-        }
-        self::addRelations($model, $relations);
-        return $model ?? null;
-    }
+    // public static function getCacheByUserIdAndPlatform($k, $k2, $relations = [])
+    // {
+    //     $redis = make(\Hyperf\Redis\Redis::class);
+    //     $mc = new McUserPlatform($redis);
+    //     $id = $mc->getByPlatformAndUserId($k, $k2);
+    //     if ($id) {
+    //         $cache = $mc->getModel($id);
+    //         if ($cache) {
+    //             $model = (new self())->newInstance($cache, true);
+    //         } else {
+    //             $model = null;
+    //         }
+    //     } else {
+    //         $model = (new self())->where('id', $k2)
+    //             ->first();
+    //     }
+    //     if ($model) {
+    //         if (in_array('user', $relations)) {
+    //             $model->user = User::getCacheById($model->u_id) ?? null;
+    //         }
+    //     }
+    //     return $model ?? null;
+    // }
+    //
+    // public static function getCacheByWxPlatformAndUserIdAndOpenid($k, $k2, $k3, $relations = [])
+    // {
+    //     $redis = make(\Hyperf\Redis\Redis::class);
+    //     $mc = new McUserPlatform($redis);
+    //     $id = $mc->getByPlatformAndUserIdAndWxOpenid($k, $k2, $k3);
+    //     if ($id) {
+    //         $cache = $mc->getModel($id);
+    //         if ($cache) {
+    //             $model = (new self())->newInstance($cache, true);
+    //         } else {
+    //             $model = null;
+    //         }
+    //     } else {
+    //         $model = (new self())->where('platform', $k)
+    //             ->where('u_id', $k2)
+    //             ->where('wx_openid', $k3)
+    //             ->first();
+    //     }
+    //     self::addRelations($model, $relations);
+    //     return $model ?? null;
+    // }
+    //
+    // public static function getCacheByWxPlatformAndOpenid($k, $k3, $relations = [])
+    // {
+    //     $redis = make(\Hyperf\Redis\Redis::class);
+    //     $mc = new McUserPlatform($redis);
+    //     $id = $mc->getByPlatformAndWxOpenid($k, $k3);
+    //     if ($id) {
+    //         $cache = $mc->getModel($id);
+    //         if ($cache) {
+    //             $model = (new self())->newInstance($cache, true);
+    //         } else {
+    //             $model = null;
+    //         }
+    //     } else {
+    //         $model = (new self())->where('platform', $k)
+    //             ->where('wx_openid', $k3)
+    //             ->first();
+    //     }
+    //     self::addRelations($model, $relations);
+    //     return $model ?? null;
+    // }
 }

@@ -10,9 +10,8 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
-namespace App\Service\Order;
+namespace App\Service\Business\Order;
 
-use App\Event\OrderCreated;
 use Hyperf\Di\Annotation\Inject;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
@@ -26,7 +25,7 @@ class OrderService
 
     public function create()
     {
-        $orderModel = new Order();
-        $this->eventDispatcher->dispatch(new OrderCreated($orderModel));
+        // $orderModel = new Order();
+        // $this->eventDispatcher->dispatch(new OrderCreated($orderModel));
     }
 }
