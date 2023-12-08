@@ -12,21 +12,17 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use Hyperf\Database\Model\Model;
 // use App\Service\Utils\Redis\PlaywReport\McUserPlatform;
 // use App\Service\Utils\Redis\PlaywReport\ModelCacheTrait;
-use Hyperf\Database\Model\Model;
+use Hyperf\Database\Model\SoftDeletes;
 
 /**
- * @property int $id
- * @property int $u_id
+ * @property int $user_id
  * @property int $platform
  * @property string $wx_openid
- * @property string $wx_session_key
  * @property string $login_token
  * @property string $login_token_expire_time
- * @property string $created_at
- * @property string $updated_at
- * @property string $deleted_at
  * @property mixed $user
  */
 class UserPlatform extends BaseModel
@@ -45,12 +41,12 @@ class UserPlatform extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'u_id', 'platform', 'wx_openid', 'wx_session_key', 'login_token', 'login_token_expire_time', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['user_id', 'platform', 'wx_openid', 'login_token', 'login_token_expire_time'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'u_id' => 'integer', 'platform' => 'integer'];
+    protected array $casts = ['user_id' => 'integer', 'platform' => 'integer'];
 
     public static function getPlatformArray()
     {

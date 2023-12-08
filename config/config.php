@@ -17,7 +17,9 @@ use function Hyperf\Support\env;
 return [
     'app_name' => env('APP_NAME', 'skeleton'),
     'app_env' => env('APP_ENV', 'dev'),
-    'scan_cacheable' => env('SCAN_CACHEABLE', true),
+    // 'scan_cacheable' => env('SCAN_CACHEABLE', true),
+    'scan_cacheable' => false,
+    'allow_lang' => ['zh_CN', 'en'],
     StdoutLoggerInterface::class => [
         'log_level' => [
             LogLevel::ALERT,

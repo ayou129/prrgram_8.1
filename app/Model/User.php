@@ -14,8 +14,6 @@ namespace App\Model;
 
 // use App\Service\Utils\Redis\PlaywReport\McUser;
 // use App\Service\Utils\Redis\PlaywReport\ModelCacheTrait;
-use Hyperf\Collection\Collection;
-use Hyperf\Paginator\LengthAwarePaginator;
 
 /**
  * @property int $id

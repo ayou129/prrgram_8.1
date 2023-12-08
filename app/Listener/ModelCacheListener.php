@@ -19,7 +19,6 @@ namespace App\Listener;
 // use App\Model\PlaywReportPlaywClubBoss;
 use App\Model\User;
 use App\Model\UserPlatform;
-
 // use App\Service\Utils\Redis\PlaywReport\McPlaywReportClub;
 // use App\Service\Utils\Redis\PlaywReport\McPlaywReportClubGroup;
 // use App\Service\Utils\Redis\PlaywReport\McPlaywReportClubOrder;
@@ -50,7 +49,6 @@ class ModelCacheListener implements ListenerInterface
         ];
     }
 
-    //
     public function process(object $event): void
     {
         //     var_dump('in 模型Event');

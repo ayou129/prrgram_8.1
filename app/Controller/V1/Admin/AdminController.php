@@ -34,7 +34,7 @@ class AdminController extends AbstractController
         $params = $this->getRequestAllFilter();
 
         if (! isset($params['username'], $params['password'])) {
-            return $this->responseJson(ServiceCode::ERROR_PARAM_MISSING);
+            throw new HttpException(ServiceCode::ERROR, '请输入账号和密码');
         }
         $sysUserModel = SysUser::where('username', $params['username'])
             ->with([
@@ -77,7 +77,7 @@ class AdminController extends AbstractController
             }
         }
 
-        $token = Tools::genToken((string) $sysUserModel->id);
+        $token = Tools::generateRandomPassword((string) $sysUserModel->id);
 
         $result = [
             'token' => $token,

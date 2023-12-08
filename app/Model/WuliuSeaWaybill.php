@@ -63,9 +63,74 @@ namespace App\Model;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
+ * @property null|WuliuSailSchedule $sailSchedule
+ * @property null|WuliuCar $car
+ * @property null|WuliuPartner $partner
+ * @property null|WuliuBill $shipCompanyBill
+ * @property null|WuliuBill $motorcadeBill
+ * @property null|WuliuBill $partnerBill
+ * @property null|WuliuBill $selfBill
  */
 class WuliuSeaWaybill extends BaseModel
 {
+    public const FH_STATUS_NO = 0;
+
+    public const FH_STATUS_YES = 1;
+
+    public const FH_STATUS_DEFAULT = 10;
+
+    public const SHIP_COMPANY_DZ_STATUS_NO = 0;
+
+    public const SHIP_COMPANY_DZ_STATUS_YES = 1;
+
+    public const MOTORCADE_DZ_STATUS_NO = 0;
+
+    public const MOTORCADE_DZ_STATUS_YES = 1;
+
+    public const PARTNER_DZ_STATUS_NO = 0;
+
+    public const PARTNER_DZ_STATUS_YES = 1;
+
+    public const RECEIPT_STATUS_DEFAULT = 0;
+
+    public const RECEIPT_STATUS_NOT_UPLOAD = 1;
+
+    public const RECEIPT_STATUS_UPLOADED = 2;
+
+    public const POUNDBILL_STATUS_DEFAULT = 0;
+
+    public const POUNDBILL_STATUS_NOT_TAKEN = 1;
+
+    public const POUNDBILL_STATUS_NOT_POSTED = 2;
+
+    public const POUNDBILL_STATUS_POSTED = 3;
+
+    public const BOX_REPORTING_STATUS_DEFAULT = 0;
+
+    public const BOX_REPORTING_STATUS_NOT_EXEC = 10;
+
+    public const BOX_REPORTING_STATUS_EXEC = 20;
+
+    public const RUSH_STATUS_NO = 0;
+
+    public const RUSH_STATUS_YES = 1;
+
+    public const TOS_DEFAULT = 0;
+
+    public const TOS_DAOMEN = 1;
+
+    public const TOS_DAOGANG = 2;
+
+    public const TOS_JIAMENDIAN = 3;
+
+    public const TYPE_DEFAULT = 0;
+
+    public const TYPE_JINKOU = 1;
+
+    public const TYPE_CHUKOU = 2;
+
+    public const STATUS_DEFAULT = 0;
+
     /**
      * The table associated with the model.
      */
@@ -80,4 +145,109 @@ class WuliuSeaWaybill extends BaseModel
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['id' => 'integer', 'sail_schedule_id' => 'integer', 'car_id' => 'integer', 'receipt_status' => 'integer', 'poundbill_status' => 'integer', 'box_reporting_status' => 'integer', 'fh_status' => 'integer', 'rush_status' => 'integer', 'tos' => 'integer', 'ship_company_bill_id' => 'integer', 'motorcade_bill_id' => 'integer', 'partner_id' => 'integer', 'partner_stay_pole' => 'integer', 'partner_bill_id' => 'integer', 'self_bill_id' => 'integer', 'type' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    protected array $appends = ['type_text', 'fh_status_text', 'receipt_status_text', 'poundbill_status_text', 'box_reporting_status_text', 'rush_status_text', 'tos_text'];
+
+    public static function getFhStatusArray()
+    {
+        return [self::FH_STATUS_DEFAULT => '-', self::FH_STATUS_NO => '未放货', self::FH_STATUS_YES => '已放货'];
+    }
+
+    public static function getReceiptStatusArray()
+    {
+        return [self::RECEIPT_STATUS_DEFAULT => '-', self::RECEIPT_STATUS_NOT_UPLOAD => '未上传', self::RECEIPT_STATUS_UPLOADED => '已上传'];
+    }
+
+    public static function getBoxReportingStatusArray()
+    {
+        return [self::BOX_REPORTING_STATUS_DEFAULT => '-', self::BOX_REPORTING_STATUS_NOT_EXEC => '未报备', self::BOX_REPORTING_STATUS_EXEC => '已报备'];
+    }
+
+    public static function getPoundbillStatusArray()
+    {
+        return [self::POUNDBILL_STATUS_DEFAULT => '-', self::POUNDBILL_STATUS_NOT_TAKEN => '单未拿回', self::POUNDBILL_STATUS_NOT_POSTED => '未邮寄', self::POUNDBILL_STATUS_POSTED => '已寄'];
+    }
+
+    public static function getTypeArray()
+    {
+        return [self::TYPE_DEFAULT => '-', self::TYPE_CHUKOU => '出口', self::TYPE_JINKOU => '进口'];
+    }
+
+    public static function getRushStatusArray()
+    {
+        return [null => null, self::RUSH_STATUS_NO => '-', self::RUSH_STATUS_YES => '加急'];
+    }
+
+    public static function getTosArray()
+    {
+        return [self::TOS_DEFAULT => '-', self::TOS_DAOMEN => '到门', self::TOS_DAOGANG => '到港', self::TOS_JIAMENDIAN => '假门点'];
+    }
+
+    public function sailSchedule()
+    {
+        return $this->hasOne(WuliuSailSchedule::class, 'id', 'sail_schedule_id');
+    }
+
+    public function car()
+    {
+        return $this->hasOne(WuliuCar::class, 'id', 'car_id');
+    }
+
+    public function partner()
+    {
+        return $this->hasOne(WuliuPartner::class, 'id', 'partner_id');
+    }
+
+    public function shipCompanyBill()
+    {
+        return $this->hasOne(WuliuBill::class, 'id', 'ship_company_bill_id');
+    }
+
+    public function motorcadeBill()
+    {
+        return $this->hasOne(WuliuBill::class, 'id', 'motorcade_bill_id');
+    }
+
+    public function partnerBill()
+    {
+        return $this->hasOne(WuliuBill::class, 'id', 'partner_bill_id');
+    }
+
+    public function selfBill()
+    {
+        return $this->hasOne(WuliuBill::class, 'id', 'self_bill_id');
+    }
+
+    /**
+     * 根据 运单号+箱号 查出存在的数据.
+     * @param mixed $modelsArray
+     * @param mixed $number
+     * @param mixed $case_number
+     * @return bool
+     */
+    public static function checkIsExistsByNumberAndCaseNumber($modelsArray, $number, $case_number)
+    {
+        foreach ($modelsArray as $key => $value) {
+            if ($value['number'] === $number && $value['case_number'] === $case_number) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 根据 运单号+箱号 查出存在的数据.
+     * @param mixed $modelsArray
+     * @param mixed $number
+     * @param mixed $case_number
+     */
+    public static function getByNumberAndCaseNumber($modelsArray, $number, $case_number)
+    {
+        foreach ($modelsArray as $value) {
+            if ($value['number'] === $number && $value['case_number'] === $case_number) {
+                return $value;
+            }
+        }
+        return false;
+    }
 }

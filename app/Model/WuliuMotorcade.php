@@ -23,6 +23,10 @@ namespace App\Model;
  */
 class WuliuMotorcade extends BaseModel
 {
+    public const TYPE_DEDAULT = 0;
+
+    public const TYPE_SELF = 1;
+
     /**
      * The table associated with the model.
      */
@@ -37,4 +41,11 @@ class WuliuMotorcade extends BaseModel
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['id' => 'integer', 'type' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    protected array $appends = ['type_text'];
+
+    public static function getTypeArray()
+    {
+        return [self::TYPE_DEDAULT => '-', self::TYPE_SELF => '自己车'];
+    }
 }

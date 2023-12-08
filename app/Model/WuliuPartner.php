@@ -35,4 +35,22 @@ class WuliuPartner extends BaseModel
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    /**
+     * 通过名称获取ID，找不到则返回false.
+     * @param mixed $modelsArray 模型数组
+     * @param mixed $name 名称
+     */
+    public static function getIdByName($modelsArray, $name)
+    {
+        $result = false;
+        foreach ($modelsArray as $key => $value) {
+            if (strpos($value['name'], $name) !== false) {
+                // if ($value['name'] === $name) {
+                $result = $value['id'];
+                break;
+            }
+        }
+        return $result;
+    }
 }

@@ -57,7 +57,7 @@ Router::addGroup(
     }
 );
 Router::addGroup(
-    '/v1/admin',
+    '/api/v1/admin',
     function () {
         Router::post('/auth/login', [
             AdminController::class,
@@ -71,7 +71,7 @@ Router::addGroup(
 );
 
 Router::addGroup(
-    '/v1/admin',
+    '/api/v1/admin',
     function () {
         Router::get('/auth/info', [
             AdminController::class,

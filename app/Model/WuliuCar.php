@@ -20,6 +20,7 @@ namespace App\Model;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
+ * @property null|WuliuMotorcade $motorcade
  */
 class WuliuCar extends BaseModel
 {
@@ -37,4 +38,26 @@ class WuliuCar extends BaseModel
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['id' => 'integer', 'motorcade_id' => 'integer', 'driver_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    public function motorcade()
+    {
+        return $this->hasOne(WuliuMotorcade::class, 'id', 'motorcade_id');
+    }
+
+    /**
+     * 通过 车牌号 获取ID，找不到则返回false.
+     * @param mixed $modelsArray
+     * @param mixed $number
+     */
+    public static function getIdByNumber($modelsArray, $number)
+    {
+        $result = false;
+        foreach ($modelsArray as $key => $value) {
+            if ($value['number'] === $number) {
+                $result = $value['id'];
+                break;
+            }
+        }
+        return $result;
+    }
 }
