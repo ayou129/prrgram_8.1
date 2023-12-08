@@ -1,16 +1,3 @@
-## git相关
-~~~
-git remote -v
-{
-   origin: 自己的 Forked 仓库
-   upstream: 指向原始骨架项目的仓库
-   pw: 指向gitee自己的仓库
-}
-
-合并原始项目代码
-git merge upstream/master
-~~~
-## Docker 相关 看docker文件夹的readme
 
 # Introduction
 

@@ -12,8 +12,6 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use HyperfExt\Jwt\Contracts\JwtSubjectInterface;
-
 /**
  * @property int $id
  * @property string $username
@@ -26,7 +24,7 @@ use HyperfExt\Jwt\Contracts\JwtSubjectInterface;
  * @property string $deleted_at
  * @property AdminGroupRelation[]|\Hyperf\Database\Model\Collection $groups
  */
-class Admin extends BaseModel implements JwtSubjectInterface
+class Admin extends BaseModel
 {
     /**
      * The table associated with the model.

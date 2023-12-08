@@ -427,7 +427,7 @@ class MenuController extends AbstractController
                     } else {
                         $menuVo['component'] = 'Layout';
                     }
-                    // 如果不是一级菜单，并且菜单类型为目录，则代表是多级菜单
+                // 如果不是一级菜单，并且菜单类型为目录，则代表是多级菜单
                 } else {
                     if ($menu['component']) {
                         $menuVo['component'] = $menu['component'];
@@ -452,7 +452,7 @@ class MenuController extends AbstractController
                 $menuVo['alwaysShow'] = true;
                 $menuVo['redirect'] = 'noredirect';
                 $menuVo['children'] = self::buildMenus($menuChildrenList);
-                // 处理是一级菜单并且没有子菜单的情况
+            // 处理是一级菜单并且没有子菜单的情况
             } elseif ($menu['pid'] === null) {
                 $menuVo1 = [];
                 $menuVo1['meta'] = $menuVo['meta'];
