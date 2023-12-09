@@ -1128,7 +1128,6 @@ class SeaWaybillController extends AbstractController
 
             if (! isset($tosIndex, $typeIndex, $numberIndex, $case_numberIndex, $qf_numberIndex, $liaison_address_detailIndex, $boxIndex, $liaison_Index, $liaison_mobileIndex, $car_numberIndex, $partner_Index, $partner_towing_feeIndex, $partner_thc_feeIndex, $partner_overdue_feeIndex, $partner_stockpiling_feeIndex, $partner_print_feeIndex, $partner_clean_feeIndex, $partner_other_feeIndex, $partner_other_fee_descIndex, $partner_stay_poleIndex, $partner_remarksIndex, $good_nameIndex, $created_atIndex)) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '文件有误，请联系开发人员');
-
             }
             $seaWaybillMatchingModels = WuliuSeaWaybill::get();
             $seaWaybillMatchingModelsArray = $seaWaybillMatchingModels->toArray();

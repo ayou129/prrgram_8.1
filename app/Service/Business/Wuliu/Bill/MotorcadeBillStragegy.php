@@ -44,7 +44,7 @@ class MotorcadeBillStragegy implements BillExportStrategyInterface
         ];
         $spreadsheet->getDefaultStyle()->getFont()->setName('微软雅黑');
         $worksheet = $spreadsheet->getActiveSheet();
-        $worksheet->setCellValue('A1', '阿尤陪玩报备' . $model->title . '对账单');
+        $worksheet->setCellValue('A1', env('APP_NAME', '') . $model->title . '对账单');
         $spreadsheet->getActiveSheet()->getStyle('A1')->getFont()->setBold(false)
             ->setSize(16);
         $worksheet->getStyle('A1:J1')->applyFromArray($styleArray);

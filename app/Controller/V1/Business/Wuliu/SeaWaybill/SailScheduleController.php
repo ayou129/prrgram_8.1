@@ -17,7 +17,6 @@ use App\Controller\AbstractController;
 use App\Exception\ServiceException;
 use App\Model\WuliuSailSchedule;
 use App\Model\WuliuSeaWaybill;
-use Hyperf\HttpMessage\Exception\HttpException;
 
 class SailScheduleController extends AbstractController
 {

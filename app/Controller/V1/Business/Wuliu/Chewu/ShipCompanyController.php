@@ -144,7 +144,6 @@ class ShipCompanyController extends AbstractController
         // $params = $this->getRequestAllFilter();
         // var_dump($params);
         throw new ServiceException(ServiceCode::ERROR, [], 400, [], '当前船公司不允许删除');
-
         // Db::beginTransaction();
         // try {
         //     $params = array_unique($params);

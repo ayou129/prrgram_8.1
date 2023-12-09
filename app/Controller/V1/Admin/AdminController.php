@@ -19,7 +19,6 @@ use App\Model\SysUser;
 use App\Service\Admin\AdminService;
 use App\Utils\Tools;
 use Hyperf\Di\Annotation\Inject;
-use Hyperf\HttpMessage\Exception\HttpException;
 
 class AdminController extends AbstractController
 {
