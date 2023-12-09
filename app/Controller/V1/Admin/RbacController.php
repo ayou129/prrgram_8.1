@@ -31,19 +31,11 @@ use Hyperf\Validation\ValidationException;
  */
 class RbacController extends AbstractController
 {
-    /**
-     * @Inject
-     *
-     * @var AdminService
-     */
-    protected $adminService;
+    #[Inject]
+    protected AdminService $adminService;
 
-    /**
-     * @Inject
-     *
-     * @var UserService
-     */
-    protected $userService;
+    #[Inject]
+    protected UserService $userService;
 
     /**
      * @RequestMapping(path="usernameLogin", methods="post")

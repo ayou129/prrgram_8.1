@@ -20,12 +20,8 @@ use Hyperf\View\RenderInterface;
 
 class IndexController extends BaseController
 {
-    /**
-     * @Inject
-     *
-     * @var UserService
-     */
-    protected $userService;
+    #[Inject]
+    protected UserService $userService;
 
     public function index2(RenderInterface $render)
     {

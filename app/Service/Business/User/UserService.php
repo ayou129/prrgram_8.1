@@ -24,11 +24,8 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 
 class UserService
 {
-    /**
-     * @Inject
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+    #[Inject]
+    private EventDispatcherInterface $eventDispatcher;
 
     public function getList($params = [])
     {

@@ -14,6 +14,7 @@ namespace App\Controller\V1\Business\Wuliu\SeaWaybill;
 
 use App\Constant\ServiceCode;
 use App\Controller\AbstractController;
+use App\Exception\ServiceException;
 use App\Model\WuliuBill;
 use App\Model\WuliuCar;
 use App\Model\WuliuPartner;
@@ -32,21 +33,23 @@ use PhpOffice\PhpSpreadsheet\Reader\Exception as ReaderExcetpion;
 
 class SeaWaybillController extends AbstractController
 {
-    /**
-     * @Inject
-     * @var SeaWaybillService
-     */
-    private $seaWaybillService;
+    #[Inject]
+    public SeaWaybillService $seaWaybillService;
 
     public function searchOptions()
     {
         // $shipCompanyModels = WuliuShipCompany::orderBy('created_at', 'desc')->with(['sailSchedule' => function ($q) {
         //     $q->orderBy('arrival_date', 'desc');
         // }])->get();
-        $sailScheduleModels = WuliuSailSchedule::orderBy('arrival_date', 'desc')->with(['shipCompany'])->get();
-        $carModels = WuliuCar::orderBy('created_at', 'desc')->get();
-        $billModels = WuliuBill::orderBy('created_at', 'desc')->get();
-        $partnerModels = WuliuPartner::orderBy('created_at', 'desc')->get();
+        $sailScheduleModels = WuliuSailSchedule::orderBy('arrival_date', 'desc')
+            ->with(['shipCompany'])
+            ->get();
+        $carModels = WuliuCar::orderBy('created_at', 'desc')
+            ->get();
+        $billModels = WuliuBill::orderBy('created_at', 'desc')
+            ->get();
+        $partnerModels = WuliuPartner::orderBy('created_at', 'desc')
+            ->get();
         $needReceiptArray = WuliuSeaWaybill::getReceiptStatusArray();
         $needPoundbillArray = WuliuSeaWaybill::getPoundbillStatusArray();
         $boxReportingStatusArray = WuliuSeaWaybill::getBoxReportingStatusArray();
@@ -148,16 +151,19 @@ class SeaWaybillController extends AbstractController
                 $query->whereIn(
                     'ship_company_bill_id',
                     $params['bill_id']
-                )->orWhereIn(
-                    'partner_bill_id',
-                    $params['bill_id'],
-                )->orWhereIn(
-                    'self_bill_id',
-                    $params['bill_id'],
-                )->orWhereIn(
-                    'motorcade_bill_id',
-                    $params['bill_id'],
-                );
+                )
+                    ->orWhereIn(
+                        'partner_bill_id',
+                        $params['bill_id'],
+                    )
+                    ->orWhereIn(
+                        'self_bill_id',
+                        $params['bill_id'],
+                    )
+                    ->orWhereIn(
+                        'motorcade_bill_id',
+                        $params['bill_id'],
+                    );
             });
         }
         // if (isset($params['ship_company_ids']) && $params['ship_company_ids']) {
@@ -247,10 +253,10 @@ class SeaWaybillController extends AbstractController
                 $sailScheduleModel = WuliuSailSchedule::where('id', $params['sail_schedule_id'])
                     ->first();
                 if (! $sailScheduleModel) {
-                    throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '船期不存在');
+                    throw new ServiceException(ServiceCode::ERROR, [], 400, [], '船期不存在');
                 }
                 if (! $sailScheduleModel->ship_company_id) {
-                    throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '船期还未绑定船公司，请先绑定');
+                    throw new ServiceException(ServiceCode::ERROR, [], 400, [], '船期还未绑定船公司，请先绑定');
                 }
             }
 
@@ -259,7 +265,7 @@ class SeaWaybillController extends AbstractController
                     ->where('case_number', $params['case_number'])
                     ->first();
                 if ($existsModel) {
-                    throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '存在相同的海运单和箱号');
+                    throw new ServiceException(ServiceCode::ERROR, [], 400, [], '存在相同的海运单和箱号');
                 }
             }
 
@@ -322,19 +328,20 @@ class SeaWaybillController extends AbstractController
                 'motorcadeBill',
                 'partnerBill',
                 'selfBill',
-            ])->find($params['id']);
+            ])
+                ->find($params['id']);
             if (! $model) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '海运单不存在');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '海运单不存在');
             }
             // 检查 船期 是否存在
             if ($params['sail_schedule_id']) {
                 $sailScheduleModel = WuliuSailSchedule::where('id', $params['sail_schedule_id'])
                     ->first();
                 if (! $sailScheduleModel) {
-                    throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '船期不存在');
+                    throw new ServiceException(ServiceCode::ERROR, [], 400, [], '船期不存在');
                 }
                 if (! $sailScheduleModel->ship_company_id) {
-                    throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '船期还未绑定船公司，请先绑定');
+                    throw new ServiceException(ServiceCode::ERROR, [], 400, [], '船期还未绑定船公司，请先绑定');
                 }
             }
 
@@ -344,7 +351,7 @@ class SeaWaybillController extends AbstractController
                     ->where('case_number', $params['case_number'])
                     ->first();
                 if ($existsModel) {
-                    throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '存在相同的海运单和箱号');
+                    throw new ServiceException(ServiceCode::ERROR, [], 400, [], '存在相同的海运单和箱号');
                 }
             }
 
@@ -363,7 +370,7 @@ class SeaWaybillController extends AbstractController
                 $error = true;
             }
             if ($error) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '海运单存在于账单中且账单状态不是默认，无法更改');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '海运单存在于账单中且账单状态不是默认，无法更改');
             }
 
             if ($params['sail_schedule_id']) {
@@ -424,10 +431,12 @@ class SeaWaybillController extends AbstractController
                 'motorcadeBill',
                 'partnerBill',
                 'selfBill',
-            ])->whereIn('id', $params)->get();
+            ])
+                ->whereIn('id', $params)
+                ->get();
 
             if (! $models->count()) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '海运单不存在');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '海运单不存在');
             }
             foreach ($models as $key => $model) {
                 // 账单 已对 无法删除
@@ -445,7 +454,7 @@ class SeaWaybillController extends AbstractController
                     $error = true;
                 }
                 if ($error) {
-                    throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '海运单{id:' . $model->id . '}存在于账单中，无法删除');
+                    throw new ServiceException(ServiceCode::ERROR, [], 400, [], '海运单{id:' . $model->id . '}存在于账单中，无法删除');
                 }
 
                 $model->delete();
@@ -484,7 +493,10 @@ class SeaWaybillController extends AbstractController
             $insertData = $result['insertData'];
             $updateData = $result['updateCount'];
             Db::commit();
-            return $this->resJson("共导入{$insertCount}条，更新{$updateCount}条数据！", [$insertData, $updateData]);
+            return $this->resJson("共导入{$insertCount}条，更新{$updateCount}条数据！", [
+                $insertData,
+                $updateData,
+            ]);
         } catch (Exception $e) {
             Db::rollBack();
             throw $e;
@@ -498,9 +510,10 @@ class SeaWaybillController extends AbstractController
 
         Db::beginTransaction();
         try {
-            $baseModel = WuliuSeaWaybill::with(['sailSchedule'])->find($params['id']);
+            $baseModel = WuliuSeaWaybill::with(['sailSchedule'])
+                ->find($params['id']);
             if (! $baseModel) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '海运单不存在');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '海运单不存在');
             }
 
             if ($params['case_numbers']) {
@@ -515,7 +528,7 @@ class SeaWaybillController extends AbstractController
                 }
             }
             if ($count > 100) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '数量不能大于100');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数量不能大于100');
             }
 
             for ($i = 0; $i < $count; ++$i) {
@@ -529,7 +542,7 @@ class SeaWaybillController extends AbstractController
                     $model->case_number = trim($case_numbers[$i]);
 
                     if ($this->seaWaybillService->checkExistsSingle($model->number, $model->case_number)) {
-                        throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '海运单：' . $model->number . ' 箱号：' . $model->case_number . '已存在');
+                        throw new ServiceException(ServiceCode::ERROR, [], 400, [], '海运单：' . $model->number . ' 箱号：' . $model->case_number . '已存在');
                     }
                 }
 
@@ -596,18 +609,19 @@ class SeaWaybillController extends AbstractController
             // 查看车辆是否存在
             $carModel = WuliuCar::find($params['car_id']);
             if (! $carModel) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '车辆不存在');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '车辆不存在');
             }
 
             // 检查海运单
             $params['ids'] = array_unique($params['ids']);
-            $models = WuliuSeaWaybill::whereIn('id', $params['ids'])->get();
+            $models = WuliuSeaWaybill::whereIn('id', $params['ids'])
+                ->get();
             // var_dump($models->count());
             if (! $models->count()) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '需要操作的数据为空');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '需要操作的数据为空');
             }
             if ($models->count() != count($params['ids'])) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '部分数据不存在，请刷新页面重试');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '部分数据不存在，请刷新页面重试');
             }
             // 查看是否有 已经派车的数据，报错
             $existsErrorArray = [];
@@ -619,7 +633,7 @@ class SeaWaybillController extends AbstractController
             if ($existsErrorArray) {
                 $text = '箱号：';
                 $text .= implode(',', $existsErrorArray);
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, $text . '已派车，请先取消派车');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], $text . '已派车，请先取消派车');
             }
 
             // 修改
@@ -647,13 +661,14 @@ class SeaWaybillController extends AbstractController
         try {
             // 检查海运单
             $params['ids'] = array_unique($params['ids']);
-            $models = WuliuSeaWaybill::whereIn('id', $params['ids'])->get();
+            $models = WuliuSeaWaybill::whereIn('id', $params['ids'])
+                ->get();
             // var_dump($models->count());
             if (! $models->count()) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '需要删除的数据为空');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '需要删除的数据为空');
             }
             if ($models->count() != count($params['ids'])) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '部分数据不存在，请刷新页面重试');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '部分数据不存在，请刷新页面重试');
             }
 
             // 查看是否有 已经派车的数据，报错
@@ -694,21 +709,22 @@ class SeaWaybillController extends AbstractController
             // 查看车辆是否存在
             $billModel = WuliuBill::find($params['bill_id']);
             if (! $billModel) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '账单不存在');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '账单不存在');
             }
             if ($billModel->status !== WuliuBill::STATUS_DEFAULT) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '账单状态不是默认，无法修改');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '账单状态不是默认，无法修改');
             }
 
             // 检查海运单
             $params['ids'] = array_unique($params['ids']);
-            $models = WuliuSeaWaybill::whereIn('id', $params['ids'])->get();
+            $models = WuliuSeaWaybill::whereIn('id', $params['ids'])
+                ->get();
             // var_dump($models->count());
             if (! $models->count()) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '需要操作的数据为空');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '需要操作的数据为空');
             }
             if ($models->count() != count($params['ids'])) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '部分数据不存在，请刷新页面重试');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '部分数据不存在，请刷新页面重试');
             }
 
             // 修改
@@ -734,7 +750,7 @@ class SeaWaybillController extends AbstractController
                 if ($type === WuliuBill::TYPE_SELF) {
                     // 如果绑定的是车辆，则要检查车辆是否派车
                     if (! $model->car_id) {
-                        throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, "海运单{{$model->number}}未派车，请先处理");
+                        throw new ServiceException(ServiceCode::ERROR, [], 400, [], "海运单{{$model->number}}未派车，请先处理");
                     }
                 }
 
@@ -742,18 +758,18 @@ class SeaWaybillController extends AbstractController
                 if ($type === WuliuBill::TYPE_SELF) {
                     // 如果绑定的是车辆，则要检查车辆是否派车
                     if ($model->motorcade_bill_id) {
-                        throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, "海运单{{$model->number}}已绑定车队或个人");
+                        throw new ServiceException(ServiceCode::ERROR, [], 400, [], "海运单{{$model->number}}已绑定车队或个人");
                     }
                 } elseif ($type === WuliuBill::TYPE_MOTORCADE) {
                     // 如果绑定的是车辆，则要检查车辆是否派车
                     if ($model->self_bill_id) {
-                        throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, "海运单{{$model->number}}已绑定车队或个人");
+                        throw new ServiceException(ServiceCode::ERROR, [], 400, [], "海运单{{$model->number}}已绑定车队或个人");
                     }
                 }
 
                 if ($model->{$field}) {
                     // 如果海运单已经绑定订单，则不允许操作
-                    throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, "海运单{{$model->number}}已绑定账单，请先处理");
+                    throw new ServiceException(ServiceCode::ERROR, [], 400, [], "海运单{{$model->number}}已绑定账单，请先处理");
                 }
                 $model->{$field} = $billModel->id;
                 $model->save();
@@ -777,10 +793,10 @@ class SeaWaybillController extends AbstractController
             // 查看车辆是否存在
             $billModel = WuliuBill::find($params['bill_id']);
             if (! $billModel) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '账单不存在');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '账单不存在');
             }
             if ($billModel->status !== WuliuBill::STATUS_DEFAULT) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '账单状态不是默认，无法修改');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '账单状态不是默认，无法修改');
             }
 
             // 检查海运单
@@ -795,10 +811,10 @@ class SeaWaybillController extends AbstractController
                 ->get();
             // var_dump($models->count());
             if (! $models->count()) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '需要操作的数据为空');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '需要操作的数据为空');
             }
             if ($models->count() != count($params['ids'])) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '部分数据不存在，请刷新页面重试');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '部分数据不存在，请刷新页面重试');
             }
 
             // 修改
@@ -823,7 +839,7 @@ class SeaWaybillController extends AbstractController
             foreach ($models as $model) {
                 if (! $model->{$field}) {
                     // 如果海运单已经绑定订单，则不允许操作
-                    throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, "海运单{{$model->number}}未绑定账单，不用处理");
+                    throw new ServiceException(ServiceCode::ERROR, [], 400, [], "海运单{{$model->number}}未绑定账单，不用处理");
                 }
                 $model->{$field} = null;
                 $model->save();
@@ -847,18 +863,19 @@ class SeaWaybillController extends AbstractController
         try {
             $partnerModel = WuliuPartner::find($params['partner_id']);
             if (! $partnerModel) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '合作公司或个人不存在');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '合作公司或个人不存在');
             }
 
             // 检查海运单
             $params['ids'] = array_unique($params['ids']);
-            $models = WuliuSeaWaybill::whereIn('id', $params['ids'])->get();
+            $models = WuliuSeaWaybill::whereIn('id', $params['ids'])
+                ->get();
             // var_dump($models->count());
             if (! $models->count()) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '需要操作的数据为空');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '需要操作的数据为空');
             }
             if ($models->count() != count($params['ids'])) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '部分数据不存在，请刷新页面重试');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '部分数据不存在，请刷新页面重试');
             }
 
             $updateData = [];
@@ -891,13 +908,14 @@ class SeaWaybillController extends AbstractController
         try {
             // 检查海运单
             $params['ids'] = array_unique($params['ids']);
-            $models = WuliuSeaWaybill::whereIn('id', $params['ids'])->get();
+            $models = WuliuSeaWaybill::whereIn('id', $params['ids'])
+                ->get();
             // var_dump($models->count());
             if (! $models->count()) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '需要操作的数据为空');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '需要操作的数据为空');
             }
             if ($models->count() != count($params['ids'])) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '部分数据不存在，请刷新页面重试');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '部分数据不存在，请刷新页面重试');
             }
 
             $updateData = [];
@@ -929,14 +947,15 @@ class SeaWaybillController extends AbstractController
         try {
             // 查看车辆是否存在
             if (! isset($params['ids']) || ! $params['ids'] || ! is_array($params['ids'])) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '参数错误');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '参数错误');
             }
-            $models = WuliuSeaWaybill::with(['sailSchedule'])->find($params['ids']);
+            $models = WuliuSeaWaybill::with(['sailSchedule'])
+                ->find($params['ids']);
             if (! $models) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '数据不存在');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据不存在');
             }
             if ($models->count() != count($params['ids'])) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '数据数量有误');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据数量有误');
             }
             $result = $this->seaWaybillService->getReceipt($models);
             // 将文件内容作为响应体返回
@@ -980,7 +999,7 @@ class SeaWaybillController extends AbstractController
             /** Load $inputFileName to a Spreadsheet Object  */
             $spreadsheet = IOFactory::load($file->getRealPath());
         } catch (ReaderExcetpion $e) {
-            throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '文件有误，请联系开发人员');
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '文件有误，请联系开发人员');
         }
 
         // 读取文件
@@ -1107,8 +1126,9 @@ class SeaWaybillController extends AbstractController
                 }
             }
 
-            if (! isset($tosIndex, $typeIndex, $numberIndex, $case_numberIndex,$qf_numberIndex, $liaison_address_detailIndex,$boxIndex,$liaison_Index,$liaison_mobileIndex,$car_numberIndex,$partner_Index,$partner_towing_feeIndex, $partner_thc_feeIndex, $partner_overdue_feeIndex, $partner_stockpiling_feeIndex, $partner_print_feeIndex, $partner_clean_feeIndex, $partner_other_feeIndex ,$partner_other_fee_descIndex, $partner_stay_poleIndex, $partner_remarksIndex, $good_nameIndex, $created_atIndex)) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '文件第一行标题格式有误');
+            if (! isset($tosIndex, $typeIndex, $numberIndex, $case_numberIndex, $qf_numberIndex, $liaison_address_detailIndex, $boxIndex, $liaison_Index, $liaison_mobileIndex, $car_numberIndex, $partner_Index, $partner_towing_feeIndex, $partner_thc_feeIndex, $partner_overdue_feeIndex, $partner_stockpiling_feeIndex, $partner_print_feeIndex, $partner_clean_feeIndex, $partner_other_feeIndex, $partner_other_fee_descIndex, $partner_stay_poleIndex, $partner_remarksIndex, $good_nameIndex, $created_atIndex)) {
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '文件有误，请联系开发人员');
+
             }
             $seaWaybillMatchingModels = WuliuSeaWaybill::get();
             $seaWaybillMatchingModelsArray = $seaWaybillMatchingModels->toArray();
@@ -1132,7 +1152,21 @@ class SeaWaybillController extends AbstractController
                     $value[$car_numberIndex] = str_replace('    ', ' ', $value[$car_numberIndex]);
                     $value[$car_numberIndex] = str_replace('   ', ' ', $value[$car_numberIndex]);
                     $value[$car_numberIndex] = str_replace('  ', ' ', $value[$car_numberIndex]);
-                    $value[$car_numberIndex] = str_replace(['送', '有地', ' 忆', '忆', ' 已', '已', '对', '四', '哥', '已對', '付', '收', '装'], '', $value[$car_numberIndex]);
+                    $value[$car_numberIndex] = str_replace([
+                        '送',
+                        '有地',
+                        ' 忆',
+                        '忆',
+                        ' 已',
+                        '已',
+                        '对',
+                        '四',
+                        '哥',
+                        '已對',
+                        '付',
+                        '收',
+                        '装',
+                    ], '', $value[$car_numberIndex]);
                     $array = explode(' ', $value[$car_numberIndex]);
                     if (count($array) != 2) {
                         var_dump($array, $a0, $car_numberIndex);
@@ -1155,21 +1189,41 @@ class SeaWaybillController extends AbstractController
                     $value['car_id'] = $car_id;
                     if (isset($array[1])) {
                         $car_finished_date = trim($array[1]);
-                        $timeStr = str_replace(['送', "\t", '发货方日鑫鱼粉厂', '有地', ' 忆', '忆', '已', '对', '對', '阿海'], '', $car_finished_date);
+                        $timeStr = str_replace([
+                            '送',
+                            "\t",
+                            '发货方日鑫鱼粉厂',
+                            '有地',
+                            ' 忆',
+                            '忆',
+                            '已',
+                            '对',
+                            '對',
+                            '阿海',
+                        ], '', $car_finished_date);
                         $a1 = $timeStr;
 
                         $timeStr = str_replace('号', '日', $timeStr);
                         $a2 = $timeStr;
-                        $timeStr = str_replace(['号', '日', '提'], '', $timeStr);
+                        $timeStr = str_replace([
+                            '号',
+                            '日',
+                            '提',
+                        ], '', $timeStr);
                         $a3 = $timeStr;
                         // var_dump($timeStr);
-                        $timeStr = str_replace(['年', '月', '日', '号'], '-', $timeStr);
+                        $timeStr = str_replace([
+                            '年',
+                            '月',
+                            '日',
+                            '号',
+                        ], '-', $timeStr);
                         $a4 = $timeStr;
                         $timeStr = str_replace('.', '-', $timeStr);
                         $a5 = $timeStr;
 
                         if (! $timestamp = strtotime($timeStr)) {
-                            throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, $a1 . $a2 . $a3 . $a4 . $a5 . '---' . $car_finished_date);
+                            throw new ServiceException(ServiceCode::ERROR, [], 400, [], $a1 . $a2 . $a3 . $a4 . $a5 . '---' . $car_finished_date);
                         }
                         // var_dump($timeStr);
                         // var_dump($timestamp);
@@ -1182,7 +1236,7 @@ class SeaWaybillController extends AbstractController
                 if ($value[$partner_Index]) {
                     $partner_id = WuliuPartner::getIdByName($partnerMatchingModelsArray, $value[$partner_Index]);
                     if (! $partner_id) {
-                        throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, $value[$partner_Index] . '不存在');
+                        throw new ServiceException(ServiceCode::ERROR, [], 400, [], $value[$partner_Index] . '不存在');
                     }
                 } else {
                     $partner_id = null;
@@ -1282,7 +1336,10 @@ a;
 
             Db::commit();
 
-            return $this->resJson("共导入{$insertCount}条，更新{$updateCount}条数据！", [$insertData, $updateData]);
+            return $this->resJson("共导入{$insertCount}条，更新{$updateCount}条数据！", [
+                $insertData,
+                $updateData,
+            ]);
         } catch (Exception $e) {
             Db::rollBack();
             throw $e;
@@ -1298,7 +1355,7 @@ a;
             // $spreadsheet = WuliuSpreadsheetService::getUtf8Context($spreadsheet, $fileEncoding);
             $filename = $file->getClientFilename();
         } catch (ReaderExcetpion $e) {
-            throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '文件有误，请联系开发人员' . $e->getMessage() . $file->getRealPath());
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '文件有误，请联系开发人员' . $e->getMessage() . $file->getRealPath());
         }
 
         // 读取文件
@@ -1317,15 +1374,37 @@ a;
             $case_numberFieldArray = ['箱号'];
             $fh_statusFieldArray = ['放货状态'];
             $receipt_statusFieldArray = ['客户签收单'];
-            $ship_company_towing_feeFieldArray = ['拖车费', '请派价'];
+            $ship_company_towing_feeFieldArray = [
+                '拖车费',
+                '请派价',
+            ];
             $typeFieldArray = ['进口出口'];
             $weightFieldArray = ['单箱重量'];
             $good_nameFieldArray = ['货名'];
-            $boxFieldArray = ['箱型', '箱型尺寸'];
-            $qf_numberFieldArray = ['铅封号', '封号', '铅封号(客户)'];
-            $liaison_FieldArray = ['联系人', '收货人'];
-            $liaison_mobileFieldArray = ['联系人电话', '联系电话'];
-            $liaison_address_detailFieldArray = ['联系人详细地址', '详细地址', '收货地址', '联系人/联系电话/收货地址', '联系人/联系电话/发货地址'];
+            $boxFieldArray = [
+                '箱型',
+                '箱型尺寸',
+            ];
+            $qf_numberFieldArray = [
+                '铅封号',
+                '封号',
+                '铅封号(客户)',
+            ];
+            $liaison_FieldArray = [
+                '联系人',
+                '收货人',
+            ];
+            $liaison_mobileFieldArray = [
+                '联系人电话',
+                '联系电话',
+            ];
+            $liaison_address_detailFieldArray = [
+                '联系人详细地址',
+                '详细地址',
+                '收货地址',
+                '联系人/联系电话/收货地址',
+                '联系人/联系电话/发货地址',
+            ];
             $remarkFieldArray = ['地址备注'];
             $liaison_remarkFieldArray = ['派车要求'];
             $created_atArray = ['派车时间']; # '要求装货时间', '要求送货时间',
@@ -1470,12 +1549,12 @@ a;
                 } elseif ($value[$sail_scheduleIndex]) {
                     $sail_schedule_array = $this->getImportFotmatSailScheduleNameAndVoyavge($value[$sail_scheduleIndex]);
                     if (! $sail_schedule_array) {
-                        throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '船期航次数据有误:' . $value[$sail_scheduleIndex]);
+                        throw new ServiceException(ServiceCode::ERROR, [], 400, [], '船期航次数据有误:' . $value[$sail_scheduleIndex]);
                     }
                     $sail_schedule_name = $sail_schedule_array[0];
                     $sail_schedule_voyage = $sail_schedule_array[1];
                 } else {
-                    throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '无法匹配出船期数据');
+                    throw new ServiceException(ServiceCode::ERROR, [], 400, [], '无法匹配出船期数据');
                 }
                 if ($common_ship_company_id) {
                     $ship_company_id = $common_ship_company_id;
@@ -1483,7 +1562,7 @@ a;
                     $ship_company_id = WuliuShipCompany::getIdBySeaWaybillNumber($value[$numberIndex]);
                 }
                 if (! $ship_company_id) {
-                    throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '运单号：' . $value[$numberIndex] . '匹配不到船公司');
+                    throw new ServiceException(ServiceCode::ERROR, [], 400, [], '运单号：' . $value[$numberIndex] . '匹配不到船公司');
                 }
                 $sail_schedule_id = WuliuSailSchedule::getIdByShipCompanyNameAndNameAndVoyage($sailScheduleMatchingModelsArray, $ship_company_id, $sail_schedule_name, $sail_schedule_voyage);
                 if (! $sail_schedule_id) {
@@ -1510,7 +1589,7 @@ a;
                         if ($type) {
                             $seaWaybillSaveArray['type'] = $type;
                         } else {
-                            throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '无法判断运单 进出口类型' . implode('_', $value));
+                            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '无法判断运单 进出口类型' . implode('_', $value));
                         }
                     }
                 } else {
@@ -1522,7 +1601,7 @@ a;
                             $seaWaybillSaveArray['type'] = WuliuSeaWaybill::TYPE_CHUKOU;
                             break;
                         default:
-                            throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '无法判断运单 进出口类型:' . $seaWaybillSaveArray['type']);
+                            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '无法判断运单 进出口类型:' . $seaWaybillSaveArray['type']);
                     }
                 }
                 $seaWaybillSaveArray['sail_schedule_id'] = $sail_schedule_id;
@@ -1574,7 +1653,7 @@ a;
                         $seaWaybillSaveArray['receipt_status'] = WuliuSeaWaybill::RECEIPT_STATUS_NOT_UPLOAD;
                         break;
                     default:
-                        throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '签收单状态有误：' . $value[$receipt_statusIndex]);
+                        throw new ServiceException(ServiceCode::ERROR, [], 400, [], '签收单状态有误：' . $value[$receipt_statusIndex]);
                 }
 
                 $seaWaybillSaveArray['qf_number'] = $value[$qf_numberIndex];
@@ -1605,7 +1684,10 @@ a;
 
             Db::commit();
 
-            return $this->resJson("共导入{$insertCount}条，更新{$updateCount}条数据！", [$insertData, $updateData]);
+            return $this->resJson("共导入{$insertCount}条，更新{$updateCount}条数据！", [
+                $insertData,
+                $updateData,
+            ]);
         } catch (Exception $e) {
             Db::rollBack();
             throw $e;
@@ -1679,9 +1761,18 @@ a;
                 if ($value[$car_finished_dateIndex]) {
                     $timeStr = str_replace('送', '', '2022.' . $value[$car_finished_dateIndex]);
                     $timeStr = str_replace('号', '日', $timeStr);
-                    $timeStr = str_replace(['号', '日', '提'], '', $timeStr);
+                    $timeStr = str_replace([
+                        '号',
+                        '日',
+                        '提',
+                    ], '', $timeStr);
                     // var_dump($timeStr);
-                    $timeStr = str_replace(['年', '月', '日', '号'], '-', $timeStr);
+                    $timeStr = str_replace([
+                        '年',
+                        '月',
+                        '日',
+                        '号',
+                    ], '-', $timeStr);
                     $timeStr = str_replace('.', '-', $timeStr);
                     // var_dump($timeStr);
                     try {
@@ -1914,11 +2005,24 @@ a;
                     }
                     $car_number = $array[0];
                     $car_finished_date = $array[1];
-                    $timeStr = str_replace(['送', '已', '对'], '', '2022.' . $car_finished_date);
+                    $timeStr = str_replace([
+                        '送',
+                        '已',
+                        '对',
+                    ], '', '2022.' . $car_finished_date);
                     $timeStr = str_replace('号', '日', $timeStr);
-                    $timeStr = str_replace(['号', '日', '提'], '', $timeStr);
+                    $timeStr = str_replace([
+                        '号',
+                        '日',
+                        '提',
+                    ], '', $timeStr);
                     // var_dump($timeStr);
-                    $timeStr = str_replace(['年', '月', '日', '号'], '-', $timeStr);
+                    $timeStr = str_replace([
+                        '年',
+                        '月',
+                        '日',
+                        '号',
+                    ], '-', $timeStr);
                     $timeStr = str_replace('.', '-', $timeStr);
                     if (! $timestamp = strtotime($timeStr)) {
                         return $this->responseJson(ServiceCode::SUCCESS, $car_finished_date);
@@ -2234,11 +2338,24 @@ a;
                     // }
                     // $car_number = $array[0];
                     // $car_finished_date = $array[1];
-                    $timeStr = str_replace(['送', '已', '对'], '', '2022.' . $value[$car_finished_dateIndex]);
+                    $timeStr = str_replace([
+                        '送',
+                        '已',
+                        '对',
+                    ], '', '2022.' . $value[$car_finished_dateIndex]);
                     $timeStr = str_replace('号', '日', $timeStr);
-                    $timeStr = str_replace(['号', '日', '提'], '', $timeStr);
+                    $timeStr = str_replace([
+                        '号',
+                        '日',
+                        '提',
+                    ], '', $timeStr);
                     // var_dump($timeStr);
-                    $timeStr = str_replace(['年', '月', '日', '号'], '-', $timeStr);
+                    $timeStr = str_replace([
+                        '年',
+                        '月',
+                        '日',
+                        '号',
+                    ], '-', $timeStr);
                     $timeStr = str_replace('.', '-', $timeStr);
                     if (! $timestamp = strtotime($timeStr)) {
                         return $this->responseJson(ServiceCode::SUCCESS, $value[$car_finished_dateIndex]);
@@ -2249,7 +2366,10 @@ a;
                 }
 
                 if ($value[$car_numberIndex]) {
-                    $car_number = str_replace(['已对', ' '], '', $value[$car_numberIndex]);
+                    $car_number = str_replace([
+                        '已对',
+                        ' ',
+                    ], '', $value[$car_numberIndex]);
                     $car_id = WuliuCar::getIdByNumber($carMatchingModelsArray, $car_number);
                     if (! $car_id) {
                         // 自动创建
@@ -2400,9 +2520,9 @@ a;
                     if (is_string($value[$liaison_address_detailIndex2]) && $value[$liaison_address_detailIndex2]) {
                         if (strpos($value[$liaison_address_detailIndex2], '日') || strpos($value[$liaison_address_detailIndex2], '号') || strpos($value[$liaison_address_detailIndex2], '送')) {
                             if (strpos($value[$liaison_address_detailIndex2], '订单号') === false
-                            && strpos($value[$liaison_address_detailIndex2], '陈日攀') === false
-                            && strpos($value[$liaison_address_detailIndex2], '发货方日鑫鱼粉厂') === false
-                            && strpos($value[$liaison_address_detailIndex2], '4383送') === false
+                                && strpos($value[$liaison_address_detailIndex2], '陈日攀') === false
+                                && strpos($value[$liaison_address_detailIndex2], '发货方日鑫鱼粉厂') === false
+                                && strpos($value[$liaison_address_detailIndex2], '4383送') === false
                             ) {
                                 $value[$car_numberInfo] .= ' ' . $value[$liaison_address_detailIndex2];
                                 $value[$liaison_address_detailIndex2] = $value[$liaison_address_detailIndex3];
@@ -2417,7 +2537,21 @@ a;
                     $value[$car_numberInfo] = str_replace('    ', ' ', $value[$car_numberInfo]);
                     $value[$car_numberInfo] = str_replace('   ', ' ', $value[$car_numberInfo]);
                     $value[$car_numberInfo] = str_replace('  ', ' ', $value[$car_numberInfo]);
-                    $value[$car_numberInfo] = str_replace(['送', '有地', ' 忆', '忆', ' 已', '已', '对', '四', '哥', '已對', '付', '收', '装'], '', $value[$car_numberInfo]);
+                    $value[$car_numberInfo] = str_replace([
+                        '送',
+                        '有地',
+                        ' 忆',
+                        '忆',
+                        ' 已',
+                        '已',
+                        '对',
+                        '四',
+                        '哥',
+                        '已對',
+                        '付',
+                        '收',
+                        '装',
+                    ], '', $value[$car_numberInfo]);
                     $array = explode(' ', $value[$car_numberInfo]);
                     if (count($array) > 2) {
                         // var_dump($value[$car_numberInfo], $value[$liaison_address_detailIndex2]);
@@ -2440,14 +2574,34 @@ a;
 
                     if (isset($array[1])) {
                         $car_finished_date = trim($array[1]);
-                        $timeStr = str_replace(['送', "\t", '发货方日鑫鱼粉厂', '有地', ' 忆', '忆', '已', '对', '對', '阿海'], '', '2022.' . $car_finished_date);
+                        $timeStr = str_replace([
+                            '送',
+                            "\t",
+                            '发货方日鑫鱼粉厂',
+                            '有地',
+                            ' 忆',
+                            '忆',
+                            '已',
+                            '对',
+                            '對',
+                            '阿海',
+                        ], '', '2022.' . $car_finished_date);
                         $a1 = $timeStr;
                         $timeStr = str_replace('号', '日', $timeStr);
                         $a2 = $timeStr;
-                        $timeStr = str_replace(['号', '日', '提'], '', $timeStr);
+                        $timeStr = str_replace([
+                            '号',
+                            '日',
+                            '提',
+                        ], '', $timeStr);
                         $a3 = $timeStr;
                         // var_dump($timeStr);
-                        $timeStr = str_replace(['年', '月', '日', '号'], '-', $timeStr);
+                        $timeStr = str_replace([
+                            '年',
+                            '月',
+                            '日',
+                            '号',
+                        ], '-', $timeStr);
                         $a4 = $timeStr;
                         $timeStr = str_replace('.', '-', $timeStr);
                         $a5 = $timeStr;
@@ -2902,7 +3056,8 @@ a;
 
             $seaWaybillMatchingModels = WuliuSeaWaybill::get();
             $seaWaybillMatchingModelsArray = $seaWaybillMatchingModels->toArray();
-            $sailScheduleMatchingModels = WuliuSailSchedule::with(['shipCompany'])->get();
+            $sailScheduleMatchingModels = WuliuSailSchedule::with(['shipCompany'])
+                ->get();
             $sailScheduleMatchingModelsArray = $sailScheduleMatchingModels->toArray();
             $carMatchingModels = WuliuCar::get();
             $carMatchingModelsArray = $carMatchingModels->toArray();
@@ -2955,7 +3110,21 @@ a;
                     $value[$car_numberInfo] = str_replace('    ', ' ', $value[$car_numberInfo]);
                     $value[$car_numberInfo] = str_replace('   ', ' ', $value[$car_numberInfo]);
                     $value[$car_numberInfo] = str_replace('  ', ' ', $value[$car_numberInfo]);
-                    $value[$car_numberInfo] = str_replace(['送', '有地', ' 忆', '忆', ' 已', '已', '对', '四', '哥', '已對', '付', '收', '装'], '', $value[$car_numberInfo]);
+                    $value[$car_numberInfo] = str_replace([
+                        '送',
+                        '有地',
+                        ' 忆',
+                        '忆',
+                        ' 已',
+                        '已',
+                        '对',
+                        '四',
+                        '哥',
+                        '已對',
+                        '付',
+                        '收',
+                        '装',
+                    ], '', $value[$car_numberInfo]);
                     $car_number = $value[$car_numberInfo];
                     $car_id = WuliuCar::getIdByNumber($carMatchingModelsArray, $car_number);
                     if (! $car_id) {
@@ -2973,14 +3142,34 @@ a;
                 }
                 if (isset($value[$car_finished_dateIndex])) {
                     $car_finished_date = trim($value[$car_finished_dateIndex]);
-                    $timeStr = str_replace(['送', "\t", '发货方日鑫鱼粉厂', '有地', ' 忆', '忆', '已', '对', '對', '阿海'], '', '2023.' . $car_finished_date);
+                    $timeStr = str_replace([
+                        '送',
+                        "\t",
+                        '发货方日鑫鱼粉厂',
+                        '有地',
+                        ' 忆',
+                        '忆',
+                        '已',
+                        '对',
+                        '對',
+                        '阿海',
+                    ], '', '2023.' . $car_finished_date);
                     $a1 = $timeStr;
                     $timeStr = str_replace('号', '日', $timeStr);
                     $a2 = $timeStr;
-                    $timeStr = str_replace(['号', '日', '提'], '', $timeStr);
+                    $timeStr = str_replace([
+                        '号',
+                        '日',
+                        '提',
+                    ], '', $timeStr);
                     $a3 = $timeStr;
                     // var_dump($timeStr);
-                    $timeStr = str_replace(['年', '月', '日', '号'], '-', $timeStr);
+                    $timeStr = str_replace([
+                        '年',
+                        '月',
+                        '日',
+                        '号',
+                    ], '-', $timeStr);
                     $a4 = $timeStr;
                     $timeStr = str_replace('.', '-', $timeStr);
                     $a5 = $timeStr;
@@ -3100,7 +3289,8 @@ a;
 
             $seaWaybillMatchingModels = WuliuSeaWaybill::get();
             $seaWaybillMatchingModelsArray = $seaWaybillMatchingModels->toArray();
-            $sailScheduleMatchingModels = WuliuSailSchedule::with(['shipCompany'])->get();
+            $sailScheduleMatchingModels = WuliuSailSchedule::with(['shipCompany'])
+                ->get();
             $sailScheduleMatchingModelsArray = $sailScheduleMatchingModels->toArray();
             $carMatchingModels = WuliuCar::get();
             $carMatchingModelsArray = $carMatchingModels->toArray();
@@ -3154,7 +3344,21 @@ a;
                     $value[$car_numberInfo] = str_replace('    ', ' ', $value[$car_numberInfo]);
                     $value[$car_numberInfo] = str_replace('   ', ' ', $value[$car_numberInfo]);
                     $value[$car_numberInfo] = str_replace('  ', ' ', $value[$car_numberInfo]);
-                    $value[$car_numberInfo] = str_replace(['送', '有地', ' 忆', '忆', ' 已', '已', '对', '四', '哥', '已對', '付', '收', '装'], '', $value[$car_numberInfo]);
+                    $value[$car_numberInfo] = str_replace([
+                        '送',
+                        '有地',
+                        ' 忆',
+                        '忆',
+                        ' 已',
+                        '已',
+                        '对',
+                        '四',
+                        '哥',
+                        '已對',
+                        '付',
+                        '收',
+                        '装',
+                    ], '', $value[$car_numberInfo]);
                     $car_number = $value[$car_numberInfo];
                     $car_id = WuliuCar::getIdByNumber($carMatchingModelsArray, $car_number);
                     if (! $car_id) {
@@ -3172,14 +3376,34 @@ a;
                 }
                 if (isset($value[$car_finished_dateIndex])) {
                     $car_finished_date = trim($value[$car_finished_dateIndex]);
-                    $timeStr = str_replace(['送', "\t", '发货方日鑫鱼粉厂', '有地', ' 忆', '忆', '已', '对', '對', '阿海'], '', '2023.' . $car_finished_date);
+                    $timeStr = str_replace([
+                        '送',
+                        "\t",
+                        '发货方日鑫鱼粉厂',
+                        '有地',
+                        ' 忆',
+                        '忆',
+                        '已',
+                        '对',
+                        '對',
+                        '阿海',
+                    ], '', '2023.' . $car_finished_date);
                     $a1 = $timeStr;
                     $timeStr = str_replace('号', '日', $timeStr);
                     $a2 = $timeStr;
-                    $timeStr = str_replace(['号', '日', '提'], '', $timeStr);
+                    $timeStr = str_replace([
+                        '号',
+                        '日',
+                        '提',
+                    ], '', $timeStr);
                     $a3 = $timeStr;
                     // var_dump($timeStr);
-                    $timeStr = str_replace(['年', '月', '日', '号'], '-', $timeStr);
+                    $timeStr = str_replace([
+                        '年',
+                        '月',
+                        '日',
+                        '号',
+                    ], '-', $timeStr);
                     $a4 = $timeStr;
                     $timeStr = str_replace('.', '-', $timeStr);
                     $a5 = $timeStr;
@@ -3309,7 +3533,8 @@ a;
 
             $seaWaybillMatchingModels = WuliuSeaWaybill::get();
             $seaWaybillMatchingModelsArray = $seaWaybillMatchingModels->toArray();
-            $sailScheduleMatchingModels = WuliuSailSchedule::with(['shipCompany'])->get();
+            $sailScheduleMatchingModels = WuliuSailSchedule::with(['shipCompany'])
+                ->get();
             $sailScheduleMatchingModelsArray = $sailScheduleMatchingModels->toArray();
             $carMatchingModels = WuliuCar::get();
             $carMatchingModelsArray = $carMatchingModels->toArray();
@@ -3328,7 +3553,21 @@ a;
                     $value[$car_numberInfo] = str_replace('    ', ' ', $value[$car_numberInfo]);
                     $value[$car_numberInfo] = str_replace('   ', ' ', $value[$car_numberInfo]);
                     $value[$car_numberInfo] = str_replace('  ', ' ', $value[$car_numberInfo]);
-                    $value[$car_numberInfo] = str_replace(['送', '有地', ' 忆', '忆', ' 已', '已', '对', '四', '哥', '已對', '付', '收', '装'], '', $value[$car_numberInfo]);
+                    $value[$car_numberInfo] = str_replace([
+                        '送',
+                        '有地',
+                        ' 忆',
+                        '忆',
+                        ' 已',
+                        '已',
+                        '对',
+                        '四',
+                        '哥',
+                        '已對',
+                        '付',
+                        '收',
+                        '装',
+                    ], '', $value[$car_numberInfo]);
                     $array = explode(' ', $value[$car_numberInfo]);
                     if (count($array) > 2) {
                         // var_dump($value[$car_numberInfo], $value[$liaison_address_detailIndex2]);
@@ -3351,14 +3590,34 @@ a;
 
                     if (isset($array[1])) {
                         $car_finished_date = trim($array[1]);
-                        $timeStr = str_replace(['送', "\t", '发货方日鑫鱼粉厂', '有地', ' 忆', '忆', '已', '对', '對', '阿海'], '', '2022.' . $car_finished_date);
+                        $timeStr = str_replace([
+                            '送',
+                            "\t",
+                            '发货方日鑫鱼粉厂',
+                            '有地',
+                            ' 忆',
+                            '忆',
+                            '已',
+                            '对',
+                            '對',
+                            '阿海',
+                        ], '', '2022.' . $car_finished_date);
                         $a1 = $timeStr;
                         $timeStr = str_replace('号', '日', $timeStr);
                         $a2 = $timeStr;
-                        $timeStr = str_replace(['号', '日', '提'], '', $timeStr);
+                        $timeStr = str_replace([
+                            '号',
+                            '日',
+                            '提',
+                        ], '', $timeStr);
                         $a3 = $timeStr;
                         // var_dump($timeStr);
-                        $timeStr = str_replace(['年', '月', '日', '号'], '-', $timeStr);
+                        $timeStr = str_replace([
+                            '年',
+                            '月',
+                            '日',
+                            '号',
+                        ], '-', $timeStr);
                         $a4 = $timeStr;
                         $timeStr = str_replace('.', '-', $timeStr);
                         $a5 = $timeStr;
@@ -3500,7 +3759,8 @@ a;
 
             $seaWaybillMatchingModels = WuliuSeaWaybill::get();
             $seaWaybillMatchingModelsArray = $seaWaybillMatchingModels->toArray();
-            $sailScheduleMatchingModels = WuliuSailSchedule::with(['shipCompany'])->get();
+            $sailScheduleMatchingModels = WuliuSailSchedule::with(['shipCompany'])
+                ->get();
             $sailScheduleMatchingModelsArray = $sailScheduleMatchingModels->toArray();
             // $carMatchingModels = WuliuCar::get();
             // $carMatchingModelsArray = $carMatchingModels->toArray();
@@ -3638,7 +3898,7 @@ a;
             $exists = false;
             foreach ($matchingModelsArray as $matchingArray) {
                 if ($sheet['ship_company_name'] === $matchingArray['ship_company']['name']
-                   && $sheet['sail_schedule_name'] === $matchingArray['name']) {
+                    && $sheet['sail_schedule_name'] === $matchingArray['name']) {
                     $exists = true;
                     break;
                 }
@@ -3659,7 +3919,7 @@ a;
         foreach ($sheetArray as $sheet) {
             foreach ($matchingModelsArray as $matchingArray) {
                 if ($sheet['number'] === $matchingArray['number']
-                   && $sheet['case_number'] === $matchingArray['case_number']) {
+                    && $sheet['case_number'] === $matchingArray['case_number']) {
                     $array[] = $sheet;
                     break;
                 }
@@ -3679,7 +3939,12 @@ a;
             //   $str_3 = str_replace([' ', '-', '/'], '|', '吉航87/2247S');
             //   throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, $str_1 . $str_2 . $str_3);
             $str = trim($str);
-            $replace_str = str_replace([' ', '  ', '-', '/'], '|', $str);
+            $replace_str = str_replace([
+                ' ',
+                '  ',
+                '-',
+                '/',
+            ], '|', $str);
             $arr = explode('|', $replace_str);
             if (count($arr) !== 2) {
                 return false;

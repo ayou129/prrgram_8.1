@@ -14,6 +14,7 @@ namespace App\Controller\V1\Business\Wuliu\Chewu;
 
 use App\Constant\ServiceCode;
 use App\Controller\AbstractController;
+use App\Exception\ServiceException;
 use App\Model\WuliuShipCompany;
 use Exception;
 use Hyperf\DbConnection\Db;
@@ -70,7 +71,8 @@ class ShipCompanyController extends AbstractController
                 }
             })
             ->with([
-            ])->orderBy('id', 'desc');
+            ])
+            ->orderBy('id', 'desc');
 
         $result = $models->paginate((int) $this->request->input('size', 10));
         $result = $result->toArray();
@@ -95,7 +97,7 @@ class ShipCompanyController extends AbstractController
         $model = WuliuShipCompany::where('name', $params['name'])
             ->first();
         if ($model) {
-            throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '存在相同数据：' . $params['name']);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '存在相同数据：' . $params['name']);
         }
 
         $model = new WuliuShipCompany();
@@ -115,13 +117,14 @@ class ShipCompanyController extends AbstractController
             // 查看数据是否存在
             $model = WuliuShipCompany::find($params['id']);
             if (! $model) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '数据不存在');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据不存在');
             }
 
             // 检查是否存在相同数据
-            $existsCount = WuliuShipCompany::where('name', $params['name'])->count();
+            $existsCount = WuliuShipCompany::where('name', $params['name'])
+                ->count();
             if ($existsCount) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '存在相同数据：' . $params['name']);
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '存在相同数据：' . $params['name']);
             }
 
             $model->name = $params['name'];
@@ -138,40 +141,41 @@ class ShipCompanyController extends AbstractController
 
     public function delete()
     {
-        $params = $this->getRequestAllFilter();
+        // $params = $this->getRequestAllFilter();
         // var_dump($params);
-        throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '当前船公司不允许删除');
-        Db::beginTransaction();
-        try {
-            $params = array_unique($params);
-            $models = WuliuShipCompany::whereIn('id', $params)->get();
-            if (! $models->count()) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '需要删除的数据为空');
-            }
-            if ($models->count() != count($params)) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '部分数据不存在，请刷新页面重试');
-            }
+        throw new ServiceException(ServiceCode::ERROR, [], 400, [], '当前船公司不允许删除');
 
-            // // 关联1：账单表
-            // $relationBillModelCount = WuliuBill::where('', '')->count();
-            // if ($relationBillModelCount) {
-            //     throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '该合作方存在绑定的 账单数据，无法删除');
-            // }
+        // Db::beginTransaction();
+        // try {
+        //     $params = array_unique($params);
+        //     $models = WuliuShipCompany::whereIn('id', $params)->get();
+        //     if (! $models->count()) {
+        //         throw new ServiceException(ServiceCode::ERROR, [], 400, [], '需要删除的数据为空');
+        //     }
+        //     if ($models->count() != count($params)) {
+        //         throw new ServiceException(ServiceCode::ERROR, [], 400, [], '部分数据不存在，请刷新页面重试');
+        //     }
+        //
+        //     // // 关联1：账单表
+        //     // $relationBillModelCount = WuliuBill::where('', '')->count();
+        //     // if ($relationBillModelCount) {
+        //     //     throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '该合作方存在绑定的 账单数据，无法删除');
+        //     // }
+        //
+        //     // // 关联2：海运单表
+        //     // $relatioSeaWaybillModelCount = WuliuSeaWaybill::where('', '')->count();
+        //     // if ($relatioSeaWaybillModelCount) {
+        //     //     throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '该合作方存在绑定的 海运单数据，无法删除');
+        //     // }
+        //
+        //     WuliuShipCompany::whereIn('id', $params)->delete();
+        //
+        //     Db::commit();
+        // } catch (Exception $e) {
+        //     Db::rollBack();
+        //     throw $e;
+        // }
 
-            // // 关联2：海运单表
-            // $relatioSeaWaybillModelCount = WuliuSeaWaybill::where('', '')->count();
-            // if ($relatioSeaWaybillModelCount) {
-            //     throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '该合作方存在绑定的 海运单数据，无法删除');
-            // }
-
-            WuliuShipCompany::whereIn('id', $params)->delete();
-
-            Db::commit();
-        } catch (Exception $e) {
-            Db::rollBack();
-            throw $e;
-        }
-
-        return $this->responseJson(ServiceCode::SUCCESS);
+        // return $this->responseJson(ServiceCode::SUCCESS);
     }
 }

@@ -81,7 +81,7 @@ class JobController extends AbstractController
         $exists = SysJob::where('name', '=', $params['name'])
             ->count();
         if ($exists) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据已存在');
         }
 
         $model = (new SysJob());
@@ -105,13 +105,13 @@ class JobController extends AbstractController
             ->where('id', '<>', $params['id'])
             ->count();
         if ($exists) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据已存在');
         }
 
         $model = SysJob::query()
             ->find($params['id']);
         if (! $model) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_IS_NOT_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据不存在');
         }
 
         $model->name = $params['name'];
@@ -127,7 +127,7 @@ class JobController extends AbstractController
     {
         $idsArray = $this->request->all();
         if (! $idsArray || ! is_array($idsArray)) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_FORMAT);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '参数有误');
         }
         // var_dump($idsArray,'$idsArray');
         // $childMenus = SysJob::whereIn('pid', $idsArray)

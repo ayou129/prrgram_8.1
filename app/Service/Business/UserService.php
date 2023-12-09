@@ -26,11 +26,8 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 
 class UserService
 {
-    /**
-     * @Inject
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+    #[Inject]
+    private EventDispatcherInterface $eventDispatcher;
 
     /**
      * 记录登录信息.

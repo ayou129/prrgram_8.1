@@ -106,17 +106,17 @@ class UserController extends AbstractController
         $exists = SysUser::where('username', '=', $params['username'])
             ->count();
         if ($exists) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据已存在');
         }
 
         if (! isset($params['dept_id'], $params['jobs'], $params['roles'])) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据已存在');
         }
 
         $existsDept = SysDept::where('id', '=', $params['dept_id'])
             ->count();
         if (! $existsDept) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据已存在');
         }
 
         $jobsIds = $rolesIds = [];
@@ -131,12 +131,12 @@ class UserController extends AbstractController
         $existsJobs = SysJob::whereIn('id', $jobsIds)
             ->count();
         if ($existsJobs !== count($jobsIds)) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据已存在');
         }
         $existsRoles = SysRole::whereIn('id', $rolesIds)
             ->count();
         if ($existsRoles !== count($rolesIds)) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据已存在');
         }
 
         $model = (new SysUser());
@@ -186,24 +186,24 @@ class UserController extends AbstractController
         $model = SysUser::where('id', '=', $params['id'])
             ->first();
         if (! $model) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据不存在');
         }
 
         $exists = SysUser::where('username', '=', $params['username'])
             ->where('id', '<>', $params['id'])
             ->count();
         if ($exists) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据已存在');
         }
 
         if (! isset($params['dept_id'], $params['jobs'], $params['roles'])) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据已存在');
         }
 
         $existsDept = SysDept::where('id', '=', $params['dept_id'])
             ->count();
         if (! $existsDept) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据不存在');
         }
 
         $jobsIds = $rolesIds = [];
@@ -218,12 +218,12 @@ class UserController extends AbstractController
         $existsJobs = SysJob::whereIn('id', $jobsIds)
             ->count();
         if ($existsJobs !== count($jobsIds)) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据已存在');
         }
         $existsRoles = SysRole::whereIn('id', $rolesIds)
             ->count();
         if ($existsRoles !== count($rolesIds)) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据已存在');
         }
 
         $model->dept_id = $params['dept_id'];
@@ -276,7 +276,7 @@ class UserController extends AbstractController
         $model = SysUser::where('id', '=', $params['id'])
             ->first();
         if (! $model) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '用户不存在');
         }
         # 判断所有依赖关系 TODO
 
@@ -296,7 +296,7 @@ class UserController extends AbstractController
         // var_dump($params);
         $token = $this->request->header('Authorization');
         if (! isset($token, $params['oldPass'])) {
-            return $this->responseJson(ServiceCode::ERROR_PARAM_MISSING);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '请填写旧密码');
         }
 
         # 不能重复 title、component_name(name)
@@ -305,7 +305,7 @@ class UserController extends AbstractController
             ->first();
         if (! $model) {
             # 密码错误
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '旧密码错误');
         }
         $model->password = $params['newPass'];
         $model->save();

@@ -218,7 +218,7 @@ class RoleController extends AbstractController
     {
         $idsArray = $this->request->all();
         if (! $idsArray || ! is_array($idsArray)) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_FORMAT);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据有误');
         }
         // var_dump($idsArray,'$idsArray');
         // $childMenus = SysRole::whereIn('pid', $idsArray)
@@ -240,7 +240,7 @@ class RoleController extends AbstractController
     {
         $token = $this->request->header('Authorization');
         if (! isset($token)) {
-            return $this->responseJson(ServiceCode::ERROR_PARAM_MISSING);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '请携带token');
         }
         $sysUserModel = SysUser::where('token', $token)
             ->with([
@@ -248,7 +248,7 @@ class RoleController extends AbstractController
             ])
             ->first();
         if (! $sysUserModel) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_IS_NOT_EXISTS_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据不存在');
         }
         $min_level = null;
         foreach ($sysUserModel->roles as $role) {

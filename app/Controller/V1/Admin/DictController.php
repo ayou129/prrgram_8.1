@@ -229,7 +229,7 @@ class DictController extends AbstractController
     {
         $idsArray = $this->request->all();
         if (! $idsArray || ! is_array($idsArray)) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_FORMAT);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据有误');
         }
 
         $model = SysDict::where('id', '=', $idsArray[0])

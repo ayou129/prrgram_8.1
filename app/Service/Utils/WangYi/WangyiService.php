@@ -17,11 +17,8 @@ use Hyperf\Di\Annotation\Inject;
 
 class WangyiService
 {
-    /**
-     * @Inject
-     * @var WangyiIM
-     */
-    protected $wangyiIM;
+    #[Inject]
+    protected WangyiIM $wangyiIM;
 
     public function success($modify_response = [], $callback_ext = '')
     {

@@ -23,11 +23,8 @@ use Hyperf\Validation\ValidationException;
 
 class UserController
 {
-    /**
-     * @Inject
-     * @var UserService
-     */
-    protected $userService;
+    #[Inject]
+    protected UserService $userService;
 
     public function testSnowflake()
     {

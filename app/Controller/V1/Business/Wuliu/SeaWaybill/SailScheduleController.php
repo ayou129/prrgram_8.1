@@ -14,6 +14,7 @@ namespace App\Controller\V1\Business\Wuliu\SeaWaybill;
 
 use App\Constant\ServiceCode;
 use App\Controller\AbstractController;
+use App\Exception\ServiceException;
 use App\Model\WuliuSailSchedule;
 use App\Model\WuliuSeaWaybill;
 use Hyperf\HttpMessage\Exception\HttpException;
@@ -91,7 +92,7 @@ class SailScheduleController extends AbstractController
             ->where('voyage', $params['voyage'])
             ->first();
         if ($model) {
-            throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '存在' . $params['name'] . $params['voyage'] . '的数据');
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '存在' . $params['name'] . $params['voyage'] . '的数据');
         }
         $model = new WuliuSailSchedule();
         // var_dump($params);
@@ -112,7 +113,7 @@ class SailScheduleController extends AbstractController
 
         $model = WuliuSailSchedule::find($params['id']);
         if (! $model) {
-            throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据不存在');
         }
 
         $model->name = $params['name'];
@@ -132,7 +133,7 @@ class SailScheduleController extends AbstractController
         // 有海运单则不允许删除
         $sea = WuliuSeaWaybill::whereIn('sail_schedule_id', $params)->count();
         if ($sea) {
-            throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '该船期下存在海运单，不可删除');
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该船期下存在海运单，不可删除');
         }
 
         WuliuSailSchedule::whereIn('id', $params)

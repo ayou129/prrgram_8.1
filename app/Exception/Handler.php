@@ -29,11 +29,10 @@ use Throwable;
 
 class Handler extends ExceptionHandler
 {
+    #[Inject]
     protected StdoutLoggerInterface $logger;
 
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected FormatterInterface $formatter;
 
     public function __construct(StdoutLoggerInterface $logger)

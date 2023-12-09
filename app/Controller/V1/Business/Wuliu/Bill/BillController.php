@@ -14,21 +14,18 @@ namespace App\Controller\V1\Business\Wuliu\Bill;
 
 use App\Constant\ServiceCode;
 use App\Controller\AbstractController;
+use App\Exception\ServiceException;
 use App\Model\WuliuBill;
 use App\Model\WuliuSeaWaybill;
 use App\Service\Business\Wuliu\Bill\BillService;
 use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
-use Hyperf\HttpMessage\Exception\HttpException;
 
 class BillController extends AbstractController
 {
-    /**
-     * @Inject
-     * @var BillService
-     */
-    private $billService;
+    #[Inject]
+    private BillService $billService;
 
     public function optons()
     {
@@ -97,7 +94,8 @@ class BillController extends AbstractController
                 }
             })
             ->with([
-            ])->orderBy('id', 'desc');
+            ])
+            ->orderBy('id', 'desc');
 
         $result = $models->paginate((int) $this->request->input('size', 10));
         $result = $result->toArray();
@@ -123,7 +121,7 @@ class BillController extends AbstractController
                 ->where('type', $params['type'])
                 ->first();
             if ($model) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '存在相同数据：' . $params['title']) . $params['type'];
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '存在相同数据：' . $params['title'] . $params['type']);
             }
             $model = new WuliuBill();
             $model->title = $params['title'];
@@ -150,7 +148,7 @@ class BillController extends AbstractController
             // 查看数据是否存在
             $model = WuliuBill::find($params['id']);
             if (! $model) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '数据不存在');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据不存在');
             }
 
             // 检查是否存在相同数据
@@ -159,7 +157,7 @@ class BillController extends AbstractController
                 ->count();
 
             if ($existsCount) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '存在相同数据：' . $params['title']);
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '存在相同数据：' . $params['title']);
             }
 
             $model->title = $params['title'];
@@ -186,7 +184,7 @@ class BillController extends AbstractController
             // 查看数据是否存在
             $model = WuliuBill::find($params['id']);
             if (! $model) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '数据不存在');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据不存在');
             }
             switch ($params['status']) {
                 case '确认账单':
@@ -202,7 +200,7 @@ class BillController extends AbstractController
                     $status = WuliuBill::STATUS_CONFIRMED;
                     break;
                 default:
-                    throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '状态有误');
+                    throw new ServiceException(ServiceCode::ERROR, [], 400, [], '状态有误');
             }
 
             $model->status = $status;
@@ -225,12 +223,13 @@ class BillController extends AbstractController
         Db::beginTransaction();
         try {
             $params = array_unique($params);
-            $models = WuliuBill::whereIn('id', $params)->get();
+            $models = WuliuBill::whereIn('id', $params)
+                ->get();
             if (! $models->count()) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '需要删除的数据为空');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '需要删除的数据为空');
             }
             if ($models->count() != count($params)) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '部分数据不存在，请刷新页面重试');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '部分数据不存在，请刷新页面重试');
             }
 
             // 关联1
@@ -241,7 +240,7 @@ class BillController extends AbstractController
                 ->orWhereIn('self_bill_id', $params)
                 ->count();
             if ($relationModelCount) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '该数据下的海运单存在关联的数据，无法删除');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该数据下的海运单存在关联的数据，无法删除');
             }
 
             // 关联2
@@ -250,7 +249,8 @@ class BillController extends AbstractController
             //     throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR);
             // }
 
-            WuliuBill::whereIn('id', $params)->delete();
+            WuliuBill::whereIn('id', $params)
+                ->delete();
 
             Db::commit();
         } catch (Exception $e) {
@@ -268,21 +268,24 @@ class BillController extends AbstractController
 
         Db::beginTransaction();
         try {
-            $model = WuliuBill::where('', '')->find($params['id']);
+            $model = WuliuBill::where('', '')
+                ->find($params['id']);
             if (! $model) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '数据不存在');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据不存在');
             }
 
             // 关联1
-            $relationModelCount = Relation::where('', '')->count();
+            $relationModelCount = Relation::where('', '')
+                ->count();
             if ($relationModelCount) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR);
+                throw new ServiceException(ServiceCode::ERROR, [], 400, []);
             }
 
             // 关联2
-            $relationModelCount = Relation::where('', '')->count();
+            $relationModelCount = Relation::where('', '')
+                ->count();
             if ($relationModelCount) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR);
+                throw new ServiceException(ServiceCode::ERROR, [], 400, []);
             }
 
             $model->delete();
@@ -305,7 +308,7 @@ class BillController extends AbstractController
         try {
             $model = WuliuBill::find($params['id']);
             if (! $model) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '数据不存在');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据不存在');
             }
             // 查询出所有 海运单，计算总额，导出
             $result = $this->billService->export($model);

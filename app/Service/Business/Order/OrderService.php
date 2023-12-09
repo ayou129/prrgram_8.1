@@ -17,11 +17,8 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 
 class OrderService
 {
-    /**
-     * @Inject
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+    #[Inject]
+    private EventDispatcherInterface $eventDispatcher;
 
     public function create()
     {

@@ -14,6 +14,7 @@ namespace App\Controller\V1\Business\Wuliu\Chewu;
 
 use App\Constant\ServiceCode;
 use App\Controller\AbstractController;
+use App\Exception\ServiceException;
 use App\Model\WuliuBill;
 use App\Model\WuliuCar;
 use App\Model\WuliuMotorcade;
@@ -107,12 +108,12 @@ class CarController extends AbstractController
             $model = WuliuCar::where('number', $params['number'])->where('motorcade_id', $params['motorcade_id'])
                 ->first();
             if ($model) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '存在相同的数据:' . $params['number'] . $params['motorcade_id']);
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '存在相同的数据:' . $params['number'] . $params['motorcade_id']);
             }
             $motorcadeModel = WuliuMotorcade::where('id', $params['motorcade_id'])
                 ->first();
             if (! $motorcadeModel) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '车队数据不存在:' . $params['motorcade_id']);
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '车队数据不存在:' . $params['motorcade_id']);
             }
 
             $model = new WuliuCar();
@@ -137,13 +138,13 @@ class CarController extends AbstractController
             // 查看数据是否存在
             $model = WuliuCar::find($params['id']);
             if (! $model) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '数据不存在');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据不存在');
             }
 
             // 检查是否存在相同数据
             $existsCount = WuliuCar::where('number', $params['number'])->where('motorcade_id', $params['motorcade_id'])->count();
             if ($existsCount) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '存在相同数据：' . $params['number'] . '-' . $params['motorcade_id']);
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '存在相同数据：' . $params['number'] . '-' . $params['motorcade_id']);
             }
 
             $model->number = $params['number'];
@@ -169,10 +170,10 @@ class CarController extends AbstractController
             $params = array_unique($params);
             $models = WuliuCar::whereIn('id', $params)->get();
             if (! $models->count()) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '需要删除的数据为空');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '需要删除的数据为空');
             }
             if ($models->count() != count($params)) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '部分数据不存在，请刷新页面重试');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '部分数据不存在，请刷新页面重试');
             }
 
             // // 关联1：账单表
@@ -184,7 +185,7 @@ class CarController extends AbstractController
             // 关联2：海运单表
             $relatioSeaWaybillModelCount = WuliuSeaWaybill::whereIn('car_id', $params)->count();
             if ($relatioSeaWaybillModelCount) {
-                throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, '该车辆存在绑定的 海运单数据，无法删除');
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '该车辆存在绑定的 海运单数据，无法删除');
             }
 
             WuliuCar::whereIn('id', $params)->delete();

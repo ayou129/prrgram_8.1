@@ -23,18 +23,15 @@ use Hyperf\HttpMessage\Exception\HttpException;
 
 class AdminController extends AbstractController
 {
-    /**
-     * @Inject
-     * @var AdminService
-     */
-    public $adminService;
+    #[Inject]
+    public AdminService $adminService;
 
     public function authLogin()
     {
         $params = $this->getRequestAllFilter();
 
         if (! isset($params['username'], $params['password'])) {
-            throw new HttpException(ServiceCode::ERROR, '请输入账号和密码');
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '请输入账号和密码');
         }
         $sysUserModel = SysUser::where('username', $params['username'])
             ->with([
@@ -52,11 +49,11 @@ class AdminController extends AbstractController
             // ])
             ->first();
         if (! $sysUserModel) {
-            throw new HttpException(400, '用户不存在');
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '用户不存在');
         }
 
         if ($sysUserModel->password != $params['password']) {
-            throw new HttpException(400, '密码错误');
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '密码错误');
         }
         # 该权限所有允许的menu
         $roles_permissions = [];
@@ -77,7 +74,7 @@ class AdminController extends AbstractController
             }
         }
 
-        $token = Tools::generateRandomPassword((string) $sysUserModel->id);
+        $token = Tools::generateRandomPassword();
 
         $result = [
             'token' => $token,
@@ -100,7 +97,7 @@ class AdminController extends AbstractController
     {
         $token = $this->request->header('Authorization');
         if (! isset($token)) {
-            return $this->responseJson(ServiceCode::ERROR_PARAM_MISSING);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '缺少token');
         }
         $sysUserModel = SysUser::where('token', $token)
             ->with([

@@ -23,9 +23,7 @@ use Hyperf\Validation\ValidationException;
 
 class AddressController extends BaseController
 {
-    /**
-     * @Inject
-     */
+    #[Inject]
     protected UserAddressService $userAddressService;
 
     public function getAddressById()

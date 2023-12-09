@@ -134,7 +134,7 @@ class MenuController extends AbstractController
     {
         $idsArray = $this->request->all();
         if (! $idsArray || ! is_array($idsArray)) {
-            throw new ServiceException(ServiceCode::ERROR_PARAM_FORMAT);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '参数错误');
         }
         // var_dump($idsArray,'$idsArray');
         $childMenus = SysMenu::whereIn('pid', $idsArray)
@@ -187,7 +187,7 @@ class MenuController extends AbstractController
             $exists = SysMenu::where('name', '=', $params['componentName'])
                 ->count();
             if ($exists) {
-                throw new ServiceException(ServiceCode::ERROR_PARAM_DATA_EXISTS_ERROR);
+                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '数据已存在');
             }
         }
 
@@ -225,7 +225,7 @@ class MenuController extends AbstractController
     {
         $token = $this->request->header('Authorization');
         if (! isset($token)) {
-            return $this->responseJson(ServiceCode::ERROR_PARAM_MISSING);
+            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '请携带token');
         }
         $sysUserModel = SysUser::where('token', $token)
             ->with([
@@ -279,11 +279,6 @@ class MenuController extends AbstractController
 
         $result = self::buildMenus($menusTreeData);
         return $this->responseJson(ServiceCode::SUCCESS, $result);
-        // }
-        return $this->responseJson(ServiceCode::SUCCESS, [
-            $menusData,
-            $result,
-        ]);
     }
 
     public function child()
