@@ -23,6 +23,7 @@ namespace App\Model;
  * @property string $good_name
  * @property string $weight
  * @property string $ship_company_towing_fee
+ * @property string $ship_company_towing_fee_desc
  * @property string $car_fee
  * @property string $car_other_fee
  * @property string $car_other_fee_desc
@@ -139,7 +140,7 @@ class WuliuSeaWaybill extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'sail_schedule_id', 'number', 'case_number', 'qf_number', 'box', 'box_main_code', 'good_name', 'weight', 'ship_company_towing_fee', 'car_fee', 'car_other_fee', 'car_other_fee_desc', 'car_id', 'car_finished_date', 'receipt_status', 'poundbill_status', 'box_reporting_status', 'liaison', 'liaison_mobile', 'liaison_address', 'liaison_address_detail', 'liaison_remark', 'estimated_time', 'driver_name', 'driver_mobile_number', 'driver_id_card', 'fh_status', 'rush_status', 'tos', 'ship_company_bill_id', 'motorcade_bill_id', 'partner_id', 'partner_towing_fee', 'partner_overdue_fee', 'partner_stockpiling_fee', 'partner_thc_fee', 'partner_print_fee', 'partner_clean_fee', 'partner_other_fee', 'partner_other_fee_desc', 'partner_stay_pole', 'partner_remarks', 'partner_bill_id', 'self_bill_id', 'type', 'status', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'sail_schedule_id', 'number', 'case_number', 'qf_number', 'box', 'box_main_code', 'good_name', 'weight', 'ship_company_towing_fee', 'ship_company_towing_fee_desc', 'car_fee', 'car_other_fee', 'car_other_fee_desc', 'car_id', 'car_finished_date', 'receipt_status', 'poundbill_status', 'box_reporting_status', 'liaison', 'liaison_mobile', 'liaison_address', 'liaison_address_detail', 'liaison_remark', 'estimated_time', 'driver_name', 'driver_mobile_number', 'driver_id_card', 'fh_status', 'rush_status', 'tos', 'ship_company_bill_id', 'motorcade_bill_id', 'partner_id', 'partner_towing_fee', 'partner_overdue_fee', 'partner_stockpiling_fee', 'partner_thc_fee', 'partner_print_fee', 'partner_clean_fee', 'partner_other_fee', 'partner_other_fee_desc', 'partner_stay_pole', 'partner_remarks', 'partner_bill_id', 'self_bill_id', 'type', 'status', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.

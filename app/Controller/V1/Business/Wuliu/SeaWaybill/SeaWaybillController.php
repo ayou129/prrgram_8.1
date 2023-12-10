@@ -1276,7 +1276,7 @@ a;
                     $seaWaybillSaveArray['id'] = $existsModel['id'];
                     $seaWaybillSaveArray['updated_at'] = $value['car_finished_date'] ?? '2023-01-13';
                     $updateData[] = $seaWaybillSaveArray;
-                // throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, $value[$numberIndex] . $value[$case_numberIndex] . '已存在');
+                    // throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, $value[$numberIndex] . $value[$case_numberIndex] . '已存在');
                 } else {
                     switch ($value[$typeIndex]) {
                         case '进口':
@@ -1366,18 +1366,34 @@ a;
             $sail_schedule_nameFieldArray = ['船名'];
             $sail_schedule_voyageFieldArray = ['航次'];
             $sail_schedule_arrival_dateFieldArray = ['卸船日期'];
-            $sail_scheduleFieldArray = ['船名航次'];
+            $sail_scheduleFieldArray = [
+                '船名航次',
+                '船名/航次',
+            ];
             $qiyungangFieldArray = ['起运港'];
             $mudigangFieldArray = ['目的港'];
-            $numberFieldArray = ['运单号'];
+            $numberFieldArray = [
+                '运单号',
+                '海运单号',
+            ];
             $case_numberFieldArray = ['箱号'];
-            $fh_statusFieldArray = ['放货状态'];
+            $fh_statusFieldArray = [
+                '放货状态',
+                '扣货状态',
+            ];
             $receipt_statusFieldArray = ['客户签收单'];
             $ship_company_towing_feeFieldArray = [
                 '拖车费',
                 '请派价',
+                '派单价格',
             ];
-            $typeFieldArray = ['进口出口'];
+            $ship_company_towing_fee_descFieldArray = [
+                '车队代垫费备注',
+            ];
+            $typeFieldArray = [
+                '进口出口',
+                '进出口',
+            ];
             $weightFieldArray = ['单箱重量'];
             $good_nameFieldArray = ['货名'];
             $boxFieldArray = [
@@ -1405,7 +1421,10 @@ a;
                 '联系人/联系电话/发货地址',
             ];
             $remarkFieldArray = ['地址备注'];
-            $liaison_remarkFieldArray = ['派车要求'];
+            $liaison_remarkFieldArray = [
+                '派车要求',
+                '派单要求',
+            ];
             $created_atArray = ['派车时间']; # '要求装货时间', '要求送货时间',
             // $car_numberFieldArray = '车辆 派送日期';
             // $partner_towing_feeFieldArray = '二段拖车费';
@@ -1418,7 +1437,7 @@ a;
             // $partner_stay_poleFieldArray = '加固杆';
             // $partner_remarksFieldArray = '备注';
             $only_notID = 99999999999;
-            $mudigangIndex = $qiyungangIndex = $sail_schedule_nameIndex = $sail_schedule_nameIndex = $sail_schedule_voyageIndex = $sail_schedule_arrival_dateIndex = $sail_scheduleIndex = $numberIndex = $case_numberIndex = $qf_numberIndex = $good_nameIndex = $boxIndex = $weightIndex = $fh_statusIndex = $receipt_statusIndex = $ship_company_towing_feeIndex = $liaison_Index = $liaison_mobileIndex = $liaison_address_detailIndex = $liaison_remarkIndex = $typeIndex = $created_atIndex = $remarkIndex = $only_notID;
+            $mudigangIndex = $qiyungangIndex = $sail_schedule_nameIndex = $sail_schedule_nameIndex = $sail_schedule_voyageIndex = $sail_schedule_arrival_dateIndex = $sail_scheduleIndex = $numberIndex = $case_numberIndex = $qf_numberIndex = $good_nameIndex = $boxIndex = $weightIndex = $fh_statusIndex = $receipt_statusIndex = $ship_company_towing_feeIndex = $ship_company_towing_fee_descIndex = $liaison_Index = $liaison_mobileIndex = $liaison_address_detailIndex = $liaison_remarkIndex = $typeIndex = $created_atIndex = $remarkIndex = $only_notID;
             foreach ($dataArray[0] as $index => $value) {
                 if (in_array($value, $mudigangFieldArray)) {
                     $mudigangIndex = $index;
@@ -1478,6 +1497,10 @@ a;
                 }
                 if (in_array($value, $ship_company_towing_feeFieldArray)) {
                     $ship_company_towing_feeIndex = $index;
+                    continue;
+                }
+                if (in_array($value, $ship_company_towing_fee_descFieldArray)) {
+                    $ship_company_towing_fee_descIndex = $index;
                     continue;
                 }
                 if (in_array($value, $liaison_FieldArray)) {
@@ -1541,10 +1564,10 @@ a;
                 if ($value[$sail_schedule_nameIndex] && $value[$sail_schedule_voyageIndex]) {
                     $sail_schedule_name = $value[$sail_schedule_nameIndex];
                     $sail_schedule_voyage = $value[$sail_schedule_voyageIndex];
-                // var_dump($sail_schedule_id);
-                // return $this->responseJson(ServiceCode::SUCCESS, 1);
-                // return $this->responseJson(ServiceCode::SUCCESS, [$sailScheduleMatchingModelsArray, $sail_schedule_id, $ship_company_id, $sail_schedule_array[0], $sail_schedule_array[1]]);
-                // var_dump();
+                    // var_dump($sail_schedule_id);
+                    // return $this->responseJson(ServiceCode::SUCCESS, 1);
+                    // return $this->responseJson(ServiceCode::SUCCESS, [$sailScheduleMatchingModelsArray, $sail_schedule_id, $ship_company_id, $sail_schedule_array[0], $sail_schedule_array[1]]);
+                    // var_dump();
                 } elseif ($value[$sail_scheduleIndex]) {
                     $sail_schedule_array = $this->getImportFotmatSailScheduleNameAndVoyavge($value[$sail_scheduleIndex]);
                     if (! $sail_schedule_array) {
@@ -1632,6 +1655,9 @@ a;
                 }
                 $seaWaybillSaveArray['number'] = $value[$numberIndex];
                 $seaWaybillSaveArray['case_number'] = $value[$case_numberIndex];
+                if (! $seaWaybillSaveArray['case_number']) {
+                    throw new ServiceException(ServiceCode::ERROR, [], 400, [], '导入的每一条数据都需要有箱号');
+                }
                 switch ($value[$fh_statusIndex]) {
                     case '未放货':
                         $seaWaybillSaveArray['fh_status'] = WuliuSeaWaybill::FH_STATUS_NO;
@@ -1645,14 +1671,22 @@ a;
                 }
                 switch ($value[$receipt_statusIndex]) {
                     case '':
+                    case '20':
                     case '不需要':
                         $seaWaybillSaveArray['receipt_status'] = WuliuSeaWaybill::RECEIPT_STATUS_DEFAULT;
                         break;
+                    case '10':
                     case '需要':
                         $seaWaybillSaveArray['receipt_status'] = WuliuSeaWaybill::RECEIPT_STATUS_NOT_UPLOAD;
                         break;
                     default:
                         throw new ServiceException(ServiceCode::ERROR, [], 400, [], '签收单状态有误：' . $value[$receipt_statusIndex]);
+                }
+
+                if ($value[$ship_company_towing_fee_descIndex]) {
+                    $seaWaybillSaveArray['ship_company_towing_fee_desc'] = (string) $value[$ship_company_towing_fee_descIndex];
+                } else {
+                    $seaWaybillSaveArray['ship_company_towing_fee_desc'] = '';
                 }
 
                 $seaWaybillSaveArray['qf_number'] = $value[$qf_numberIndex];

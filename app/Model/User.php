@@ -14,7 +14,6 @@ namespace App\Model;
 
 // use App\Service\Utils\Redis\PlaywReport\McUser;
 // use App\Service\Utils\Redis\PlaywReport\ModelCacheTrait;
-
 /**
  * @property int $id
  * @property string $phone
