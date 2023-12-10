@@ -12,15 +12,10 @@ declare(strict_types=1);
 
 namespace App\Middleware;
 
-use App\Constant\ServiceCode;
-use App\Exception\ServiceException;
 use App\Model\SysUser;
 use App\Service\Admin\AdminService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpMessage\Exception\HttpException;
-use HyperfExt\Jwt\Exceptions\JwtException;
-use HyperfExt\Jwt\Exceptions\TokenExpiredException;
-use HyperfExt\Jwt\Jwt;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

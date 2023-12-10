@@ -11,12 +11,12 @@ declare(strict_types=1);
  */
 return [
     'default' => [
-        'handler' => [
+        'handlers' => [
             [
                 'class' => Monolog\Handler\StreamHandler::class,
                 'constructor' => [
-                    'stream' => BASE_PATH . '/runtime/logs/sql.log',
-                    'level' => Monolog\Level::Debug,
+                    'stream' => BASE_PATH . '/runtime/logs/error.log',
+                    'level' => Monolog\Level::Warning,
                 ],
                 'formatter' => [
                     'class' => Monolog\Formatter\LineFormatter::class,
@@ -27,10 +27,14 @@ return [
                     ],
                 ],
             ],
+        ],
+    ],
+    'sql' => [
+        'handlers' => [
             [
                 'class' => Monolog\Handler\StreamHandler::class,
                 'constructor' => [
-                    'stream' => BASE_PATH . '/runtime/logs/hyperf.log',
+                    'stream' => BASE_PATH . '/runtime/logs/sql.log',
                     'level' => Monolog\Level::Debug,
                 ],
                 'formatter' => [

@@ -21,27 +21,36 @@ use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\ExceptionHandler\Formatter\FormatterInterface;
 use Hyperf\HttpMessage\Exception\HttpException;
 use Hyperf\HttpMessage\Stream\SwooleStream;
+use Hyperf\Logger\LoggerFactory;
 use Hyperf\Validation\ValidationException;
 use LogicException;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Throwable;
 
 class Handler extends ExceptionHandler
 {
-    #[Inject]
-    protected StdoutLoggerInterface $logger;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     #[Inject]
     protected FormatterInterface $formatter;
 
-    public function __construct(StdoutLoggerInterface $logger)
+    public function __construct(ContainerInterface $container)
     {
-        $this->logger = $logger;
+        $this->logger = $container->get(LoggerFactory::class)
+            ->get('error');
     }
 
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {
+        $this->logger->error(sprintf('%s[%s] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
+        $this->logger->error($throwable->getTraceAsString());
+
         $result['data'] = [];
         $result['code'] = $throwable->getCode() === 0 ? ServiceCode::ERROR : $throwable->getCode();
         $result['msg'] = $throwable->getMessage();
