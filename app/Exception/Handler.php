@@ -15,7 +15,6 @@ namespace App\Exception;
 use App\Constant\ServiceCode;
 use App\Utils\Tools;
 use Hyperf\Context\Context;
-use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\ExceptionHandler\Formatter\FormatterInterface;
@@ -32,13 +31,13 @@ use Throwable;
 
 class Handler extends ExceptionHandler
 {
+    #[Inject]
+    protected FormatterInterface $formatter;
+
     /**
      * @var LoggerInterface
      */
     private $logger;
-
-    #[Inject]
-    protected FormatterInterface $formatter;
 
     public function __construct(ContainerInterface $container)
     {
