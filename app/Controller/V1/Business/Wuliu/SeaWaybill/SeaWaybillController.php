@@ -183,14 +183,14 @@ class SeaWaybillController extends AbstractController
                 $models = $models->where(
                     'created_at',
                     '>=',
-                    '2023-02-01'
+                    '2023-12-01'
                 );
             }
         } else {
             $models = $models->where(
                 'created_at',
                 '>=',
-                '2023-02-01'
+                '2023-12-01'
             );
         }
         if (isset($params['sail_schedule_is_null']) && $params['sail_schedule_is_null'] == 'true') {
