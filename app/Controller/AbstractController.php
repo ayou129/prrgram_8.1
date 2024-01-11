@@ -67,6 +67,21 @@ abstract class AbstractController
     /**
      * 输出结果，并且将文字进行翻译.
      * 小程序是否显示弹窗，是否回退页面，是否跳转页面.
+     * @param mixed $string
+     */
+    protected function resJsonString(mixed $msg, string $string = '', int $code = 0): \Psr\Http\Message\ResponseInterface
+    {
+        $json = [
+            'msg' => $msg,
+            'data' => $string,
+            'code' => $code,
+        ];
+        return $this->response->json($json);
+    }
+
+    /**
+     * 输出结果，并且将文字进行翻译.
+     * 小程序是否显示弹窗，是否回退页面，是否跳转页面.
      * @param mixed $msg
      * @param mixed $data
      * @param mixed $code

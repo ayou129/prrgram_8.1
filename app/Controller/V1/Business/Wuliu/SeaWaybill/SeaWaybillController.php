@@ -975,20 +975,28 @@ class SeaWaybillController extends AbstractController
         // http://219.132.70.181:8000/GetPageData.ashx?ReqDataID=WebLastConrSt&Con1=ZGXU6150331&PageCnt=3&PageNo=1
         $case_number = $params['case_number'];
         $url = 'https://icttc.zjport.com/query/GetPageData.ashx?ReqDataID=WebLastConrSt&Con1=' . $case_number . '&PageCnt=1&PageNo=1';
-
+        // var_dump($url);
         $ch = curl_init();
         $timeout = 5;
+        // $options = [
+        //     "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+        //     "Content-Type: text/html; charset=utf-8"
+        // ];
+        // curl_setopt($ch, CURLOPT_HTTPHEADER, $options);
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+        // curl_setopt($ch, CURLOPT_FAILONERROR, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         // curl_setopt($ch, CURLOPT_PROXYUSERPWD, ":"); //http代理认证帐号，username:password的格式
         curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP); // 使用http代理模式
         $file_contents = curl_exec($ch);
+        // var_dump(curl_error($ch), $file_contents);
         curl_close($ch);
-
         // Db::commit();
 
-        return $this->responseJson(ServiceCode::SUCCESS, $file_contents);
+        return $this->resJsonString(ServiceCode::SUCCESS, $file_contents);
     }
 
     public function importShoudongdan()
