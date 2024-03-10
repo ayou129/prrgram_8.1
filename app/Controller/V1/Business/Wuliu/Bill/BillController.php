@@ -223,6 +223,8 @@ class BillController extends AbstractController
         Db::beginTransaction();
         try {
             $params = array_unique($params);
+            unset($params['token']);
+
             $models = WuliuBill::whereIn('id', $params)
                 ->get();
             if (! $models->count()) {

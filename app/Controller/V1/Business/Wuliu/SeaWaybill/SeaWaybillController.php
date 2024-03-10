@@ -174,8 +174,10 @@ class SeaWaybillController extends AbstractController
         // }
         if (isset($params['car_id_is_null']) && $params['car_id_is_null'] == 'true') {
             $models = $models->where(
-                'car_id',
-                null
+                function ($query) {
+                    $query->where('car_id', null)
+                        ->orWhere('car_finished_date', '>', date('Y-m-d H:i:s'));
+                }
             );
         }
         if (isset($params['dirty_data'])) {
@@ -295,6 +297,7 @@ class SeaWaybillController extends AbstractController
             $model->partner_towing_fee = $params['partner_towing_fee'] ?? null;
             $model->partner_overdue_fee = $params['partner_overdue_fee'] ?? null;
             $model->partner_stockpiling_fee = $params['partner_stockpiling_fee'] ?? null;
+            $model->partner_huandan_fee = $params['partner_huandan_fee'] ?? null;
             $model->partner_print_fee = $params['partner_print_fee'] ?? null;
             $model->partner_clean_fee = $params['partner_clean_fee'] ?? null;
             $model->partner_other_fee = $params['partner_other_fee'] ?? null;
@@ -398,6 +401,7 @@ class SeaWaybillController extends AbstractController
             $model->partner_towing_fee = $params['partner_towing_fee'] ?? null;
             $model->partner_overdue_fee = $params['partner_overdue_fee'] ?? null;
             $model->partner_stockpiling_fee = $params['partner_stockpiling_fee'] ?? null;
+            $model->partner_huandan_fee = $params['partner_huandan_fee'] ?? null;
             $model->partner_print_fee = $params['partner_print_fee'] ?? null;
             $model->partner_clean_fee = $params['partner_clean_fee'] ?? null;
             $model->partner_other_fee = $params['partner_other_fee'] ?? null;
@@ -422,6 +426,7 @@ class SeaWaybillController extends AbstractController
     public function delete()
     {
         $params = $this->getRequestAllFilter();
+        unset($params['token']);
         // var_dump($params);
 
         Db::beginTransaction();
@@ -555,6 +560,7 @@ class SeaWaybillController extends AbstractController
                 $model->partner_towing_fee = $baseModel->partner_towing_fee;
                 $model->partner_overdue_fee = $baseModel->partner_overdue_fee;
                 $model->partner_stockpiling_fee = $baseModel->partner_stockpiling_fee;
+                $model->partner_huandan_fee = $baseModel->partner_huandan_fee;
                 $model->partner_thc_fee = $baseModel->partner_thc_fee;
                 $model->partner_print_fee = $baseModel->partner_print_fee;
                 $model->partner_clean_fee = $baseModel->partner_clean_fee;
@@ -580,6 +586,7 @@ class SeaWaybillController extends AbstractController
                 // $model->partner_towing_fee = $params['partner_towing_fee'] ?? null;
                 // $model->partner_overdue_fee = $params['partner_overdue_fee'] ?? null;
                 // $model->partner_stockpiling_fee = $params['partner_stockpiling_fee'] ?? null;
+                // $model->partner_huandan_fee = $params['partner_huandan_fee'] ?? null;
                 // $model->partner_print_fee = $params['partner_print_fee'] ?? null;
                 // $model->partner_clean_fee = $params['partner_clean_fee'] ?? null;
                 // $model->partner_other_fee = $params['partner_other_fee'] ?? null;
@@ -999,359 +1006,360 @@ class SeaWaybillController extends AbstractController
         return $this->resJsonString(ServiceCode::SUCCESS, $file_contents);
     }
 
-    public function importShoudongdan()
-    {
-        $params = $this->getRequestAllFilter();
-        try {
-            $file = $this->request->file('file');
-            /** Load $inputFileName to a Spreadsheet Object  */
-            $spreadsheet = IOFactory::load($file->getRealPath());
-        } catch (ReaderExcetpion $e) {
-            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '文件有误，请联系开发人员');
-        }
-
-        // 读取文件
-        $dataArray = $spreadsheet->getActiveSheet()
-            ->toArray();
-        Tools::paramsFilter($dataArray);
-        Db::beginTransaction();
-        try {
-            $numberName = '运单号';
-            $case_numberName = '箱号';
-            $qf_numberName = '铅封号';
-            $liaison_Name = '联系人';
-            $liaison_mobileName = '联系人电话';
-            $liaison_address_detailName = '联系人详细地址';
-            $good_nameName = '货名';
-            $boxName = '箱型';
-            $car_numberName = '车辆 派送日期';
-            $typeName = '进出口';
-            $tosName = '业务类型';
-            $partner_Name = '合作公司或个人(对账全称)';
-            $partner_towing_feeName = '二段拖车费';
-            $partner_overdue_feeName = '船公司：滞箱费/超期费';
-            $partner_stockpiling_feeName = '码头：堆存费';
-            $partner_thc_feeName = '码头：装卸作业费(THC)';
-            $partner_print_feeName = '打单费';
-            $partner_clean_feeName = '洗柜费';
-            $partner_other_feeName = '其他费用';
-            $partner_other_fee_descName = '其他费用说明';
-            $partner_stay_poleName = '加固杆';
-            $partner_remarksName = '备注';
-            $created_atName = '创建日期';
-            foreach ($dataArray[0] as $index => $value) {
-                if ($numberName === $value) {
-                    $numberIndex = $index;
-                    continue;
-                }
-                if ($case_numberName === $value) {
-                    $case_numberIndex = $index;
-                    continue;
-                }
-                if ($qf_numberName === $value) {
-                    $qf_numberIndex = $index;
-                    continue;
-                }
-                if ($liaison_address_detailName === $value) {
-                    $liaison_address_detailIndex = $index;
-                    continue;
-                }
-                if ($liaison_Name === $value) {
-                    $liaison_Index = $index;
-                    continue;
-                }
-                if ($liaison_mobileName === $value) {
-                    $liaison_mobileIndex = $index;
-                    continue;
-                }
-                if ($car_numberName === $value) {
-                    $car_numberIndex = $index;
-                    continue;
-                }
-                if ($good_nameName === $value) {
-                    $good_nameIndex = $index;
-                    continue;
-                }
-                if ($boxName === $value) {
-                    $boxIndex = $index;
-                    continue;
-                }
-                if ($typeName === $value) {
-                    $typeIndex = $index;
-                    continue;
-                }
-                if ($tosName === $value) {
-                    $tosIndex = $index;
-                    continue;
-                }
-                if ($partner_Name === $value) {
-                    $partner_Index = $index;
-                    continue;
-                }
-                if ($partner_towing_feeName === $value) {
-                    $partner_towing_feeIndex = $index;
-                    continue;
-                }
-                if ($partner_thc_feeName === $value) {
-                    $partner_thc_feeIndex = $index;
-                    continue;
-                }
-                if ($partner_overdue_feeName === $value) {
-                    $partner_overdue_feeIndex = $index;
-                    continue;
-                }
-                if ($partner_stockpiling_feeName === $value) {
-                    $partner_stockpiling_feeIndex = $index;
-                    continue;
-                }
-                if ($partner_print_feeName === $value) {
-                    $partner_print_feeIndex = $index;
-                    continue;
-                }
-                if ($partner_clean_feeName === $value) {
-                    $partner_clean_feeIndex = $index;
-                    continue;
-                }
-                if ($partner_other_feeName === $value) {
-                    $partner_other_feeIndex = $index;
-                    continue;
-                }
-                if ($partner_other_fee_descName === $value) {
-                    $partner_other_fee_descIndex = $index;
-                    continue;
-                }
-                if ($partner_stay_poleName === $value) {
-                    $partner_stay_poleIndex = $index;
-                    continue;
-                }
-                if ($partner_remarksName === $value) {
-                    $partner_remarksIndex = $index;
-                    continue;
-                }
-                if ($created_atName === $value) {
-                    $created_atIndex = $index;
-                    continue;
-                }
-            }
-
-            if (! isset($tosIndex, $typeIndex, $numberIndex, $case_numberIndex, $qf_numberIndex, $liaison_address_detailIndex, $boxIndex, $liaison_Index, $liaison_mobileIndex, $car_numberIndex, $partner_Index, $partner_towing_feeIndex, $partner_thc_feeIndex, $partner_overdue_feeIndex, $partner_stockpiling_feeIndex, $partner_print_feeIndex, $partner_clean_feeIndex, $partner_other_feeIndex, $partner_other_fee_descIndex, $partner_stay_poleIndex, $partner_remarksIndex, $good_nameIndex, $created_atIndex)) {
-                throw new ServiceException(ServiceCode::ERROR, [], 400, [], '文件有误，请联系开发人员');
-            }
-            $seaWaybillMatchingModels = WuliuSeaWaybill::get();
-            $seaWaybillMatchingModelsArray = $seaWaybillMatchingModels->toArray();
-            $carMatchingModels = WuliuCar::get();
-            $carMatchingModelsArray = $carMatchingModels->toArray();
-            // $partnerName = $dataArray[0][1];
-            // var_dump($partnerName);
-            $partnerMatchingModels = WuliuPartner::get();
-            $partnerMatchingModelsArray = $partnerMatchingModels->toArray();
-            $insertData = $newCarData = $updateData = [];
-            foreach ($dataArray as $key => &$value) {
-                if ($key < 1) {
-                    continue;
-                }
-
-                # 车辆 + 派送日期
-                $a0 = $value[$car_numberIndex];
-                if ($value[$car_numberIndex]) {
-                    $value[$car_numberIndex] = str_replace("\t", ' ', $value[$car_numberIndex]);
-                    $value[$car_numberIndex] = str_replace('     ', ' ', $value[$car_numberIndex]);
-                    $value[$car_numberIndex] = str_replace('    ', ' ', $value[$car_numberIndex]);
-                    $value[$car_numberIndex] = str_replace('   ', ' ', $value[$car_numberIndex]);
-                    $value[$car_numberIndex] = str_replace('  ', ' ', $value[$car_numberIndex]);
-                    $value[$car_numberIndex] = str_replace([
-                        '送',
-                        '有地',
-                        ' 忆',
-                        '忆',
-                        ' 已',
-                        '已',
-                        '对',
-                        '四',
-                        '哥',
-                        '已對',
-                        '付',
-                        '收',
-                        '装',
-                    ], '', $value[$car_numberIndex]);
-                    $array = explode(' ', $value[$car_numberIndex]);
-                    if (count($array) != 2) {
-                        var_dump($array, $a0, $car_numberIndex);
-                        return $this->responseJson(ServiceCode::SUCCESS, $value[$car_numberIndex]);
-                    }
-                    $car_number = $array[0];
-                    $car_id = WuliuCar::getIdByNumber($carMatchingModelsArray, $car_number);
-                    if (! $car_id) {
-                        // 自动创建
-                        $carModel = new WuliuCar();
-                        $carModel->number = $car_number;
-                        $carModel->save();
-                        $carMatchingModelsArray[] = $carModel->toArray();
-                        $value['car_id'] = $carModel->id;
-                        $newCarData[] = $carModel->number;
-
-                        // 不自动创建
-                        // throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, "车牌号{{$numberTemp}}不存在，请先创建");
-                    }
-                    $value['car_id'] = $car_id;
-                    if (isset($array[1])) {
-                        $car_finished_date = trim($array[1]);
-                        $timeStr = str_replace([
-                            '送',
-                            "\t",
-                            '发货方日鑫鱼粉厂',
-                            '有地',
-                            ' 忆',
-                            '忆',
-                            '已',
-                            '对',
-                            '對',
-                            '阿海',
-                        ], '', $car_finished_date);
-                        $a1 = $timeStr;
-
-                        $timeStr = str_replace('号', '日', $timeStr);
-                        $a2 = $timeStr;
-                        $timeStr = str_replace([
-                            '号',
-                            '日',
-                            '提',
-                        ], '', $timeStr);
-                        $a3 = $timeStr;
-                        // var_dump($timeStr);
-                        $timeStr = str_replace([
-                            '年',
-                            '月',
-                            '日',
-                            '号',
-                        ], '-', $timeStr);
-                        $a4 = $timeStr;
-                        $timeStr = str_replace('.', '-', $timeStr);
-                        $a5 = $timeStr;
-
-                        if (! $timestamp = strtotime($timeStr)) {
-                            throw new ServiceException(ServiceCode::ERROR, [], 400, [], $a1 . $a2 . $a3 . $a4 . $a5 . '---' . $car_finished_date);
-                        }
-                        // var_dump($timeStr);
-                        // var_dump($timestamp);
-                        $value['car_finished_date'] = date('Y-m-d', $timestamp);
-                    } else {
-                        var_dump($array);
-                    }
-                }
-
-                if ($value[$partner_Index]) {
-                    $partner_id = WuliuPartner::getIdByName($partnerMatchingModelsArray, $value[$partner_Index]);
-                    if (! $partner_id) {
-                        throw new ServiceException(ServiceCode::ERROR, [], 400, [], $value[$partner_Index] . '不存在');
-                    }
-                } else {
-                    $partner_id = null;
-                }
-
-                $seaWaybillSaveArray = [];
-                $seaWaybillSaveArray['partner_id'] = $partner_id;
-                if ($value[$created_atIndex]) {
-                    $seaWaybillSaveArray['created_at'] = $value[$created_atIndex];
-                }
-                /*
-                 * 接下来是update partner data
-                 */
-                $seaWaybillSaveArray['liaison'] = $value[$liaison_Index] ?: '';
-                $seaWaybillSaveArray['liaison_mobile'] = $value[$liaison_mobileIndex] ?: '';
-                $seaWaybillSaveArray['liaison_address_detail'] = $value[$liaison_address_detailIndex] ?: '';
-                $seaWaybillSaveArray['car_finished_date'] = $value['car_finished_date'] ?? null;
-                $seaWaybillSaveArray['car_id'] = $value['car_id'] ?? null;
-                # ----------------- 替换 -----------------
-                $abcdefg = <<<'a'
-                $seaWaybillSaveArray['liaison_address_detail'] = $value[$liaison_address_detailIndex] ?: '';
-                $seaWaybillSaveArray['partner_bill_id'] = 25;
-a;
-
-                $seaWaybillSaveArray['partner_towing_fee'] = $value[$partner_towing_feeIndex] ?: 0;
-                $seaWaybillSaveArray['partner_thc_fee'] = $value[$partner_thc_feeIndex] ?: 0;
-                $seaWaybillSaveArray['partner_overdue_fee'] = $value[$partner_overdue_feeIndex] ?: 0;
-                $seaWaybillSaveArray['partner_stockpiling_fee'] = $value[$partner_stockpiling_feeIndex] ?: 0;
-                $seaWaybillSaveArray['partner_print_fee'] = $value[$partner_print_feeIndex] ?: 0;
-                $seaWaybillSaveArray['partner_clean_fee'] = $value[$partner_clean_feeIndex] ?: 0;
-                $seaWaybillSaveArray['partner_other_fee'] = $value[$partner_other_feeIndex] ?: 0;
-                $seaWaybillSaveArray['partner_other_fee_desc'] = $value[$partner_other_fee_descIndex] ?: '';
-                $seaWaybillSaveArray['partner_stay_pole'] = $value[$partner_stay_poleIndex] ?: 0;
-                $seaWaybillSaveArray['partner_remarks'] = $value[$partner_remarksIndex] ?: '';
-
-                $existsModel = WuliuSeaWaybill::getByNumberAndCaseNumber($seaWaybillMatchingModelsArray, $value[$numberIndex], $value[$case_numberIndex]);
-                if ($existsModel) {
-                    $seaWaybillSaveArray['id'] = $existsModel['id'];
-                    $seaWaybillSaveArray['updated_at'] = $value['car_finished_date'] ?? '2023-01-13';
-                    $updateData[] = $seaWaybillSaveArray;
-                // throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, $value[$numberIndex] . $value[$case_numberIndex] . '已存在');
-                } else {
-                    switch ($value[$typeIndex]) {
-                        case '进口':
-                            $seaWaybillSaveArray['type'] = WuliuSeaWaybill::TYPE_JINKOU;
-                            break;
-                        case '出口':
-                            $seaWaybillSaveArray['type'] = WuliuSeaWaybill::TYPE_CHUKOU;
-                            break;
-                        default:
-                            $seaWaybillSaveArray['type'] = WuliuSeaWaybill::TYPE_DEFAULT;
-                            break;
-                    }
-                    $seaWaybillSaveArray['tos'] = $value[$tosIndex] ?? WuliuSeaWaybill::TOS_DEFAULT;
-                    $ship_company_id = WuliuShipCompany::getIdBySeaWaybillNumber($value[$numberIndex]);
-                    if (! $seaWaybillSaveArray['type']) {
-                        switch ($ship_company_id) {
-                            case WuliuShipCompany::ANTONG:
-                                // 默认出口
-                                $seaWaybillSaveArray['type'] = WuliuSeaWaybill::TYPE_CHUKOU;
-                                break;
-                            case WuliuShipCompany::ZHONGGU:
-                                // 进出口都有
-                            default:
-                                $seaWaybillSaveArray['type'] = WuliuSeaWaybill::TYPE_DEFAULT;
-                                break;
-                        }
-                    }
-                    $seaWaybillSaveArray['number'] = $value[$numberIndex];
-                    $seaWaybillSaveArray['case_number'] = $value[$case_numberIndex];
-                    $seaWaybillSaveArray['qf_number'] = $value[$qf_numberIndex];
-                    $seaWaybillSaveArray['good_name'] = $value[$good_nameIndex] ?: '';
-                    $seaWaybillSaveArray['box'] = $value[$boxIndex] ?: '';
-                    if (! $seaWaybillSaveArray['created_at']) {
-                        $seaWaybillSaveArray['created_at'] = $value['car_finished_date'] ?? '2023-01-13';
-                    }
-                    $insertData[] = $seaWaybillSaveArray;
-                }
-            }
-            $insertCount = 0;
-            $updateCount = 0;
-            // var_dump(count($insertData));
-            // return $this->responseJson(ServiceCode::SUCCESS, $insertData);
-            if ($insertData) {
-                $insertCount = count($insertData);
-                (new WuliuSeaWaybill())->insert($insertData);
-            }
-            if ($updateData) {
-                // $updateIds = [];
-                // foreach ($updateData as $value) {
-                //     $updateIds[] = $value['id'];
-                // }
-                // $upadteIdsStr = implode(',', $updateIds);
-                $updateCount = count($updateData);
-                // (new WuliuSeaWaybill())->updateBatch($updateData);
-            }
-
-            Db::commit();
-
-            return $this->resJson("共导入{$insertCount}条，更新{$updateCount}条数据！", [
-                $insertData,
-                $updateData,
-            ]);
-        } catch (Exception $e) {
-            Db::rollBack();
-            throw $e;
-        }
-    }
+    //     public function importShoudongdan()
+    //     {
+    //         $params = $this->getRequestAllFilter();
+    //         try {
+    //             $file = $this->request->file('file');
+    //             /** Load $inputFileName to a Spreadsheet Object  */
+    //             $spreadsheet = IOFactory::load($file->getRealPath());
+    //         } catch (ReaderExcetpion $e) {
+    //             throw new ServiceException(ServiceCode::ERROR, [], 400, [], '文件有误，请联系开发人员');
+    //         }
+    //
+    //         // 读取文件
+    //         $dataArray = $spreadsheet->getActiveSheet()
+    //             ->toArray();
+    //         Tools::paramsFilter($dataArray);
+    //         Db::beginTransaction();
+    //         try {
+    //             $numberName = '运单号';
+    //             $case_numberName = '箱号';
+    //             $qf_numberName = '铅封号';
+    //             $liaison_Name = '联系人';
+    //             $liaison_mobileName = '联系人电话';
+    //             $liaison_address_detailName = '联系人详细地址';
+    //             $good_nameName = '货名';
+    //             $boxName = '箱型';
+    //             $car_numberName = '车辆 派送日期';
+    //             $typeName = '进出口';
+    //             $tosName = '业务类型';
+    //             $partner_Name = '合作公司或个人(对账全称)';
+    //             $partner_towing_feeName = '二段拖车费';
+    //             $partner_overdue_feeName = '船公司：滞箱费/超期费';
+    //             $partner_stockpiling_feeName = '码头：堆存费';
+    //             $partner_huandan_feeName = '换单费';
+    //             $partner_thc_feeName = '码头：装卸作业费(THC)';
+    //             $partner_print_feeName = '打单费';
+    //             $partner_clean_feeName = '洗柜费';
+    //             $partner_other_feeName = '其他费用';
+    //             $partner_other_fee_descName = '其他费用说明';
+    //             $partner_stay_poleName = '加固杆';
+    //             $partner_remarksName = '备注';
+    //             $created_atName = '创建日期';
+    //             foreach ($dataArray[0] as $index => $value) {
+    //                 if ($numberName === $value) {
+    //                     $numberIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($case_numberName === $value) {
+    //                     $case_numberIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($qf_numberName === $value) {
+    //                     $qf_numberIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($liaison_address_detailName === $value) {
+    //                     $liaison_address_detailIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($liaison_Name === $value) {
+    //                     $liaison_Index = $index;
+    //                     continue;
+    //                 }
+    //                 if ($liaison_mobileName === $value) {
+    //                     $liaison_mobileIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($car_numberName === $value) {
+    //                     $car_numberIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($good_nameName === $value) {
+    //                     $good_nameIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($boxName === $value) {
+    //                     $boxIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($typeName === $value) {
+    //                     $typeIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($tosName === $value) {
+    //                     $tosIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($partner_Name === $value) {
+    //                     $partner_Index = $index;
+    //                     continue;
+    //                 }
+    //                 if ($partner_towing_feeName === $value) {
+    //                     $partner_towing_feeIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($partner_thc_feeName === $value) {
+    //                     $partner_thc_feeIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($partner_overdue_feeName === $value) {
+    //                     $partner_overdue_feeIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($partner_stockpiling_feeName === $value) {
+    //                     $partner_stockpiling_feeIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($partner_print_feeName === $value) {
+    //                     $partner_print_feeIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($partner_clean_feeName === $value) {
+    //                     $partner_clean_feeIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($partner_other_feeName === $value) {
+    //                     $partner_other_feeIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($partner_other_fee_descName === $value) {
+    //                     $partner_other_fee_descIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($partner_stay_poleName === $value) {
+    //                     $partner_stay_poleIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($partner_remarksName === $value) {
+    //                     $partner_remarksIndex = $index;
+    //                     continue;
+    //                 }
+    //                 if ($created_atName === $value) {
+    //                     $created_atIndex = $index;
+    //                     continue;
+    //                 }
+    //             }
+    //
+    //             if (! isset($tosIndex, $typeIndex, $numberIndex, $case_numberIndex, $qf_numberIndex, $liaison_address_detailIndex, $boxIndex, $liaison_Index, $liaison_mobileIndex, $car_numberIndex, $partner_Index, $partner_towing_feeIndex, $partner_thc_feeIndex, $partner_overdue_feeIndex, $partner_stockpiling_feeIndex, $partner_print_feeIndex, $partner_clean_feeIndex, $partner_other_feeIndex, $partner_other_fee_descIndex, $partner_stay_poleIndex, $partner_remarksIndex, $good_nameIndex, $created_atIndex)) {
+    //                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '文件有误，请联系开发人员');
+    //             }
+    //             $seaWaybillMatchingModels = WuliuSeaWaybill::get();
+    //             $seaWaybillMatchingModelsArray = $seaWaybillMatchingModels->toArray();
+    //             $carMatchingModels = WuliuCar::get();
+    //             $carMatchingModelsArray = $carMatchingModels->toArray();
+    //             // $partnerName = $dataArray[0][1];
+    //             // var_dump($partnerName);
+    //             $partnerMatchingModels = WuliuPartner::get();
+    //             $partnerMatchingModelsArray = $partnerMatchingModels->toArray();
+    //             $insertData = $newCarData = $updateData = [];
+    //             foreach ($dataArray as $key => &$value) {
+    //                 if ($key < 1) {
+    //                     continue;
+    //                 }
+    //
+    //                 # 车辆 + 派送日期
+    //                 $a0 = $value[$car_numberIndex];
+    //                 if ($value[$car_numberIndex]) {
+    //                     $value[$car_numberIndex] = str_replace("\t", ' ', $value[$car_numberIndex]);
+    //                     $value[$car_numberIndex] = str_replace('     ', ' ', $value[$car_numberIndex]);
+    //                     $value[$car_numberIndex] = str_replace('    ', ' ', $value[$car_numberIndex]);
+    //                     $value[$car_numberIndex] = str_replace('   ', ' ', $value[$car_numberIndex]);
+    //                     $value[$car_numberIndex] = str_replace('  ', ' ', $value[$car_numberIndex]);
+    //                     $value[$car_numberIndex] = str_replace([
+    //                         '送',
+    //                         '有地',
+    //                         ' 忆',
+    //                         '忆',
+    //                         ' 已',
+    //                         '已',
+    //                         '对',
+    //                         '四',
+    //                         '哥',
+    //                         '已對',
+    //                         '付',
+    //                         '收',
+    //                         '装',
+    //                     ], '', $value[$car_numberIndex]);
+    //                     $array = explode(' ', $value[$car_numberIndex]);
+    //                     if (count($array) != 2) {
+    //                         var_dump($array, $a0, $car_numberIndex);
+    //                         return $this->responseJson(ServiceCode::SUCCESS, $value[$car_numberIndex]);
+    //                     }
+    //                     $car_number = $array[0];
+    //                     $car_id = WuliuCar::getIdByNumber($carMatchingModelsArray, $car_number);
+    //                     if (! $car_id) {
+    //                         // 自动创建
+    //                         $carModel = new WuliuCar();
+    //                         $carModel->number = $car_number;
+    //                         $carModel->save();
+    //                         $carMatchingModelsArray[] = $carModel->toArray();
+    //                         $value['car_id'] = $carModel->id;
+    //                         $newCarData[] = $carModel->number;
+    //
+    //                         // 不自动创建
+    //                         // throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, "车牌号{{$numberTemp}}不存在，请先创建");
+    //                     }
+    //                     $value['car_id'] = $car_id;
+    //                     if (isset($array[1])) {
+    //                         $car_finished_date = trim($array[1]);
+    //                         $timeStr = str_replace([
+    //                             '送',
+    //                             "\t",
+    //                             '发货方日鑫鱼粉厂',
+    //                             '有地',
+    //                             ' 忆',
+    //                             '忆',
+    //                             '已',
+    //                             '对',
+    //                             '對',
+    //                             '阿海',
+    //                         ], '', $car_finished_date);
+    //                         $a1 = $timeStr;
+    //
+    //                         $timeStr = str_replace('号', '日', $timeStr);
+    //                         $a2 = $timeStr;
+    //                         $timeStr = str_replace([
+    //                             '号',
+    //                             '日',
+    //                             '提',
+    //                         ], '', $timeStr);
+    //                         $a3 = $timeStr;
+    //                         // var_dump($timeStr);
+    //                         $timeStr = str_replace([
+    //                             '年',
+    //                             '月',
+    //                             '日',
+    //                             '号',
+    //                         ], '-', $timeStr);
+    //                         $a4 = $timeStr;
+    //                         $timeStr = str_replace('.', '-', $timeStr);
+    //                         $a5 = $timeStr;
+    //
+    //                         if (! $timestamp = strtotime($timeStr)) {
+    //                             throw new ServiceException(ServiceCode::ERROR, [], 400, [], $a1 . $a2 . $a3 . $a4 . $a5 . '---' . $car_finished_date);
+    //                         }
+    //                         // var_dump($timeStr);
+    //                         // var_dump($timestamp);
+    //                         $value['car_finished_date'] = date('Y-m-d', $timestamp);
+    //                     } else {
+    //                         var_dump($array);
+    //                     }
+    //                 }
+    //
+    //                 if ($value[$partner_Index]) {
+    //                     $partner_id = WuliuPartner::getIdByName($partnerMatchingModelsArray, $value[$partner_Index]);
+    //                     if (! $partner_id) {
+    //                         throw new ServiceException(ServiceCode::ERROR, [], 400, [], $value[$partner_Index] . '不存在');
+    //                     }
+    //                 } else {
+    //                     $partner_id = null;
+    //                 }
+    //
+    //                 $seaWaybillSaveArray = [];
+    //                 $seaWaybillSaveArray['partner_id'] = $partner_id;
+    //                 if ($value[$created_atIndex]) {
+    //                     $seaWaybillSaveArray['created_at'] = $value[$created_atIndex];
+    //                 }
+    //                 /*
+    //                  * 接下来是update partner data
+    //                  */
+    //                 $seaWaybillSaveArray['liaison'] = $value[$liaison_Index] ?: '';
+    //                 $seaWaybillSaveArray['liaison_mobile'] = $value[$liaison_mobileIndex] ?: '';
+    //                 $seaWaybillSaveArray['liaison_address_detail'] = $value[$liaison_address_detailIndex] ?: '';
+    //                 $seaWaybillSaveArray['car_finished_date'] = $value['car_finished_date'] ?? null;
+    //                 $seaWaybillSaveArray['car_id'] = $value['car_id'] ?? null;
+    //                 # ----------------- 替换 -----------------
+    //                 $abcdefg = <<<'a'
+    //                 $seaWaybillSaveArray['liaison_address_detail'] = $value[$liaison_address_detailIndex] ?: '';
+    //                 $seaWaybillSaveArray['partner_bill_id'] = 25;
+    // a;
+    //
+    //                 $seaWaybillSaveArray['partner_towing_fee'] = $value[$partner_towing_feeIndex] ?: 0;
+    //                 $seaWaybillSaveArray['partner_thc_fee'] = $value[$partner_thc_feeIndex] ?: 0;
+    //                 $seaWaybillSaveArray['partner_overdue_fee'] = $value[$partner_overdue_feeIndex] ?: 0;
+    //                 $seaWaybillSaveArray['partner_stockpiling_fee'] = $value[$partner_stockpiling_feeIndex] ?: 0;
+    //                 $seaWaybillSaveArray['partner_print_fee'] = $value[$partner_print_feeIndex] ?: 0;
+    //                 $seaWaybillSaveArray['partner_clean_fee'] = $value[$partner_clean_feeIndex] ?: 0;
+    //                 $seaWaybillSaveArray['partner_other_fee'] = $value[$partner_other_feeIndex] ?: 0;
+    //                 $seaWaybillSaveArray['partner_other_fee_desc'] = $value[$partner_other_fee_descIndex] ?: '';
+    //                 $seaWaybillSaveArray['partner_stay_pole'] = $value[$partner_stay_poleIndex] ?: 0;
+    //                 $seaWaybillSaveArray['partner_remarks'] = $value[$partner_remarksIndex] ?: '';
+    //
+    //                 $existsModel = WuliuSeaWaybill::getByNumberAndCaseNumber($seaWaybillMatchingModelsArray, $value[$numberIndex], $value[$case_numberIndex]);
+    //                 if ($existsModel) {
+    //                     $seaWaybillSaveArray['id'] = $existsModel['id'];
+    //                     $seaWaybillSaveArray['updated_at'] = $value['car_finished_date'] ?? '2023-01-13';
+    //                     $updateData[] = $seaWaybillSaveArray;
+    //                 // throw new HttpException(ServiceCode::HTTP_CLIENT_PARAM_ERROR, $value[$numberIndex] . $value[$case_numberIndex] . '已存在');
+    //                 } else {
+    //                     switch ($value[$typeIndex]) {
+    //                         case '进口':
+    //                             $seaWaybillSaveArray['type'] = WuliuSeaWaybill::TYPE_JINKOU;
+    //                             break;
+    //                         case '出口':
+    //                             $seaWaybillSaveArray['type'] = WuliuSeaWaybill::TYPE_CHUKOU;
+    //                             break;
+    //                         default:
+    //                             $seaWaybillSaveArray['type'] = WuliuSeaWaybill::TYPE_DEFAULT;
+    //                             break;
+    //                     }
+    //                     $seaWaybillSaveArray['tos'] = $value[$tosIndex] ?? WuliuSeaWaybill::TOS_DEFAULT;
+    //                     $ship_company_id = WuliuShipCompany::getIdBySeaWaybillNumber($value[$numberIndex]);
+    //                     if (! $seaWaybillSaveArray['type']) {
+    //                         switch ($ship_company_id) {
+    //                             case WuliuShipCompany::ANTONG:
+    //                                 // 默认出口
+    //                                 $seaWaybillSaveArray['type'] = WuliuSeaWaybill::TYPE_CHUKOU;
+    //                                 break;
+    //                             case WuliuShipCompany::ZHONGGU:
+    //                                 // 进出口都有
+    //                             default:
+    //                                 $seaWaybillSaveArray['type'] = WuliuSeaWaybill::TYPE_DEFAULT;
+    //                                 break;
+    //                         }
+    //                     }
+    //                     $seaWaybillSaveArray['number'] = $value[$numberIndex];
+    //                     $seaWaybillSaveArray['case_number'] = $value[$case_numberIndex];
+    //                     $seaWaybillSaveArray['qf_number'] = $value[$qf_numberIndex];
+    //                     $seaWaybillSaveArray['good_name'] = $value[$good_nameIndex] ?: '';
+    //                     $seaWaybillSaveArray['box'] = $value[$boxIndex] ?: '';
+    //                     if (! $seaWaybillSaveArray['created_at']) {
+    //                         $seaWaybillSaveArray['created_at'] = $value['car_finished_date'] ?? '2023-01-13';
+    //                     }
+    //                     $insertData[] = $seaWaybillSaveArray;
+    //                 }
+    //             }
+    //             $insertCount = 0;
+    //             $updateCount = 0;
+    //             // var_dump(count($insertData));
+    //             // return $this->responseJson(ServiceCode::SUCCESS, $insertData);
+    //             if ($insertData) {
+    //                 $insertCount = count($insertData);
+    //                 (new WuliuSeaWaybill())->insert($insertData);
+    //             }
+    //             if ($updateData) {
+    //                 // $updateIds = [];
+    //                 // foreach ($updateData as $value) {
+    //                 //     $updateIds[] = $value['id'];
+    //                 // }
+    //                 // $upadteIdsStr = implode(',', $updateIds);
+    //                 $updateCount = count($updateData);
+    //                 // (new WuliuSeaWaybill())->updateBatch($updateData);
+    //             }
+    //
+    //             Db::commit();
+    //
+    //             return $this->resJson("共导入{$insertCount}条，更新{$updateCount}条数据！", [
+    //                 $insertData,
+    //                 $updateData,
+    //             ]);
+    //         } catch (Exception $e) {
+    //             Db::rollBack();
+    //             throw $e;
+    //         }
+    //     }
 
     public function importMen()
     {

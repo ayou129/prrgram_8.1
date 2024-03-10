@@ -77,6 +77,7 @@ class WuliuSeaWaybilFixPartner extends HyperfCommand
             }
             $model->partner_towing_fee = $value['partner_towing_fee'];
             $model->partner_stockpiling_fee = $value['partner_stockpiling_fee'];
+            $model->partner_huandan_fee = $value['partner_huandan_fee'];
             $model->save();
         }
 

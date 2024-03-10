@@ -110,7 +110,7 @@ class Tools
     public static function formatJSTimestampToPHPTimestamp(&$paramsArray)
     {
         foreach ($paramsArray as $key => &$value) {
-            if (is_numeric($value) && substr($key, -3) === '_at') {
+            if (is_numeric($value) && substr((string) $key, -3) === '_at') {
                 try {
                     // var_dump($paramsArray[$key], $key);
                     $value = substr((string) $value, 0, 10);

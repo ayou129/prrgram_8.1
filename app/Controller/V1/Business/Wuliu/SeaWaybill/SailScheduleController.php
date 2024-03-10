@@ -128,7 +128,7 @@ class SailScheduleController extends AbstractController
     {
         $params = $this->getRequestAllFilter();
         // var_dump($params);
-
+        unset($params['token']);
         // 有海运单则不允许删除
         $sea = WuliuSeaWaybill::whereIn('sail_schedule_id', $params)->count();
         if ($sea) {

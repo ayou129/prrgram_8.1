@@ -147,6 +147,8 @@ class DriverController extends AbstractController
         Db::beginTransaction();
         try {
             $params = array_unique($params);
+            unset($params['token']);
+
             $models = WuliuDriver::whereIn('id', $params)->get();
             if (! $models->count()) {
                 throw new ServiceException(ServiceCode::ERROR, [], 400, [], '需要删除的数据为空');
