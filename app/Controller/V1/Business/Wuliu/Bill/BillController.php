@@ -59,6 +59,13 @@ class BillController extends AbstractController
         }
 
         $where = $whereOr = [];
+        if (isset($params['title'])) {
+            $where[] = [
+                'title',
+                'like',
+                '%' . $params['title'] . '%',
+            ];
+        }
         if (isset($params['created_at_start_time'])) {
             $where[] = [
                 'created_at',
