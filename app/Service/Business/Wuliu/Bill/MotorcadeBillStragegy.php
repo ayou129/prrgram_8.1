@@ -18,6 +18,47 @@ use App\Utils\Tools;
 
 class MotorcadeBillStragegy implements BillExportStrategyInterface
 {
+    private array $config = [];
+
+    private float $price_total = 0;
+
+    public function __construct()
+    {
+        $modelCommentArray = WuliuSeaWaybill::getAttributeComment();
+        $this->config = [
+            'number' => ['auto_width' => true],
+            'case_number' => ['auto_width' => true],
+            'qf_number' => ['auto_width' => true],
+            'good_name' => ['auto_width' => true],
+            'liaison_address_detail' => [],
+            'car_number' => ['label' => '车牌号'],
+            'car_finished_date' => ['auto_width' => true],
+            'car_fee' => ['is_collect' => true, 'is_collect_price' => true],
+            'car_other_fee' => ['is_collect' => true, 'is_collect_price' => true],
+            'car_other_fee_desc' => [],
+        ];
+
+        $this->config = array_merge(['index' => ['label' => '序号']], $this->config);
+
+        # 动态赋值 config 的 label
+        $index = 0;
+        foreach ($this->config as $key => &$value) {
+            if (! isset($value['label'])) {
+                $value['label'] = $modelCommentArray[$key];
+            }
+            if (isset($value['is_collect'])) {
+                $value['is_collect_all'] = 0;
+            }
+            if (isset($value['is_collect_price'])) {
+                $value['is_collect_price_all'] = 0;
+            }
+
+            # 列名ABCD...
+            $value['col'] = Tools::genExcelColNameFromArrayIndex($index);
+            ++$index;
+        }
+    }
+
     public function export($model)
     {
         // 2.车队账单：多个车辆派车费
@@ -50,54 +91,82 @@ class MotorcadeBillStragegy implements BillExportStrategyInterface
         $worksheet->getStyle('A1:J1')->applyFromArray($styleArray);
         $worksheet->mergeCells('A1:J1');
 
-        $worksheet->getStyle('A2:J2')->applyFromArray($styleArray);
-        $worksheet->getRowDimension(1)->setRowHeight(50);
-        $worksheet->getColumnDimension('B')->setWidth(15);
-        $worksheet->getColumnDimension('C')->setWidth(22);
-        $worksheet->getColumnDimension('D')->setWidth(15);
-        $worksheet->getColumnDimension('E')->setWidth(35);
-        $worksheet->getColumnDimension('F')->setWidth(10);
-        $worksheet->getColumnDimension('G')->setWidth(7);
-        $worksheet->getColumnDimension('H')->setWidth(8);
-        $worksheet->getColumnDimension('I')->setWidth(11);
-        $worksheet->getColumnDimension('J')->setWidth(15);
-        $contextRow = 2;
-        $worksheet->setCellValue('A' . $contextRow, '序号');
-        $worksheet->setCellValue('B' . $contextRow, '派车日期');
-        $worksheet->setCellValue('C' . $contextRow, '运单号');
-        $worksheet->setCellValue('D' . $contextRow, '箱号');
-        $worksheet->setCellValue('E' . $contextRow, '地址');
-        $worksheet->setCellValue('F' . $contextRow, '货名');
-        $worksheet->setCellValue('G' . $contextRow, '拖车费');
-        $worksheet->setCellValue('H' . $contextRow, '其他费用');
-        $worksheet->setCellValue('I' . $contextRow, '其他费用说明');
-        $worksheet->setCellValue('J' . $contextRow, '车牌号');
-        $total = $totalCarFee = $totalCarOtherFee = 0;
-        $dataIndex = 1;
-        $contextRow = 3;
-        foreach ($seaWaybillModelsArray as $seaWaybillModelArray) {
-            $worksheet->setCellValue('A' . $contextRow, $dataIndex);
-            $worksheet->setCellValue('B' . $contextRow, $seaWaybillModelArray['car_finished_date']);
-            $worksheet->setCellValue('C' . $contextRow, $seaWaybillModelArray['number']);
-            $worksheet->setCellValue('D' . $contextRow, $seaWaybillModelArray['case_number']);
-            $worksheet->setCellValue('E' . $contextRow, $seaWaybillModelArray['liaison_address_detail']);
-            $worksheet->setCellValue('F' . $contextRow, $seaWaybillModelArray['good_name']);
-            $worksheet->setCellValue('G' . $contextRow, $seaWaybillModelArray['car_fee']);
-            $worksheet->setCellValue('H' . $contextRow, $seaWaybillModelArray['car_other_fee']);
-            $worksheet->setCellValue('I' . $contextRow, $seaWaybillModelArray['car_other_fee_desc']);
-            $worksheet->setCellValue('J' . $contextRow, $seaWaybillModelArray['car']['number']);
-            $totalCarFee = Tools::add($totalCarFee, $seaWaybillModelArray['car_fee']);
-            $totalCarOtherFee = Tools::add($totalCarOtherFee, $seaWaybillModelArray['car_other_fee']);
-            ++$contextRow;
-            ++$dataIndex;
+
+        $contextRow = 1;
+
+        # 标题
+        foreach ($this->config as $fieldConfig) {
+            $location = $fieldConfig['col'] . (string) $contextRow;
+            $worksheet->setCellValue($location, $fieldConfig['label']);
+
+            # 设置标题和宽度
+            if (isset($fieldConfig['auto_width'])) {
+                $worksheet->getColumnDimension($fieldConfig['col'])->setAutoSize(true);
+            }
         }
-        $worksheet->setCellValue('G' . $contextRow, $totalCarFee);
-        $worksheet->setCellValue('H' . $contextRow, $totalCarOtherFee);
+        ++$contextRow;
+
+        # 数据
+        $dataCount = 1;
+        foreach ($seaWaybillModelsArray as $keys => $seaWaybillModelArray) {
+            foreach ($seaWaybillModelArray as $field => $value) {
+                if ($field == 'car') {
+                    $field = 'car_number';
+                    $value = $value['number'] ?? '';
+                }
+
+                if (isset($this->config[$field])) {
+                    $fieldConfig = $this->config[$field];
+
+                    # 序号
+                    $worksheet->setCellValue('A' . (string) $contextRow, $dataCount);
+
+                    # 数据
+                    $location = $fieldConfig['col'] . (string) $contextRow;
+                    $worksheet->setCellValue($location, $value);
+
+                    if (isset($fieldConfig['is_collect'])) {
+                        $this->config[$field]['is_collect_all'] = Tools::add($this->config[$field]['is_collect_all'], $value);
+                    }
+
+                    if (isset($fieldConfig['is_collect_price'])) {
+                        $this->config[$field]['is_collect_price_all'] = Tools::add($this->config[$field]['is_collect_price_all'], $value);
+                    }
+                }
+            }
+            ++$dataCount;
+            ++$contextRow;
+        }
+
+        $is_collect = false;
+        # 处理汇总的数据
+        foreach ($this->config as $fieldConfig) {
+            if (isset($fieldConfig['is_collect'])) {
+                $worksheet->setCellValue($fieldConfig['col'] . (string) $contextRow, $fieldConfig['is_collect_all']);
+                $is_collect = true;
+
+                # 处理总价格
+                if (isset($fieldConfig['is_collect_price'])) {
+                    $this->price_total = Tools::add($this->price_total, $fieldConfig['is_collect_price_all']);
+                }
+            }
+        }
+        if ($is_collect) {
+            ++$contextRow;
+        }
+
+        ++$contextRow;
+        $worksheet->setCellValue('J' . $contextRow, '总计');
+        $worksheet->setCellValue('K' . $contextRow, $this->price_total);
         ++$contextRow;
         ++$contextRow;
-        $total = Tools::add($totalCarFee, $totalCarOtherFee);
-        $worksheet->setCellValue('F' . $contextRow, '应付总额');
-        $worksheet->setCellValue('G' . $contextRow, $total);
+        $worksheet->setCellValue('H' . $contextRow, '运费请付');
+        ++$contextRow;
+        $worksheet->setCellValue('H' . $contextRow, '开户行：中国建设银行股份有限公司深圳光明支行');
+        ++$contextRow;
+        $worksheet->setCellValue('H' . $contextRow, '户    名：李国欣');
+        ++$contextRow;
+        $worksheet->setCellValue('H' . $contextRow, '账    号：6217007200077503871');
 
         return SpreadsheetService::exportExcelByTianchang($spreadsheet, $filename);
     }

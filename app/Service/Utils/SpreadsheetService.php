@@ -17,36 +17,13 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class SpreadsheetService
 {
-    // public function __constructTemp()
-    // {
-    //     // 创建单元格 getCell()
-
-    //     // 通过坐标设置单元格值
-    //     // Set cell A1 with a string value
-    //     $spreadsheet->getActiveSheet()->setCellValue('A1', 'PhpSpreadsheet');
-
-    //     // Set cell A2 with a numeric value
-    //     $spreadsheet->getActiveSheet()->setCellValue('A2', 12345.6789);
-
-    //     // Set cell A3 with a boolean value
-    //     $spreadsheet->getActiveSheet()->setCellValue('A3', true);
-
-    //     // Set cell A4 with a formula
-    //     $spreadsheet->getActiveSheet()->setCellValue(
-    //         'A4',
-    //         '=IF(A3, CONCATENATE(A1, " ", A2), CONCATENATE(A2, " ", A1))'
-    //     );
-    //     $spreadsheet->getActiveSheet()
-    //         ->getCell('B8')
-    //         ->setValue('Some value');
-    // }
 
     public static function genExcelByTianchang(): Spreadsheet
     {
         return new Spreadsheet();
     }
 
-    public static function exportExcelByTianchang($spreadsheet, $filename, $suffix = 'xlsx'): array
+    public static function exportExcelByTianchang($spreadsheet, $filename, $suffix = 'csv'): array
     {
         $path = BASE_PATH . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'download' . DIRECTORY_SEPARATOR;
         $outFilename = $path . $filename . '.' . $suffix;
