@@ -150,6 +150,64 @@ class WuliuSeaWaybill extends BaseModel
 
     protected array $appends = ['type_text', 'fh_status_text', 'receipt_status_text', 'poundbill_status_text', 'box_reporting_status_text', 'rush_status_text', 'tos_text'];
 
+    public static function getAttributeComment()
+    {
+        return [
+            'id' => '编号',
+            'sail_schedule_id' => '船期ID',
+            'number' => '海运单',
+            'case_number' => '箱号',
+            'qf_number' => '铅封号',
+            'box' => '箱型',
+            'box_main_code' => '箱主代码',
+            'good_name' => '商品名',
+            'weight' => '重量',
+            'ship_company_towing_fee' => '船公司拖车费',
+            'ship_company_towing_fee_desc' => '船公司拖车费说明',
+            'car_id' => '车辆ID',
+            'car_fee' => '司机费用',
+            'car_other_fee' => '司机其他费用',
+            'car_other_fee_desc' => '其他费用说明',
+            'car_finished_date' => '车辆派送日期',
+            'receipt_status' => '箱主代码',
+            'poundbill_status' => '箱主代码',
+            'box_reporting_status' => '箱主代码',
+            'liaison' => '联系人',
+            'liaison_mobile' => '联系人电话',
+            'liaison_address' => '联系人地址',
+            'liaison_address_detail' => '联系人地址详情',
+            'liaison_remark' => '联系人备注',
+            'estimated_time' => '预计卸/装时间',
+            'driver_name' => '司机姓名',
+            'driver_mobile_number' => '司机电话',
+            'driver_id_card' => '司机身份证',
+            'fh_status' => '放货状态',
+            'rush_status' => '是否加急',
+            'tos' => '业务类型',
+            'ship_company_bill_id' => 'xxxxx',
+            'motorcade_bill_id' => 'xxxxx',
+            'partner_id' => 'xxxxx',
+            'partner_towing_fee' => '拖车费',
+            'partner_overdue_fee' => '滞箱费/超期费',
+            'partner_stockpiling_fee' => '码头：堆存费',
+            'partner_huandan_fee' => '换单费',
+            'partner_thc_fee' => '码头装卸作业费',
+            'partner_print_fee' => '打单费',
+            'partner_clean_fee' => '洗柜费',
+            'partner_other_fee' => '其他费用',
+            'partner_other_fee_desc' => '其他费用说明',
+            'partner_stay_pole' => '加固杆',
+            'partner_remarks' => '备注',
+            'partner_bill_id' => 'xxxxx',
+            'self_bill_id' => 'xxxxx',
+            'type' => '类型',
+            'status' => '状态',
+            'created_at' => 'xxxxx',
+            'updated_at' => 'xxxxx',
+            'deleted_at' => 'xxxxx',
+        ];
+    }
+
     public static function getFhStatusArray()
     {
         return [self::FH_STATUS_DEFAULT => '-', self::FH_STATUS_NO => '未放货', self::FH_STATUS_YES => '已放货'];

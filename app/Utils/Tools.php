@@ -273,4 +273,27 @@ class Tools
         curl_close($ch);
         return $output;
     }
+
+    public static function genExcelColNameFromArrayIndex($array_index)
+    {
+        // 将数组索引值加上1，因为Excel列索引是从1开始（对应A）
+        $excel_index = $array_index + 1;
+
+        // 使用之前的逻辑生成Excel列名
+        $result = '';
+        while ($excel_index >= 0) {
+            $char_index = intval($excel_index / 26);
+            $remainder = $excel_index % 26;
+
+            if ($remainder == 0) {
+                --$char_index;
+                $remainder = 26;
+            }
+
+            $result = chr(ord('A') + $remainder - 1) . $result;
+            $excel_index = $char_index - 1;
+        }
+
+        return $result;
+    }
 }
