@@ -296,4 +296,9 @@ class Tools
 
         return $result;
     }
+
+    public static function formatUtf8($text)
+    {
+        return mb_convert_encoding($text, 'UTF-8', 'auto');
+    }
 }

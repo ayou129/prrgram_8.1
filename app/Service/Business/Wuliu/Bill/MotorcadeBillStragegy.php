@@ -85,19 +85,18 @@ class MotorcadeBillStragegy implements BillExportStrategyInterface
         ];
         $spreadsheet->getDefaultStyle()->getFont()->setName('微软雅黑');
         $worksheet = $spreadsheet->getActiveSheet();
-        $worksheet->setCellValue('A1', env('APP_NAME', '') . $model->title . '对账单');
+        $worksheet->setCellValue('A1', Tools::formatUtf8(env('APP_NAME', '') . $model->title . '对账单'));
         $spreadsheet->getActiveSheet()->getStyle('A1')->getFont()->setBold(false)
             ->setSize(16);
         $worksheet->getStyle('A1:J1')->applyFromArray($styleArray);
         $worksheet->mergeCells('A1:J1');
-
 
         $contextRow = 1;
 
         # 标题
         foreach ($this->config as $fieldConfig) {
             $location = $fieldConfig['col'] . (string) $contextRow;
-            $worksheet->setCellValue($location, $fieldConfig['label']);
+            $worksheet->setCellValue($location, Tools::formatUtf8($fieldConfig['label']));
 
             # 设置标题和宽度
             if (isset($fieldConfig['auto_width'])) {
@@ -119,11 +118,11 @@ class MotorcadeBillStragegy implements BillExportStrategyInterface
                     $fieldConfig = $this->config[$field];
 
                     # 序号
-                    $worksheet->setCellValue('A' . (string) $contextRow, $dataCount);
+                    $worksheet->setCellValue('A' . (string) $contextRow, Tools::formatUtf8($dataCount));
 
                     # 数据
                     $location = $fieldConfig['col'] . (string) $contextRow;
-                    $worksheet->setCellValue($location, $value);
+                    $worksheet->setCellValue($location, Tools::formatUtf8($value));
 
                     if (isset($fieldConfig['is_collect'])) {
                         $this->config[$field]['is_collect_all'] = Tools::add($this->config[$field]['is_collect_all'], $value);
@@ -142,12 +141,12 @@ class MotorcadeBillStragegy implements BillExportStrategyInterface
         # 处理汇总的数据
         foreach ($this->config as $fieldConfig) {
             if (isset($fieldConfig['is_collect'])) {
-                $worksheet->setCellValue($fieldConfig['col'] . (string) $contextRow, $fieldConfig['is_collect_all']);
+                $worksheet->setCellValue($fieldConfig['col'] . (string) $contextRow, Tools::formatUtf8($fieldConfig['is_collect_all']));
                 $is_collect = true;
 
                 # 处理总价格
                 if (isset($fieldConfig['is_collect_price'])) {
-                    $this->price_total = Tools::add($this->price_total, $fieldConfig['is_collect_price_all']);
+                    $this->price_total = Tools::add($this->price_total, Tools::formatUtf8($fieldConfig['is_collect_price_all']));
                 }
             }
         }
@@ -156,17 +155,17 @@ class MotorcadeBillStragegy implements BillExportStrategyInterface
         }
 
         ++$contextRow;
-        $worksheet->setCellValue('J' . $contextRow, '总计');
+        $worksheet->setCellValue('J' . $contextRow, Tools::formatUtf8('总计'));
         $worksheet->setCellValue('K' . $contextRow, $this->price_total);
         ++$contextRow;
         ++$contextRow;
-        $worksheet->setCellValue('H' . $contextRow, '运费请付');
+        $worksheet->setCellValue('H' . $contextRow, Tools::formatUtf8('运费请付'));
         ++$contextRow;
-        $worksheet->setCellValue('H' . $contextRow, '开户行：中国建设银行股份有限公司深圳光明支行');
+        $worksheet->setCellValue('H' . $contextRow, Tools::formatUtf8('开户行：中国建设银行股份有限公司深圳光明支行'));
         ++$contextRow;
-        $worksheet->setCellValue('H' . $contextRow, '户    名：李国欣');
+        $worksheet->setCellValue('H' . $contextRow, Tools::formatUtf8('户    名：李国欣'));
         ++$contextRow;
-        $worksheet->setCellValue('H' . $contextRow, '账    号：6217007200077503871');
+        $worksheet->setCellValue('H' . $contextRow, Tools::formatUtf8('账    号：6217007200077503871'));
 
         return SpreadsheetService::exportExcelByTianchang($spreadsheet, $filename);
     }
