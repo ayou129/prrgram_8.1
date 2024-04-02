@@ -25,7 +25,7 @@ class DictDetailController extends AbstractController
     {
         $params = $this->getRequestAllFilter();
         // var_dump($params);
-        $limit = (int) $this->request->input('size', 10);
+        $limit = (int) $this->request->input('page_limit', 10);
         $dictName = $this->request->input('dictName');
         $models = SysDictDetail::with([
             'dict',

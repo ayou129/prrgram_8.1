@@ -44,7 +44,7 @@ class RoleController extends AbstractController
     {
         $params = $this->getRequestAllFilter();
         // var_dump($params);
-        $limit = (int) $this->request->input('size', 10);
+        $limit = (int) $this->request->input('page_limit', 10);
 
         $models = (new SysRole());
 
@@ -52,8 +52,8 @@ class RoleController extends AbstractController
         $result = $models->toArray();
         foreach ($result['data'] as &$value) {
             $menus = [];
-            foreach ($value['menus'] as $key => $value) {
-                $menus[] = $value['id'];
+            foreach ($value['menus'] as $key => $menu) {
+                $menus[] = $menu['id'];
             }
             $value['menu_ids'] = $menus;
         }
@@ -109,7 +109,7 @@ class RoleController extends AbstractController
             }
 
             if (isset($params['value'])) {
-                $model->name = $params['value'];
+                $model->value = $params['value'];
                 $change = true;
             }
 
@@ -119,24 +119,24 @@ class RoleController extends AbstractController
             }
 
             if (isset($params['sort'])) {
-                $model->status = $params['sort'];
+                $model->sort = $params['sort'];
                 $change = true;
             }
 
             if (isset($params['remark'])) {
-                $model->status = $params['remark'];
+                $model->remark = $params['remark'];
                 $change = true;
             }
 
-            if (isset($params['menu'])) {
-                if (! is_array($params['menu'])) {
-                    throw new RetException('menu field error');
+            if (isset($params['menu_ids'])) {
+                if (! is_array($params['menu_ids'])) {
+                    throw new RetException('menu_ids field error');
                 }
 
-                $ids = array_unique($params['menu']);
-                $menuModels = SysMenu::findMany($params['menu']);
-                if ($menuModels->count() != count($params['menu'])) {
-                    throw new RetException('menu not found');
+                $ids = array_unique($params['menu_ids']);
+                $menuModels = SysMenu::findMany($params['menu_ids']);
+                if ($menuModels->count() != count($params['menu_ids'])) {
+                    throw new RetException('menu_ids not found');
                 }
 
                 $prepareSaveData = [];

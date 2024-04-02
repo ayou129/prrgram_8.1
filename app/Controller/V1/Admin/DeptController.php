@@ -25,7 +25,7 @@ class DeptController extends AbstractController
     {
         $params = $this->getRequestAllFilter();
         // var_dump($params);
-        $limit = (int) $this->request->input('size', 10);
+        $limit = (int) $this->request->input('page_limit', 10);
 
         $models = (new SysDept());
         $params['sort'] = $this->request->input('sort') ?? [];
