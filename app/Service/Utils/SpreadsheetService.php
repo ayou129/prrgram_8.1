@@ -17,7 +17,6 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class SpreadsheetService
 {
-
     public static function genExcelByTianchang(): Spreadsheet
     {
         return new Spreadsheet();

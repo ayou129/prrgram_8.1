@@ -14,6 +14,7 @@ namespace App\Controller\V1\Admin;
 
 use App\Constant\ServiceCode;
 use App\Controller\AbstractController;
+use App\Exception\RetException;
 use App\Exception\ServiceException;
 use App\Model\BaseModel;
 use App\Model\SysMenu;
@@ -21,6 +22,9 @@ use App\Model\SysRole;
 use App\Model\SysRolesDept;
 use App\Model\SysRolesMenu as SysRolesMenus;
 use App\Model\SysUser;
+use App\Utils\Tools;
+use Exception;
+use Hyperf\DbConnection\Db;
 
 class RoleController extends AbstractController
 {
@@ -43,51 +47,15 @@ class RoleController extends AbstractController
         $limit = (int) $this->request->input('size', 10);
 
         $models = (new SysRole());
-        $params['sort'] = $this->request->input('sort') ?? [];
-        foreach ($params['sort'] as $item) {
-            $sort = explode(',', $item);
-            $sort_field = $sort[0];
-            $sort_type = $sort[1];
-            $models = $models->orderBy($sort_field, $sort_type);
-        }
 
-        $where = [];
-
-        if (isset($params['created_at_start_time'])) {
-            $where[] = [
-                'created_at',
-                '>=',
-                $params['created_at_start_time'],
-            ];
-        }
-        if (isset($params['created_at_end_time'])) {
-            $where[] = [
-                'created_at',
-                '<=',
-                $params['created_at_end_time'],
-            ];
-        }
-        if (isset($params['blurry'])) {
-            $where[] = [
-                'name',
-                'like',
-                '%' . $params['blurry'] . '%',
-            ];
-        }
-
-        $models = $models->where($where)
-            ->with([
-                'menus',
-                'depts',
-            ])
-            ->paginate($limit);
-
-        $result = $models->isEmpty() ? [] : $models->toArray();
-        foreach ($result['data'] as &$item) {
-            if (isset($item['menus'])) {
-                SysMenu::addLabelField($item['menus']);
-                BaseModel::addTreeFields($item['menus']);
+        $models = $models->with(['menus'])->paginate($limit);
+        $result = $models->toArray();
+        foreach ($result['data'] as &$value) {
+            $menus = [];
+            foreach ($value['menus'] as $key => $value) {
+                $menus[] = $value['id'];
             }
+            $value['menu_ids'] = $menus;
         }
         return $this->responseJson(ServiceCode::SUCCESS, $result);
     }
@@ -126,51 +94,75 @@ class RoleController extends AbstractController
     public function put()
     {
         $params = $this->getRequestAllFilter();
-        // var_dump($params);
 
-        # Java code
-        // Role dict = dictRepository.findById(resources.getId()).orElseGet(Role::new);
-        // ValidationUtil.isNull( dict.getId(),"Role","id",resources.getId());
-
-        # 验证is_frame http https
-        // $model = (new SysRole())->where('id', '=', $params['id'])
-        //     ->first();
-        $model = SysRole::query()
-            ->find($params['id']);
-        if (! $model) {
-            throw new ServiceException(ServiceCode::ERROR_DEPT_NOT_EXISTS);
-        }
-
-        if (isset($params['depts']) && is_array($params['depts'])) {
-            $ids = [];
-            foreach ($params['depts'] as $item) {
-                $ids[] = $item['id'];
+        Db::beginTransaction();
+        try {
+            $model = SysRole::find($params['id']);
+            if (! $model) {
+                throw new RetException('Role not found');
             }
-            $ids = array_unique($ids);
-            $prepareSaveData = [];
-            foreach ($ids as $id) {
-                $prepareSaveData[] = [
-                    'role_id' => $model->id,
-                    'dept_id' => $id,
-                ];
+
+            $change = false;
+            if (isset($params['name'])) {
+                $model->name = $params['name'];
+                $change = true;
             }
-            // var_dump($prepareSaveData);
-            SysRolesDept::query()
-                ->where('role_id', $model->id)
-                ->delete();
-            SysRolesDept::insert($prepareSaveData);
+
+            if (isset($params['value'])) {
+                $model->name = $params['value'];
+                $change = true;
+            }
+
+            if (isset($params['status'])) {
+                $model->status = $params['status'];
+                $change = true;
+            }
+
+            if (isset($params['sort'])) {
+                $model->status = $params['sort'];
+                $change = true;
+            }
+
+            if (isset($params['remark'])) {
+                $model->status = $params['remark'];
+                $change = true;
+            }
+
+            if (isset($params['menu'])) {
+                if (! is_array($params['menu'])) {
+                    throw new RetException('menu field error');
+                }
+
+                $ids = array_unique($params['menu']);
+                $menuModels = SysMenu::findMany($params['menu']);
+                if ($menuModels->count() != count($params['menu'])) {
+                    throw new RetException('menu not found');
+                }
+
+                $prepareSaveData = [];
+                foreach ($ids as $id) {
+                    $prepareSaveData[] = [
+                        'role_id' => $model->id,
+                        'menu_id' => $id,
+                    ];
+                }
+                SysRolesMenus::where('role_id', $model->id)
+                    ->delete();
+                SysRolesMenus::insert($prepareSaveData);
+
+                $change = true;
+            }
+
+            if ($change) {
+                $model->save();
+            }
+            Db::commit();
+
+            return $this->responseJson(ServiceCode::SUCCESS);
+        } catch (Exception $e) {
+            Db::rollBack();
+            throw $e;
         }
-
-        $model->name = $params['name'] ?? '';
-        $model->level = $params['level'];
-        $model->description = $params['description'];
-        $model->data_scope = $params['data_scope'];
-        $model->create_by = $params['create_by'] ?? 'admin';
-        $model->update_by = $params['update_by'] ?? 'admin';
-        $model->save();
-
-        // var_dump($model->toArray());
-        return $this->responseJson(ServiceCode::SUCCESS);
     }
 
     public function putMenu()
@@ -185,33 +177,40 @@ class RoleController extends AbstractController
         # 验证is_frame http https
         // $model = (new SysRole())->where('id', '=', $params['id'])
         //     ->first();
-        $model = SysRole::query()
-            ->find($params['id']);
-        if (! $model) {
-            throw new ServiceException(ServiceCode::ERROR_DEPT_NOT_EXISTS);
+        Db::beginTransaction();
+        try {
+            $model = SysRole::find($params['id']);
+            if (! $model) {
+                throw new ServiceException(ServiceCode::ERROR_DEPT_NOT_EXISTS);
+            }
+
+            if (isset($params['menus']) && is_array($params['menus'])) {
+                $ids = [];
+                foreach ($params['menus'] as $item) {
+                    $ids[] = $item['id'];
+                }
+                $ids = array_unique($ids);
+                $prepareSaveData = [];
+                foreach ($ids as $id) {
+                    $prepareSaveData[] = [
+                        'role_id' => $model->id,
+                        'menu_id' => $id,
+                    ];
+                }
+                // var_dump($prepareSaveData);
+                SysRolesMenus::query()
+                    ->where('role_id', $model->id)
+                    ->delete();
+                SysRolesMenus::insert($prepareSaveData);
+            }
+            Db::commit();
+            return $this->responseJson(ServiceCode::SUCCESS);
+        } catch (Exception $e) {
+            Db::rollBack();
+            throw $e;
         }
 
-        if (isset($params['menus']) && is_array($params['menus'])) {
-            $ids = [];
-            foreach ($params['menus'] as $item) {
-                $ids[] = $item['id'];
-            }
-            $ids = array_unique($ids);
-            $prepareSaveData = [];
-            foreach ($ids as $id) {
-                $prepareSaveData[] = [
-                    'role_id' => $model->id,
-                    'menu_id' => $id,
-                ];
-            }
-            // var_dump($prepareSaveData);
-            SysRolesMenus::query()
-                ->where('role_id', $model->id)
-                ->delete();
-            SysRolesMenus::insert($prepareSaveData);
-        }
-        // var_dump($model->toArray());
-        return $this->responseJson(ServiceCode::SUCCESS);
+            // var_dump($model->toArray());
     }
 
     public function delete()

@@ -15,9 +15,9 @@ namespace App\Controller\V1\Admin;
 use App\Constant\ServiceCode;
 use App\Controller\AbstractController;
 use App\Exception\ServiceException;
-use App\Model\BaseModel;
 use App\Model\SysMenu;
 use App\Model\SysUser;
+use App\Utils\Tools;
 use Hyperf\HttpServer\Annotation\AutoController;
 
 /**
@@ -30,60 +30,6 @@ class MenuController extends AbstractController
      * 主页list：默认获取pid为null的.
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function list()
-    {
-        $params = $this->getRequestAllFilter();
-        // var_dump($params);
-        $limit = (int) $this->request->input('size', 10);
-
-        $models = (new SysMenu());
-        $models = $models->orderBy('menu_sort');
-        $params['sort'] = $this->request->input('sort') ?? [];
-        foreach ($params['sort'] as $item) {
-            $sort = explode(',', $item);
-            $sort_field = $sort[0];
-            $sort_type = $sort[1];
-            $models = $models->orderBy($sort_field, $sort_type);
-        }
-        $where = [];
-        # pid filter
-        if (isset($params['pid'])) {
-            if ($params['pid'] == 0) {
-                $params['pid'] = null;
-            }
-            $where[] = [
-                'pid',
-                $params['pid'],
-            ];
-        } else {
-            $where[] = [
-                'pid',
-                null,
-            ];
-        }
-
-        if (isset($params['created_at_start_time'])) {
-            $where[] = [
-                'created_at',
-                '>=',
-                $params['created_at_start_time'],
-            ];
-        }
-        if (isset($params['created_at_end_time'])) {
-            $where[] = [
-                'created_at',
-                '<=',
-                $params['created_at_end_time'],
-            ];
-        }
-        $result = $models->where($where)->paginate($limit);
-
-        $result = $result->toArray();
-        SysMenu::addLabelField($result['data']);
-        BaseModel::addTreeFields($result['data']);
-        return $this->responseJson(ServiceCode::SUCCESS, $result);
-    }
-
     public function create()
     {
         $params = $this->getRequestAllFilter();
@@ -128,6 +74,15 @@ class MenuController extends AbstractController
         SysMenu::updateAllSubCount();
 
         return $this->responseJson(ServiceCode::SUCCESS);
+    }
+
+    public function all()
+    {
+        $result = SysMenu::orderBy('menu_sort', 'asc')
+            ->get()
+            ->toArray();
+        $result = Tools::reorganizeDepartments($result);
+        return $this->responseJson(ServiceCode::SUCCESS, $result);
     }
 
     public function delete()

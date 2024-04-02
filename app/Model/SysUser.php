@@ -15,6 +15,7 @@ namespace App\Model;
 /**
  * @property int $id
  * @property int $dept_id
+ * @property int $role_id
  * @property string $username
  * @property string $password
  * @property string $token
@@ -26,15 +27,13 @@ namespace App\Model;
  * @property string $avatar_name
  * @property string $avatar_path
  * @property int $is_admin
- * @property string $create_by
- * @property string $update_by
  * @property string $pwd_reset_time
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
  * @property bool|mixed $enabled
  * @property null|SysDept $dept
- * @property null|\Hyperf\Database\Model\Collection|SysRole[] $roles
+ * @property null|SysRole $role
  * @property null|\Hyperf\Database\Model\Collection|SysJob[] $jobs
  */
 class SysUser extends BaseModel
@@ -53,12 +52,12 @@ class SysUser extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'dept_id', 'username', 'password', 'token', 'token_expiretime', 'nick_name', 'gender', 'phone', 'email', 'avatar_name', 'avatar_path', 'is_admin', 'enabled', 'create_by', 'update_by', 'pwd_reset_time', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'dept_id', 'role_id', 'username', 'password', 'token', 'token_expiretime', 'nick_name', 'gender', 'phone', 'email', 'avatar_name', 'avatar_path', 'is_admin', 'enabled', 'pwd_reset_time', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'dept_id' => 'integer', 'is_admin' => 'integer', 'enabled' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'dept_id' => 'integer', 'role_id' => 'integer', 'is_admin' => 'integer', 'enabled' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     // public function authorities()
     // {
@@ -79,9 +78,9 @@ class SysUser extends BaseModel
         return $this->hasOne(SysDept::class, 'id', 'dept_id');
     }
 
-    public function roles()
+    public function role()
     {
-        return $this->belongsToMany(SysRole::class, 'sys_users_roles', 'user_id', 'role_id', 'id', 'id');
+        return $this->hasOne(SysRole::class, 'id', 'role_id');
     }
 
     public function jobs()

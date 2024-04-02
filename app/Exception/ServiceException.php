@@ -24,7 +24,7 @@ class ServiceException extends HttpException
     public function __construct(
         int $const_scene_key,
         array $const_scene_params = [],
-        $http_code = 400,
+        $http_code = 200,
         $response_data = [],
         $custom_msg = '',
         Throwable $previous = null

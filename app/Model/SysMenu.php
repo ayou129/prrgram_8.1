@@ -15,7 +15,6 @@ namespace App\Model;
 /**
  * @property int $id
  * @property int $pid
- * @property int $sub_count
  * @property int $type
  * @property string $title
  * @property string $name
@@ -24,8 +23,6 @@ namespace App\Model;
  * @property string $icon
  * @property string $path
  * @property string $permission
- * @property string $create_by
- * @property string $update_by
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
@@ -43,12 +40,12 @@ class SysMenu extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'pid', 'sub_count', 'type', 'title', 'name', 'component', 'menu_sort', 'icon', 'path', 'is_frame', 'cache', 'hidden', 'permission', 'create_by', 'update_by', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'pid', 'type', 'title', 'name', 'component', 'menu_sort', 'icon', 'path', 'is_frame', 'cache', 'hidden', 'permission', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'pid' => 'integer', 'sub_count' => 'integer', 'type' => 'integer', 'menu_sort' => 'integer', 'is_frame' => 'integer', 'cache' => 'integer', 'hidden' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'pid' => 'integer', 'type' => 'integer', 'menu_sort' => 'integer', 'is_frame' => 'integer', 'cache' => 'integer', 'hidden' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     public function setHiddenAttribute($val)
     {

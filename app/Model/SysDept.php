@@ -17,8 +17,8 @@ namespace App\Model;
  * @property int $sub_count
  * @property string $name
  * @property int $dept_sort
- * @property string $create_by
- * @property string $update_by
+ * @property int $status
+ * @property string $remark
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
@@ -36,12 +36,12 @@ class SysDept extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'pid', 'sub_count', 'name', 'dept_sort', 'enabled', 'create_by', 'update_by', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'pid', 'sub_count', 'name', 'dept_sort', 'status', 'remark', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'pid' => 'integer', 'sub_count' => 'integer', 'dept_sort' => 'integer', 'enabled' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'pid' => 'integer', 'sub_count' => 'integer', 'dept_sort' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     public function setEnabledAttribute($val)
     {

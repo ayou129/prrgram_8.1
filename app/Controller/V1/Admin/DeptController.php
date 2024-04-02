@@ -17,7 +17,7 @@ use App\Controller\AbstractController;
 use App\Exception\ServiceException;
 use App\Model\BaseModel;
 use App\Model\SysDept;
-use App\Model\SysUser;
+use App\Utils\Tools;
 
 class DeptController extends AbstractController
 {
@@ -38,8 +38,8 @@ class DeptController extends AbstractController
         $where = [];
 
         # pid filter
-        if (! isset($params['pid']) || $params['pid'] == 0) {
-            $params['pid'] = null;
+        if (! isset($params['pid'])) {
+            $params['pid'] = 0;
         }
         $where[] = [
             'pid',
@@ -47,12 +47,12 @@ class DeptController extends AbstractController
         ];
 
         // var_dump($where);
-        # enabled filter
-        if (isset($params['enabled'])) {
-            $params['enabled'] = $params['enabled'] === 'true' ? '1' : '0';
+        # status filter
+        if (isset($params['status'])) {
+            $params['status'] = $params['status'] === 'true' ? '1' : '0';
             $where[] = [
-                'enabled',
-                $params['enabled'],
+                'status',
+                $params['status'],
             ];
         }
         if (isset($params['created_at_start_time'])) {
@@ -85,55 +85,13 @@ class DeptController extends AbstractController
         // var_dump($params);
         $where = [];
 
-        /**
-         * 根据用户所有的角色 查出 date_scope
-         * 1.有且只有一个 date_scope 并 '全部'   无pid则返回 的所有数据      有pid则返回 ；pid=$params['pid'] 的所有数据
-         * 1.有且只有一个 date_scope 并 '本级'   无pid则返回 自己部门数据    有pid则返回 ；[]
-         * 1.有且只有一个 date_scope 并 '自定义'  无pid则返回 自己部门       有pid则返回 自己部门
-         * 2.有多个 date_scope 并包含 '全部' 返回 最小的
-         * 3.有多个 date_scope 并不包含 '全部' 返回 所有的.
-         */
-        # 获取当前用户的权限级别
-        // $token = $this->request->header('Authorization');
-        // if (! isset($token)) {
-        //     return $this->responseJson(ServiceCode::ERROR_PARAM_MISSING);
+        // if (! isset($params['pid'])) {
+        //     $params['pid'] = 0;
         // }
-        // $sysUserModel = SysUser::where('token', $token)
-        //     ->with([
-        //         'roles' => function ($query) {
-        //             return $query->orderBy('level', 'asc')->limit(1);
-        //         },
-        //         'dept' => function ($query) {
-        //         },
-        //         // 'jobs'
-        //     ])
-        //     ->first();
-        // $role_data_scope_level = '';
-        // // var_dump($sysUserModel->toArray());
-        // if (! $sysUserModel->roles->isEmpty()) {
-        //     foreach ($sysUserModel->roles as $item) {
-        //         // var_dump($item->data_scope);
-        //         if ($item->data_scope === '全部') {
-        //             $role_data_scope_level = $item->data_scope;
-        //             break;
-        //         } elseif ($item->data_scope === '本级') {
-        //             $role_data_scope_level = $item->data_scope;
-        //             break;
-        //         } elseif ($item->data_scope === '自定义') {
-        //             $role_data_scope_level = $item->data_scope;
-        //             break;
-        //         }
-        //     }
-        // }
-        // var_dump($role_data_scope_level,'$role_data_scope_level');
-
-        if (! isset($params['pid']) || $params['pid'] == 0) {
-            $params['pid'] = null;
-        }
-        $where[] = [
-            'pid',
-            $params['pid'],
-        ];
+        // $where[] = [
+        //     'pid',
+        //     $params['pid'],
+        // ];
         $models = SysDept::where($where);
         $params['sort'] = $this->request->input('sort') ?? [];
         foreach ($params['sort'] as $item) {
@@ -146,8 +104,9 @@ class DeptController extends AbstractController
         $models = $models->get();
 
         $result = $models->isEmpty() ? [] : $models->toArray();
-        BaseModel::addTreeFields($result);
-        SysDept::addLabelField($result);
+        $result = Tools::reorganizeDepartments($result, 0);
+        // BaseModel::addTreeFields($result);
+        // SysDept::addLabelField($result);
 
         return $this->responseJson(ServiceCode::SUCCESS, $result);
     }
@@ -211,9 +170,7 @@ class DeptController extends AbstractController
         $model->sub_count = $params['sub_count'] ?? 0;
         $model->name = $params['name'] ?? '';
         $model->dept_sort = $params['dept_sort'];
-        $model->enabled = $params['enabled'];
-        $model->create_by = $params['create_by'] ?? 'admin';
-        $model->update_by = $params['update_by'] ?? 'admin';
+        $model->status = $params['status'];
         $model->save();
 
         return $this->responseJson(ServiceCode::SUCCESS);
@@ -234,19 +191,15 @@ class DeptController extends AbstractController
         # 验证is_frame http https
         // $model = (new SysDept())->where('id', '=', $params['id'])
         //     ->first();
-        $model = SysDept::query()
-            ->find($params['id']);
+        $model = SysDept::find($params['id']);
         if (! $model) {
             throw new ServiceException(ServiceCode::ERROR_DEPT_NOT_EXISTS);
         }
 
         $model->pid = $params['pid'];
-        $model->sub_count = $params['sub_count'];
         $model->name = $params['name'];
         $model->dept_sort = $params['dept_sort'];
-        $model->enabled = $params['enabled'];
-        $model->create_by = $params['create_by'] ?? 'admin';
-        $model->update_by = $params['update_by'] ?? 'admin';
+        $model->status = $params['status'];
         $model->save();
 
         // var_dump($model->toArray());

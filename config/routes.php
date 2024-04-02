@@ -56,230 +56,238 @@ Router::addGroup(
         ]);
     }
 );
-Router::addGroup(
-    '/api/v1/admin',
-    function () {
-        Router::post('/auth/login', [
-            AdminController::class,
-            'authLogin',
-        ]);
-        Router::delete('/auth/logout', [
-            AdminController::class,
-            'authLogout',
-        ]);
-    },
-);
 
 Router::addGroup(
     '/api/v1/admin',
     function () {
-        Router::get('/auth/info', [
+        Router::post('/auth/user/login', [
             AdminController::class,
-            'authInfo',
+            'authLogin',
+        ]);
+        Router::delete('/auth/user/logout', [
+            AdminController::class,
+            'authLogout',
+        ]);
+        Router::get('/auth/user/permcode', [
+            AdminController::class,
+            'authPermcode',
+        ]);
+        Router::get('/auth/user/info', [
+            AdminController::class,
+            'authUserinfo',
+        ]);
+        Router::get('/auth/user/menus', [
+            AdminController::class,
+            'authUserMenus',
         ]);
         // ------------------------ Menu -------
-        Router::get('/api/menus', [
+        Router::get('/system/menu/all', [
+            MenuController::class,
+            'all',
+        ]);
+        Router::get('/system/menu/list', [
             MenuController::class,
             'list',
         ]);
-        Router::post('/api/menus', [
+        Router::post('/system/menu', [
             MenuController::class,
             'create',
         ]);
-        Router::delete('/api/menus', [
+        Router::delete('/system/menu', [
             MenuController::class,
             'delete',
         ]);
-        Router::put('/api/menus', [
+        Router::put('/system/menu', [
             MenuController::class,
             'put',
         ]);
-        Router::get('/api/menus/build', [
+        Router::get('/system/menu/build', [
             MenuController::class,
             'build',
         ]);
-        Router::get('/api/menus/child', [
+        Router::get('/system/menu/child', [
             MenuController::class,
             'child',
         ]);
 
-        Router::post('/api/menus/superior', [
+        Router::post('/system/menu/superior', [
             MenuController::class,
             'superior',
         ]);
 
-        Router::get('/api/menus/lazy', [
+        Router::get('/system/menu/lazy', [
             MenuController::class,
             'lazy',
         ]);
 
+        // ------------------------ Role -------
+        Router::get('/system/role/list', [
+            RoleController::class,
+            'list',
+        ]);
+        Router::put('/system/role', [
+            RoleController::class,
+            'put',
+        ]);
+
+        Router::get('/system/role/id/{id}', [
+            RoleController::class,
+            'getById',
+        ]);
+        Router::get('/system/role/level', [
+            RoleController::class,
+            'level',
+        ]);
+        Router::get('/system/role/all', [
+            RoleController::class,
+            'all',
+        ]);
+
+        Router::put('/system/role/menu', [
+            RoleController::class,
+            'putMenu',
+        ]);
+        Router::post('/system/role', [
+            RoleController::class,
+            'create',
+        ]);
+        Router::delete('/system/role', [
+            RoleController::class,
+            'delete',
+        ]);
+
         // ------------------------ User -------
-        Router::get('/api/user', [
+        Router::get('/user', [
             UserController::class,
             'list',
         ]);
-        Router::put('/api/user', [
+        Router::put('/user', [
             UserController::class,
             'put',
         ]);
-        Router::put('/api/user/updateEmail', [
+        Router::put('/user/updateEmail', [
             UserController::class,
             'updateEmail',
         ]);
-        Router::put('/api/user/updatePass', [
+        Router::put('/user/updatePass', [
             UserController::class,
             'updatePass',
         ]);
-        Router::post('/api/user', [
+        Router::post('/user', [
             UserController::class,
             'create',
         ]);
-        Router::delete('/api/user', [
+        Router::delete('/user', [
             UserController::class,
             'delete',
         ]);
 
         // ------------------------ Dept -------
-        Router::get('/api/dept', [
+        Router::get('/system/dept/list', [
             DeptController::class,
             'list',
         ]);
-        Router::get('/api/dept/all', [
+        Router::get('/system/dept/all', [
             DeptController::class,
             'all',
         ]);
-        Router::put('/api/dept', [
+        Router::put('/dept', [
             DeptController::class,
             'put',
         ]);
-        Router::post('/api/dept', [
+        Router::post('/dept', [
             DeptController::class,
             'create',
         ]);
-        Router::delete('/api/dept', [
+        Router::delete('/dept', [
             DeptController::class,
             'delete',
         ]);
 
-        Router::post('/api/dept/superior', [
+        Router::post('/dept/superior', [
             DeptController::class,
             'superior',
         ]);
 
         // ------------------------ Job -------
-        Router::get('/api/job', [
+        Router::get('/job', [
             JobController::class,
             'list',
         ]);
-        Router::put('/api/job', [
+        Router::put('/job', [
             JobController::class,
             'put',
         ]);
-        Router::post('/api/job', [
+        Router::post('/job', [
             JobController::class,
             'create',
         ]);
-        Router::delete('/api/job', [
+        Router::delete('/job', [
             JobController::class,
-            'delete',
-        ]);
-
-        // ------------------------ Role -------
-        Router::get('/api/roles', [
-            RoleController::class,
-            'list',
-        ]);
-
-        Router::get('/api/roles/id/{id}', [
-            RoleController::class,
-            'getById',
-        ]);
-        Router::get('/api/roles/level', [
-            RoleController::class,
-            'level',
-        ]);
-        Router::get('/api/roles/all', [
-            RoleController::class,
-            'all',
-        ]);
-        Router::put('/api/roles', [
-            RoleController::class,
-            'put',
-        ]);
-        Router::put('/api/roles/menu', [
-            RoleController::class,
-            'putMenu',
-        ]);
-        Router::post('/api/roles', [
-            RoleController::class,
-            'create',
-        ]);
-        Router::delete('/api/roles', [
-            RoleController::class,
             'delete',
         ]);
 
         // ------------------------ Dict -------
-        Router::get('/api/dict', [
+        Router::get('/dict', [
             DictController::class,
             'list',
         ]);
-        Router::put('/api/dict', [
+        Router::put('/dict', [
             DictController::class,
             'put',
         ]);
-        Router::post('/api/dict', [
+        Router::post('/dict', [
             DictController::class,
             'create',
         ]);
-        Router::delete('/api/dict', [
+        Router::delete('/dict', [
             DictController::class,
             'delete',
         ]);
 
         // ------------------------ DictDetail -------
-        Router::get('/api/dictDetail', [
+        Router::get('/dictDetail', [
             DictDetailController::class,
             'list',
         ]);
-        Router::put('/api/dictDetail', [
+        Router::put('/dictDetail', [
             DictDetailController::class,
             'put',
         ]);
-        Router::post('/api/dictDetail', [
+        Router::post('/dictDetail', [
             DictDetailController::class,
             'create',
         ]);
-        Router::delete('/api/dictDetail', [
+        Router::delete('/dictDetail', [
             DictDetailController::class,
             'delete',
         ]);
 
         // ------------------------ RequestLog -------
-        Router::get('/api/request_log/list', [
+        Router::get('/request_log/list', [
             RequestLogController::class,
             'list',
         ]);
 
         // ------------------------ Config -------
-        Router::get('/api/config/list', [
+        Router::get('/config/list', [
             ConfigController::class,
             'list',
         ]);
-        Router::post('/api/config', [
+        Router::post('/config', [
             ConfigController::class,
             'create',
         ]);
-        Router::put('/api/config', [
+        Router::put('/config', [
             ConfigController::class,
             'put',
         ]);
-        Router::delete('/api/config', [
+        Router::delete('/config', [
             ConfigController::class,
             'delete',
         ]);
     },
-    ['middleware' => [AuthMiddleware::class]]
+    // ['middleware' => [AuthMiddleware::class]]
 );
 
 Router::addGroup(

@@ -25,12 +25,56 @@ class AdminController extends AbstractController
     #[Inject]
     public AdminService $adminService;
 
+    public function authPermcode()
+    {
+        return $this->responseJson(ServiceCode::SUCCESS, [
+            '1000',
+            '3000',
+            '5000',
+        ]);
+    }
+
+    public function authUserMenus()
+    {
+        $token = $this->request->header('Authorization');
+        if (! isset($token)) {
+            throw new ServiceException(ServiceCode::ERROR, [], 200, [], '缺少token');
+        }
+
+        $sysUserModel = SysUser::where('token', $token)
+            ->with([
+                'role' => function ($query) {
+                    return $query->with([
+                        'menus',
+                    ]);
+                },
+            ])
+            ->first();
+        // var_dump($token,$sysUserModel);
+        if (! $sysUserModel->role || ! $sysUserModel->role->menus) {
+            throw new ServiceException(ServiceCode::ERROR, [], 200, [], '用户无权限');
+        }
+
+        $menus = $sysUserModel->role->menus->toArray();
+        foreach ($menus as $key => &$value) {
+            $vlaue['meta'] = [
+                // 'hideChildrenInMenu' => true,
+                'icon' => $value['icon'],
+                'title' => $value['title'],
+            ];
+            unset($value['icon'], $value['title']);
+        }
+        $menus = Tools::reorganizeDepartments($menus);
+
+        return $this->responseJson(ServiceCode::SUCCESS, $menus);
+    }
+
     public function authLogin()
     {
         $params = $this->getRequestAllFilter();
 
         if (! isset($params['username'], $params['password'])) {
-            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '请输入账号和密码');
+            throw new ServiceException(ServiceCode::ERROR, [], 200, [], '请输入账号和密码');
         }
         $sysUserModel = SysUser::where('username', $params['username'])
             ->with([
@@ -48,11 +92,11 @@ class AdminController extends AbstractController
             // ])
             ->first();
         if (! $sysUserModel) {
-            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '用户不存在');
+            throw new ServiceException(ServiceCode::ERROR, [], 200, [], '用户不存在');
         }
 
         if ($sysUserModel->password != $params['password']) {
-            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '密码错误');
+            throw new ServiceException(ServiceCode::ERROR, [], 200, [], '密码错误');
         }
         # 该权限所有允许的menu
         $roles_permissions = [];
@@ -92,7 +136,7 @@ class AdminController extends AbstractController
         return $this->responseJson(ServiceCode::SUCCESS, $result);
     }
 
-    public function authInfo()
+    public function authUserInfo()
     {
         $token = $this->request->header('Authorization');
         if (! isset($token)) {
@@ -100,11 +144,6 @@ class AdminController extends AbstractController
         }
         $sysUserModel = SysUser::where('token', $token)
             ->with([
-                'roles' => function ($query) {
-                    return $query->with([
-                        'menus',
-                    ]);
-                },
                 'dept',
                 'jobs',
             ])
@@ -140,10 +179,8 @@ class AdminController extends AbstractController
             'user' => [],
         ];
 
-        $result['roles'] = array_unique($roles_permissions);
-        $result['authorities'] = $authorities;
-        $result['dataScopes'] = [];
-        $result['user'] = $sysUserModel->toArray();
+        $result = array_merge($result, $sysUserModel->toArray());
+        // $result['] = $sysUserModel->toArray();
         // $sysUserModel->token = $token;
         // $sysUserModel->save();
 

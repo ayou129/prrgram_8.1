@@ -301,4 +301,24 @@ class Tools
     {
         return mb_convert_encoding($text, 'UTF-8', 'auto');
     }
+
+    /**
+     * 组合生成带有children的树.
+     * @param mixed $departments
+     * @param mixed $parentId
+     */
+    public static function reorganizeDepartments($departments, $parentId = 0)
+    {
+        $result = [];
+        foreach ($departments as $department) {
+            if ($department['pid'] == $parentId) {
+                $children = self::reorganizeDepartments($departments, $department['id']);
+                if (! empty($children)) {
+                    $department['children'] = $children;
+                }
+                $result[] = $department;
+            }
+        }
+        return $result;
+    }
 }

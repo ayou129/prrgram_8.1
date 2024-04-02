@@ -15,11 +15,10 @@ namespace App\Model;
 /**
  * @property int $id
  * @property string $name
- * @property int $level
- * @property string $description
- * @property string $data_scope
- * @property string $create_by
- * @property string $update_by
+ * @property string $value
+ * @property int $sort
+ * @property string $remark
+ * @property int $status
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
@@ -36,12 +35,12 @@ class SysRole extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'name', 'level', 'description', 'data_scope', 'create_by', 'update_by', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'name', 'value', 'sort', 'remark', 'status', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'level' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'sort' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     public function menus()
     {
