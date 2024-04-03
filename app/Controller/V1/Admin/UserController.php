@@ -34,19 +34,18 @@ class UserController extends AbstractController
         $params = $this->getRequestAllFilter();
         // var_dump($params);
         $token = $this->request->header('Authorization');
-        if (! isset($token, $params['oldPass'])) {
-            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '请填写旧密码');
+        if (! isset($token, $params['old_password'])) {
+            throw new RetException("please fill in the old password");
         }
 
-        # 不能重复 title、component_name(name)
         $model = SysUser::where('token', $token)
-            ->where('password', $params['oldPass'])
+            ->where('password', $params['old_password'])
             ->first();
         if (! $model) {
             # 密码错误
-            throw new ServiceException(ServiceCode::ERROR, [], 400, [], '旧密码错误');
+            throw new RetException("old password error");
         }
-        $model->password = $params['newPass'];
+        $model->password = $params['new_password'];
         $model->save();
         return $this->responseJson(ServiceCode::SUCCESS);
     }

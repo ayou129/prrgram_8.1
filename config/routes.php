@@ -60,11 +60,17 @@ Router::addGroup(
 Router::addGroup(
     '/api/v1/admin',
     function () {
-        // ------------------------ Admin - Auth -------
         Router::post('/auth/user/login', [
             AdminController::class,
             'authLogin',
         ]);
+    }
+);
+
+Router::addGroup(
+    '/api/v1/admin',
+    function () {
+        // ------------------------ Admin - Auth -------
         Router::delete('/auth/user/logout', [
             AdminController::class,
             'authLogout',
@@ -172,20 +178,20 @@ Router::addGroup(
         ]);
 
         // ------------------------ User -------
-  
+
         Router::get('/system/user/exist', [
             UserController::class,
             'exist',
         ]);
-        Router::put('/user/updateEmail', [
+        Router::put('/system/user/updateEmail', [
             UserController::class,
             'updateEmail',
         ]);
-        Router::put('/user/updatePass', [
+
+        Router::put('/system/user/update_password', [
             UserController::class,
             'updatePass',
         ]);
-
 
         // ------------------------ Dept -------
         Router::get('/system/dept/list', [
@@ -287,7 +293,7 @@ Router::addGroup(
             'delete',
         ]);
     },
-    // ['middleware' => [AuthMiddleware::class]]
+    ['middleware' => [AuthMiddleware::class]]
 );
 
 Router::addGroup(

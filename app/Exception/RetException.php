@@ -22,11 +22,12 @@ class RetException extends HttpException
     public function __construct(
         $msg = '',
         $const_scene_key = -1,
+        $http_code = 200,
         $response_data = [],
         Throwable $previous = null
     ) {
         $this->response_data = $response_data;
-        parent::__construct(200, $msg, $const_scene_key, $previous);
+        parent::__construct($http_code, $msg, $const_scene_key, $previous);
     }
 
     public function getResponseData()
