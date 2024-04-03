@@ -23,6 +23,7 @@ namespace App\Model;
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
  * @property null|\Hyperf\Database\Model\Collection|SysMenu[] $menus
+ * @property null|SysUser $user
  * @property null|\Hyperf\Database\Model\Collection|SysDept[] $depts
  */
 class SysRole extends BaseModel
@@ -45,6 +46,11 @@ class SysRole extends BaseModel
     public function menus()
     {
         return $this->belongsToMany(SysMenu::class, 'sys_roles_menus', 'role_id', 'menu_id', 'id', 'id');
+    }
+
+    public function user()
+    {
+        return $this->hasOne(SysUser::class, 'role_id', 'id');
     }
 
     public function depts()

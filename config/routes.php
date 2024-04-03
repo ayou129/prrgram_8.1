@@ -80,6 +80,7 @@ Router::addGroup(
             AdminController::class,
             'authUserMenus',
         ]);
+
         // ------------------------ Menu -------
         Router::get('/system/menu/all', [
             MenuController::class,
@@ -129,6 +130,14 @@ Router::addGroup(
             RoleController::class,
             'put',
         ]);
+        Router::post('/system/role', [
+            RoleController::class,
+            'post',
+        ]);
+        Router::delete('/system/role', [
+            RoleController::class,
+            'delete',
+        ]);
 
         Router::get('/system/role/id/{id}', [
             RoleController::class,
@@ -147,23 +156,19 @@ Router::addGroup(
             RoleController::class,
             'putMenu',
         ]);
-        Router::post('/system/role', [
-            RoleController::class,
-            'create',
-        ]);
-        Router::delete('/system/role', [
-            RoleController::class,
-            'delete',
-        ]);
 
         // ------------------------ User -------
-        Router::get('/user', [
+        Router::get('/system/user/list', [
             UserController::class,
             'list',
         ]);
-        Router::put('/user', [
+        Router::put('/system/user', [
             UserController::class,
             'put',
+        ]);
+        Router::get('/system/user/exist', [
+            UserController::class,
+            'exist',
         ]);
         Router::put('/user/updateEmail', [
             UserController::class,

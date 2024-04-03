@@ -26,7 +26,8 @@ namespace App\Model;
  * @property string $email
  * @property string $avatar_name
  * @property string $avatar_path
- * @property int $is_admin
+ * @property string $remark
+ * @property int $status
  * @property string $pwd_reset_time
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
@@ -52,12 +53,12 @@ class SysUser extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'dept_id', 'role_id', 'username', 'password', 'token', 'token_expiretime', 'nick_name', 'gender', 'phone', 'email', 'avatar_name', 'avatar_path', 'is_admin', 'enabled', 'pwd_reset_time', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'dept_id', 'role_id', 'username', 'password', 'token', 'token_expiretime', 'nick_name', 'gender', 'phone', 'email', 'avatar_name', 'avatar_path', 'remark', 'status', 'pwd_reset_time', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'dept_id' => 'integer', 'role_id' => 'integer', 'is_admin' => 'integer', 'enabled' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'dept_id' => 'integer', 'role_id' => 'integer', 'status' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     // public function authorities()
     // {

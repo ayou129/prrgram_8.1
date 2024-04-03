@@ -34,63 +34,8 @@ class UserController extends AbstractController
         $params = $this->getRequestAllFilter();
         // var_dump($params);
         $limit = (int) $this->request->input('page_limit', 10);
-        $models = (new SysUser());
-        $params['sort'] = $this->request->input('sort') ?? [];
-        foreach ($params['sort'] as $item) {
-            $sort = explode(',', $item);
-            $sort_field = $sort[0];
-            $sort_type = $sort[1];
-            $models = $models->orderBy($sort_field, $sort_type);
-        }
-        $where = $whereOr = [];
+        $models = (new SysUser())->with(['role', 'dept']);
 
-        if (isset($params['dept_id'])) {
-            $where[] = [
-                'dept_id',
-                '=',
-                $params['dept_id'],
-            ];
-        }
-        if (isset($params['created_at_start_time'])) {
-            $where[] = [
-                'created_at',
-                '>=',
-                $params['created_at_start_time'],
-            ];
-        }
-        if (isset($params['created_at_end_time'])) {
-            $where[] = [
-                'created_at',
-                '<=',
-                $params['created_at_end_time'],
-            ];
-        }
-        if (isset($params['blurry'])) {
-            $whereOr[] = [
-                [
-                    'username',
-                    'like',
-                    '%' . $params['blurry'] . '%',
-                ],
-                [
-                    'email',
-                    'like',
-                    '%' . $params['blurry'] . '%',
-                ],
-            ];
-        }
-        $models = $models->where($where)
-            ->where(function ($query) use ($whereOr) {
-                foreach ($whereOr as $item) {
-                    $query->where(...$item[0])
-                        ->orWhere(...$item[1]);
-                }
-            })
-            ->with([
-                'dept',
-                'jobs',
-                'roles',
-            ]);
         $result = $models->paginate($limit);
 
         $result = $result->toArray();
@@ -330,5 +275,19 @@ class UserController extends AbstractController
         // $model->email = $params['email'];
         // $model->save();
         return $this->responseJson(ServiceCode::SUCCESS);
+    }
+
+    public function exist()
+    {
+        $params = $this->getRequestAllFilter();
+        // var_dump($params);
+
+        $model = SysUser::where('username', $params['username'])
+            ->count();
+        var_dump($model);
+        if ($model > 1) {
+            return $this->responseJson(ServiceCode::SUCCESS, ['exist' => true]);
+        }
+        return $this->responseJson(ServiceCode::SUCCESS, ['exist' => false]);
     }
 }

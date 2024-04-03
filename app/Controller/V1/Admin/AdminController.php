@@ -156,23 +156,23 @@ class AdminController extends AbstractController
         //     throw new ServiceException(ServiceCode::ERROR_ADMIN_IS_NOT_ADMIN_FAIL);
         // }
         # 该权限所有允许的menu
-        $roles_permissions = [];
-        $authorities = [];
-        if ($sysUserModel->is_admin == SysUser::IS_ADMIN) {
-            $authorities[]['authority'] = 'admin';
-            $roles_permissions[] = 'admin';
-        } else {
-            $sysUserModel->roles->map(function ($rule) use (&$roles_permissions) {
-                $rule->menus->map(function ($menu) use (&$roles_permissions) {
-                    if ($menu->permission) {
-                        $roles_permissions[] = $menu->permission;
-                    }
-                });
-            });
-            foreach ($roles_permissions as $roles_permission) {
-                $authorities[]['authority'] = $roles_permission;
-            }
-        }
+        // $roles_permissions = [];
+        // $authorities = [];
+        // if ($sysUserModel->is_admin == SysUser::IS_ADMIN) {
+        //     $authorities[]['authority'] = 'admin';
+        //     $roles_permissions[] = 'admin';
+        // } else {
+        //     $sysUserModel->roles->map(function ($rule) use (&$roles_permissions) {
+        //         $rule->menus->map(function ($menu) use (&$roles_permissions) {
+        //             if ($menu->permission) {
+        //                 $roles_permissions[] = $menu->permission;
+        //             }
+        //         });
+        //     });
+        //     foreach ($roles_permissions as $roles_permission) {
+        //         $authorities[]['authority'] = $roles_permission;
+        //     }
+        // }
 
         $result = [
             'token' => $token,
