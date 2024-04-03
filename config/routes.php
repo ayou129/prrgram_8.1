@@ -60,6 +60,7 @@ Router::addGroup(
 Router::addGroup(
     '/api/v1/admin',
     function () {
+        // ------------------------ Admin - Auth -------
         Router::post('/auth/user/login', [
             AdminController::class,
             'authLogin',
@@ -79,6 +80,24 @@ Router::addGroup(
         Router::get('/auth/user/menus', [
             AdminController::class,
             'authUserMenus',
+        ]);
+
+        Router::post('/system/user', [
+            AdminController::class,
+            'postUser',
+        ]);
+        Router::put('/system/user', [
+            AdminController::class,
+            'putUser',
+        ]);
+        Router::delete('/system/user', [
+            AdminController::class,
+            'deleteUser',
+        ]);
+
+        Router::get('/system/user/list', [
+            AdminController::class,
+            'userList',
         ]);
 
         // ------------------------ Menu -------
@@ -109,11 +128,6 @@ Router::addGroup(
         Router::get('/system/menu/child', [
             MenuController::class,
             'child',
-        ]);
-
-        Router::post('/system/menu/superior', [
-            MenuController::class,
-            'superior',
         ]);
 
         Router::get('/system/menu/lazy', [
@@ -158,14 +172,7 @@ Router::addGroup(
         ]);
 
         // ------------------------ User -------
-        Router::get('/system/user/list', [
-            UserController::class,
-            'list',
-        ]);
-        Router::put('/system/user', [
-            UserController::class,
-            'put',
-        ]);
+  
         Router::get('/system/user/exist', [
             UserController::class,
             'exist',
@@ -178,14 +185,7 @@ Router::addGroup(
             UserController::class,
             'updatePass',
         ]);
-        Router::post('/user', [
-            UserController::class,
-            'create',
-        ]);
-        Router::delete('/user', [
-            UserController::class,
-            'delete',
-        ]);
+
 
         // ------------------------ Dept -------
         Router::get('/system/dept/list', [
@@ -196,22 +196,17 @@ Router::addGroup(
             DeptController::class,
             'all',
         ]);
-        Router::put('/dept', [
+        Router::put('/system/dept', [
             DeptController::class,
             'put',
         ]);
-        Router::post('/dept', [
+        Router::post('/system/dept', [
             DeptController::class,
-            'create',
+            'post',
         ]);
-        Router::delete('/dept', [
+        Router::delete('/system/dept', [
             DeptController::class,
             'delete',
-        ]);
-
-        Router::post('/dept/superior', [
-            DeptController::class,
-            'superior',
         ]);
 
         // ------------------------ Job -------

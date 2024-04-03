@@ -53,9 +53,24 @@ class DeptController extends AbstractController
     public function all()
     {
         $params = $this->getRequestAllFilter();
-        $where = [];
+        $models = (new SysDept());
 
-        $models = SysDept::where($where)->get();
+        foreach ($params as $key => $value) {
+            if ($key == 'name') {
+                $models = $models->where('name', 'like', '%' . $value . '%');
+            }
+            if ($key == 'sort') {
+                $models = $models->where('sort', $value);
+            }
+            if ($key == 'pid') {
+                $models = $models->where('pid', $value);
+            }
+            if ($key == 'status') {
+                $models = $models->where('status', $value);
+            }
+        }
+
+        $models = $models->get();
 
         $result = $models->isEmpty() ? [] : $models->toArray();
         $result = Tools::reorganizeDepartments($result, 0);
@@ -76,7 +91,8 @@ class DeptController extends AbstractController
             }
 
             $model = new SysDept();
-            $model->pid = $params['pid'] ?? '';
+            $model->pid = $params['pid'] ?? 0;
+            $model->name = $params['name'] ?? '';
             $model->status = $params['status'] ?? 0;
             $model->sort = $params['sort'] ?? 100;
             $model->remark = $params['remark'] ?? '';
@@ -99,16 +115,26 @@ class DeptController extends AbstractController
         try {
             $model = SysDept::find($params['id']);
             if (! $model) {
-                throw new RetException(' not found');
+                throw new RetException('data not found');
             }
 
             $change = false;
             if (isset($params['pid'])) {
+                $pidModel = SysDept::where('id', $params['pid'])->first();
+                if (! $pidModel) {
+                    throw new RetException('pid not found');
+                }
                 $model->pid = $params['pid'];
                 $change = true;
             }
 
             if (isset($params['name'])) {
+                $count = SysDept::where('name', $params['name'])
+                    ->where('id', '<>', $params['id'])
+                    ->count();
+                if ($count) {
+                    throw new RetException('name already exists');
+                }
                 $model->name = $params['name'];
                 $change = true;
             }
@@ -147,11 +173,11 @@ class DeptController extends AbstractController
 
         Db::beginTransaction();
         try {
-            $model = SysDept::with(['user'])->find($params['id']);
+            $model = SysDept::with(['users'])->find($params['id']);
             if (! $model) {
                 throw new RetException('not found');
             }
-            if ($model->users || ! $model->users->isEmpty()) {
+            if ($model->users && ! $model->users->isEmpty()) {
                 throw new RetException('has user');
             }
 
