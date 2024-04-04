@@ -62,8 +62,9 @@ class AdminController extends AbstractController
                 // 'hideChildrenInMenu' => true,
                 'icon' => $value['icon'],
                 'title' => $value['title'],
+                'sort' => $value['menu_sort'],
             ];
-            unset($value['icon'], $value['title']);
+            unset($value['icon'], $value['title'], $value['menu_sort']);
         }
         $menus = Tools::reorganizeDepartments($menus);
 
