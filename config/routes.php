@@ -106,6 +106,16 @@ Router::addGroup(
             'userList',
         ]);
 
+        Router::get('/system/user/exist', [
+            UserController::class,
+            'exist',
+        ]);
+
+        Router::put('/system/user/update_password', [
+            UserController::class,
+            'updatePass',
+        ]);
+
         // ------------------------ Menu -------
         Router::get('/system/menu/all', [
             MenuController::class,
@@ -179,19 +189,28 @@ Router::addGroup(
 
         // ------------------------ User -------
 
-        Router::get('/system/user/exist', [
+        Router::get('/user/list', [
             UserController::class,
-            'exist',
+            'list',
         ]);
-        Router::put('/system/user/updateEmail', [
+        Router::put('/user', [
             UserController::class,
-            'updateEmail',
+            'put',
         ]);
+        Router::post('/user', [
+            UserController::class,
+            'post',
+        ]);
+        Router::delete('/user', [
+            UserController::class,
+            'delete',
+        ]);
+        // Router::put('/system/user/updateEmail', [
+        //     UserController::class,
+        //     'updateEmail',
+        // ]);
 
-        Router::put('/system/user/update_password', [
-            UserController::class,
-            'updatePass',
-        ]);
+
 
         // ------------------------ Dept -------
         Router::get('/system/dept/list', [

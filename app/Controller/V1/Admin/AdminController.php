@@ -57,6 +57,10 @@ class AdminController extends AbstractController
         }
 
         $menus = $sysUserModel->role->menus->toArray();
+
+        $sortColumn = array_column($menus, 'menu_sort');
+        array_multisort($sortColumn, SORT_DESC, $menus);
+
         foreach ($menus as $key => &$value) {
             $value['meta'] = [
                 // 'hideChildrenInMenu' => true,
@@ -66,6 +70,7 @@ class AdminController extends AbstractController
             ];
             unset($value['icon'], $value['title'], $value['menu_sort']);
         }
+
         $menus = Tools::reorganizeDepartments($menus);
 
         return $this->responseJson(ServiceCode::SUCCESS, $menus);
