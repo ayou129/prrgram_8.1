@@ -16,12 +16,8 @@ use App\Constant\ServiceCode;
 use App\Controller\AbstractController;
 use App\Exception\RetException;
 use App\Exception\ServiceException;
-use App\Model\SysDept;
-use App\Model\SysRole;
 use App\Model\SysUser;
 use App\Model\User;
-use Exception;
-use Hyperf\DbConnection\Db;
 use Hyperf\HttpServer\Annotation\AutoController;
 
 /**
@@ -36,7 +32,7 @@ class UserController extends AbstractController
         // var_dump($params);
         $token = $this->request->header('Authorization');
         if (! isset($token, $params['old_password'])) {
-            throw new RetException("please fill in the old password");
+            throw new RetException('please fill in the old password');
         }
 
         $model = SysUser::where('token', $token)
@@ -44,7 +40,7 @@ class UserController extends AbstractController
             ->first();
         if (! $model) {
             # 密码错误
-            throw new RetException("old password error");
+            throw new RetException('old password error');
         }
         $model->password = $params['new_password'];
         $model->save();
@@ -137,9 +133,6 @@ class UserController extends AbstractController
 
         $model = (new User());
         $model->name = $params['name'];
-        $model->description = $params['description'];
-        $model->create_by = $params['create_by'] ?? 'admin';
-        $model->update_by = $params['update_by'] ?? 'admin';
         $model->save();
 
         return $this->responseJson(ServiceCode::SUCCESS);
@@ -158,9 +151,6 @@ class UserController extends AbstractController
         }
 
         $model->name = $params['name'];
-        $model->description = $params['description'];
-        $model->create_by = $params['create_by'] ?? 'admin';
-        $model->update_by = $params['update_by'] ?? 'admin';
         $model->save();
 
         // var_dump($model->toArray());
@@ -184,7 +174,7 @@ class UserController extends AbstractController
 
         # 删除相关表
         // UserDetail::where('dict_id', $model->id)
-            // ->delete();
+        // ->delete();
         // $model->delete();
 
         return $this->responseJson(ServiceCode::SUCCESS);

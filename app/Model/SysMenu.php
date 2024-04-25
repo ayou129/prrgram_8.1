@@ -19,6 +19,7 @@ namespace App\Model;
  * @property string $title
  * @property string $name
  * @property string $component
+ * @property string $redirect
  * @property int $menu_sort
  * @property string $icon
  * @property string $path
@@ -40,7 +41,7 @@ class SysMenu extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'pid', 'type', 'title', 'name', 'component', 'menu_sort', 'icon', 'path', 'is_frame', 'cache', 'hidden', 'permission', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'pid', 'type', 'title', 'name', 'component', 'redirect', 'menu_sort', 'icon', 'path', 'is_frame', 'cache', 'hidden', 'permission', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.

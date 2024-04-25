@@ -5,7 +5,8 @@
 # @contact  group@hyperf.io
 # @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
 
-FROM hyperf/hyperf:8.1-alpine-v3.18-swoole-v5.0
+FROM hyperf/hyperf:8.1-alpine-v3.18-swoole-slim-v5
+# FROM hyperf/hyperf:8.1-alpine-v3.18-swoole-v5.0
 LABEL maintainer="liguoxin <guoxinlee129@gmail.com>" version="1.0" license="MIT" app.name="Liguoxin"
 
 ##

@@ -18,7 +18,7 @@ namespace App\Model;
  * @property string $path
  * @property string $bodys
  * @property string $ip
- * @property int $user_id
+ * @property int $u_id
  * @property string $exception_trace
  * @property string $exception_otherinfo
  * @property \Carbon\Carbon $created_at
@@ -27,23 +27,24 @@ namespace App\Model;
  * @property mixed $headers
  * @property mixed $user_agent
  * @property mixed $params
+ * @property null|\Hyperf\Database\Model\Collection|SysRequestSql[] $sqls
  */
-class SysRequestLog extends BaseModel
+class SysRequest extends BaseModel
 {
     /**
      * The table associated with the model.
      */
-    protected ?string $table = 'sys_request_log';
+    protected ?string $table = 'sys_request';
 
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'method', 'path', 'headers', 'params', 'bodys', 'ip', 'user_agent', 'user_id', 'exception_trace', 'exception_otherinfo', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'method', 'path', 'headers', 'params', 'bodys', 'ip', 'user_agent', 'u_id', 'exception_trace', 'exception_otherinfo', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'u_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     public function setHeadersAttribute($val)
     {
@@ -73,5 +74,10 @@ class SysRequestLog extends BaseModel
     public function getParamsAttribute($val)
     {
         return $this->getJsonAttribute($val);
+    }
+
+    public function sqls()
+    {
+        return $this->hasMany(SysRequestSql::class, 'request_id', 'id');
     }
 }

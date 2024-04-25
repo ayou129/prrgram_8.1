@@ -18,15 +18,21 @@ namespace App\Model;
  * @property int $id
  * @property string $phone
  * @property string $wx_unionid
+ * @property string $password
  * @property string $real_name
  * @property string $nickname
- * @property string $avatar_image_id
+ * @property string $avatar_url
  * @property int $gender
  * @property string $constellation
  * @property string $city
  * @property string $province
  * @property string $country
  * @property int $status
+ * @property string $playw_report_playwname
+ * @property int $playw_report_club_jiedan_price
+ * @property int $playw_report_club_id
+ * @property string $playw_report_club_join_at
+ * @property int $playw_report_club_admin
  * @property string $social_dazzle_nickname
  * @property string $social_signature
  * @property int $social_charm_value
@@ -58,12 +64,12 @@ class User extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'phone', 'wx_unionid', 'real_name', 'nickname', 'avatar_image_id', 'gender', 'birthday', 'constellation', 'city', 'province', 'country', 'status', 'social_id', 'social_dazzle_nickname', 'social_signature', 'social_charm_value', 'social_magnate_value', 'social_noble_value', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'phone', 'wx_unionid', 'password', 'real_name', 'nickname', 'avatar_url', 'gender', 'birthday', 'constellation', 'city', 'province', 'country', 'status', 'playw_report_playwname', 'playw_report_club_jiedan_price', 'playw_report_club_id', 'playw_report_club_join_at', 'playw_report_club_admin', 'social_id', 'social_dazzle_nickname', 'social_signature', 'social_charm_value', 'social_magnate_value', 'social_noble_value', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'gender' => 'integer', 'status' => 'integer', 'social_id' => 'integer', 'social_charm_value' => 'integer', 'social_magnate_value' => 'integer', 'social_noble_value' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'gender' => 'integer', 'status' => 'integer', 'playw_report_club_jiedan_price' => 'integer', 'playw_report_club_id' => 'integer', 'playw_report_club_admin' => 'integer', 'social_id' => 'integer', 'social_charm_value' => 'integer', 'social_magnate_value' => 'integer', 'social_noble_value' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     protected array $hidden = ['password'];
 

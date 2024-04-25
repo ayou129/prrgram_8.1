@@ -15,10 +15,8 @@ namespace App\Controller\V1\Admin;
 use App\Constant\ServiceCode;
 use App\Controller\AbstractController;
 use App\Exception\ServiceException;
-use App\Model\BaseModel;
 use App\Model\SysDict;
 use App\Model\SysDictDetail;
-use App\Model\SysUser;
 
 class DictController extends AbstractController
 {

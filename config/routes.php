@@ -16,6 +16,7 @@ use App\Controller\V1\Admin\DictController;
 use App\Controller\V1\Admin\DictDetailController;
 use App\Controller\V1\Admin\JobController;
 use App\Controller\V1\Admin\MenuController;
+use App\Controller\V1\Admin\RequestController;
 use App\Controller\V1\Admin\RequestLogController;
 use App\Controller\V1\Admin\RoleController;
 use App\Controller\V1\Admin\UserController;
@@ -187,6 +188,16 @@ Router::addGroup(
             'putMenu',
         ]);
 
+        // ------------------------ Request -------
+        Router::get('/request/list', [
+            RequestController::class,
+            'list',
+        ]);
+        Router::delete('/request', [
+            RequestController::class,
+            'delete',
+        ]);
+
         // ------------------------ User -------
 
         Router::get('/user/list', [
@@ -209,8 +220,6 @@ Router::addGroup(
         //     UserController::class,
         //     'updateEmail',
         // ]);
-
-
 
         // ------------------------ Dept -------
         Router::get('/system/dept/list', [

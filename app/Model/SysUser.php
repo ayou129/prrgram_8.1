@@ -21,12 +21,10 @@ namespace App\Model;
  * @property string $token
  * @property string $token_expiretime
  * @property string $nick_name
- * @property string $gender
  * @property string $phone
  * @property string $email
  * @property string $avatar_name
  * @property string $avatar_path
- * @property string $remark
  * @property int $status
  * @property string $pwd_reset_time
  * @property \Carbon\Carbon $created_at
@@ -53,7 +51,7 @@ class SysUser extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'dept_id', 'role_id', 'username', 'password', 'token', 'token_expiretime', 'nick_name', 'gender', 'phone', 'email', 'avatar_name', 'avatar_path', 'remark', 'status', 'pwd_reset_time', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'dept_id', 'role_id', 'username', 'password', 'token', 'token_expiretime', 'nick_name', 'phone', 'email', 'avatar_name', 'avatar_path', 'status', 'pwd_reset_time', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.

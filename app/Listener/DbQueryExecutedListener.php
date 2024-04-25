@@ -12,7 +12,11 @@ declare(strict_types=1);
 
 namespace App\Listener;
 
+use App\Model\SysRequest;
+use App\Model\SysRequestSql;
+use App\Utils\Tools;
 use Hyperf\Collection\Arr;
+use Hyperf\Context\Context;
 use Hyperf\Database\Events\QueryExecuted;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
@@ -61,6 +65,20 @@ class DbQueryExecutedListener implements ListenerInterface
             }
 
             $this->logger->info(sprintf('[%s] %s', $event->time, $sql));
+
+            $requestModel = Context::get('requestModel');
+            $requestTable = (new SysRequest())->getTable();
+            $requestSqlTable = (new SysRequestSql())->getTable();
+            if ($requestModel) {
+                if (! (strpos($sql, $requestTable) !== false) && ! (strpos($sql, $requestSqlTable) !== false)) {
+                    $requestSqlModel = new SysRequestSql();
+                    $requestSqlModel->request_id = $requestModel->id;
+                    $requestSqlModel->sql = $sql;
+                    $requestSqlModel->sql_exec_time = $event->time;
+                    $requestSqlModel->created_at = Tools::getNowDate();
+                    $requestSqlModel->save();
+                }
+            }
         }
     }
 }

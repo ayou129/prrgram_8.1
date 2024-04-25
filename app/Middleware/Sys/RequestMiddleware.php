@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace App\Middleware\Sys;
 
-use App\Model\SysRequestLog;
+use App\Model\SysRequest;
 use Hyperf\Context\Context;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -20,7 +20,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class RequestLogMiddleware implements MiddlewareInterface
+class RequestMiddleware implements MiddlewareInterface
 {
     /**
      * @var ContainerInterface
@@ -43,19 +43,20 @@ class RequestLogMiddleware implements MiddlewareInterface
                 break;
             }
         }
-        $requestLogModel = new SysRequestLog();
-        $requestLogModel->method = $request->getMethod();
-        $requestLogModel->path = $uri->getPath();
-        $requestLogModel->headers = $headers;
-        $requestLogModel->bodys = $request->getBody()
-            ->getContents();
-        $requestLogModel->ip = $uri->getHost();
-        $requestLogModel->params = $request->getQueryParams();
-        $requestLogModel->user_agent = $userAgent;
-        $requestLogModel->save();
-        // var_dump(',$requestLogModel->id',$requestLogModel->id);
-        Context::set('requestLogModel', $requestLogModel);
-        // var_dump(1, $userAgent);
+
+        if ($request->getMethod() !== 'OPTIONS') {
+            $requestLogModel = new SysRequest();
+            $requestLogModel->method = $request->getMethod();
+            $requestLogModel->path = $uri->getPath();
+            $requestLogModel->headers = $headers;
+            $requestLogModel->bodys = $request->getBody()
+                ->getContents();
+            $requestLogModel->ip = $uri->getHost();
+            $requestLogModel->params = $request->getQueryParams();
+            $requestLogModel->user_agent = $userAgent;
+            $requestLogModel->save();
+            Context::set('requestModel', $requestLogModel);
+        }
         return $handler->handle($request);
     }
 }
